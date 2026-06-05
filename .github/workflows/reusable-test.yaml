@@ -12,11 +12,6 @@ on:
         type: string
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
-      prewarm_models:
-        required: false
-        type: string
-        default: ''
-        description: 'Newline-separated list of HF repos to pre-download with retries before tests run. Each entry: "[type:]repo_id[@revision]" where type is "model" (default) or "dataset", and revision defaults to main.'
 
 concurrency:
   group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
@@ -27,9 +22,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      # Throttle parallelism so all matrix jobs don't slam HF's free-tier
-      # rate limit (1000 reqs / 5 min per authenticated user) at the same time.
-      max-parallel: 2
       matrix:
         os: [ ubuntu-latest ]
         python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", ]
@@ -41,13 +33,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # The HF cache is shared across all reusable-test callers (unit-tests,
-    # test-embedder, test-scorers, etc.). This is intentional: whichever
-    # workflow finishes first warms the cache for every other workflow, so the
-    # 1000-req/5-min HF quota only gets hit on the first cold start. The
-    # prewarm step is what guarantees the right models land in cache for each
-    # workflow that needs them — the cache key itself does not need to
-    # distinguish callers.
+    # The HF cache is populated by ci.yaml's warm-cache job, which runs before
+    # any reusable-test caller. The first two restore-keys prefer that warmed
+    # cache (the hashFiles key matches when .ci/hf-prewarm.yaml hasn't changed
+    # between the warm-cache save and this restore). The fallback keys cover
+    # branches whose warm-cache hasn't run yet.
     - name: Cache Hugging Face
       id: cache-hf
       uses: actions/cache@v4
@@ -55,6 +45,8 @@ jobs:
         path: ~/.cache/huggingface
         key: ${{ runner.os }}-hf-${{ github.run_id }}-${{ matrix.python-version }}
         restore-keys: |
+          ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml') }}-
+          ${{ runner.os }}-hf-warmed-
           ${{ runner.os }}-hf-${{ github.run_id }}-
           ${{ runner.os }}-hf-
 
@@ -68,75 +60,6 @@ jobs:
       run: |
         uv python pin ${{ matrix.python-version }}
         uv sync --group test ${{ inputs.extras }}
-
-    - name: Pre-warm Hugging Face models (best-effort)
-      if: inputs.prewarm_models != ''
-      continue-on-error: true
-      shell: bash
-      env:
-        PREWARM_MODELS: ${{ inputs.prewarm_models }}
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        HF_HUB_DOWNLOAD_TIMEOUT: "60"
-      run: |
-        # Best-effort: failures here (e.g. HF 429) should NOT fail the job.
-        # The downloaded files land in the HF cache and are saved for next run,
-        # so the cache warms up incrementally even on bad days.
-        set -uo pipefail
-        if [ -n "${HF_TOKEN:-}" ]; then
-          echo "HF auth: authenticated (HF_TOKEN is set)"
-        else
-          echo "HF auth: unauthenticated (HF_TOKEN is not set — rate limits will be low)"
-        fi
-        while IFS= read -r line; do
-          line="${line%%#*}"
-          line="$(echo "$line" | xargs || true)"
-          [ -z "$line" ] && continue
-          # Format: "[type:]repo[@revision]" — type is "model" (default) or "dataset"
-          repo_type="model"
-          if [[ "$line" == "dataset:"* ]]; then
-            repo_type="dataset"
-            line="${line#dataset:}"
-          elif [[ "$line" == "model:"* ]]; then
-            line="${line#model:}"
-          fi
-          if [[ "$line" == *"@"* ]]; then
-            repo="${line%@*}"
-            rev="${line##*@}"
-          else
-            repo="$line"
-            rev="main"
-          fi
-          echo "::group::Pre-warm ${repo_type}:${repo} @ ${rev}"
-          ok=0
-          # Fast path: if the cache already has every file for this revision,
-          # --local-files-only succeeds without any network call. Skips the
-          # whole API+download dance on warm-cache CI runs and avoids
-          # contributing to the 1000-req/5-min HF quota.
-          if uv run huggingface-cli download "$repo" --revision "$rev" --repo-type "$repo_type" --local-files-only >/dev/null 2>&1; then
-            ok=1
-            echo "Already cached, no download needed"
-          else
-            # Cache miss — backoff is sized for the HF rate limit (per-5-min
-            # window for authenticated users), since shorter waits usually
-            # hit the same throttle bucket and burn through retries.
-            for attempt in 1 2 3 4; do
-              if uv run huggingface-cli download "$repo" --revision "$rev" --repo-type "$repo_type"; then
-                ok=1
-                echo "Success on attempt $attempt"
-                break
-              fi
-              if [ "$attempt" -lt 4 ]; then
-                delay=$((attempt * 60))
-                echo "Attempt $attempt failed, sleeping ${delay}s before retry..."
-                sleep "$delay"
-              fi
-            done
-          fi
-          echo "::endgroup::"
-          if [ "$ok" -ne 1 ]; then
-            echo "::warning::Could not pre-warm ${repo_type}:${repo} @ ${rev} after 4 attempts; tests will fall back to live HF or cached files."
-          fi
-        done <<< "$PREWARM_MODELS"
 
     - name: Run tests
       env:
