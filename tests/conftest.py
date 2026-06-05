@@ -19,6 +19,12 @@ def _disable_transformers_mistral_regex_patch() -> None:
     # that uncacheable API call hammers the HF rate limit (429s). Tests never
     # load mistralai tokenizers, so the correction is pure overhead — replace
     # it with a no-op for the whole test session.
+    #
+    # Upstream bug & fix (merged for transformers 5.0.0+, NOT backported to 4.x):
+    #   https://github.com/huggingface/transformers/issues/44843
+    #   https://github.com/huggingface/transformers/pull/45444
+    # Drop this workaround when we upgrade to transformers>=5.0:
+    #   https://github.com/deeppavlov/AutoIntent/issues/295
     try:
         from transformers import tokenization_utils_base
     except ImportError:
