@@ -1205,7 +1205,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": null,
+                "revision": "c5ee24cb16019beea0893ab7796b1df96625c6b8",
                 "train_head": false
             }
         },
