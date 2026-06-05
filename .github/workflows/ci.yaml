@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  warm-cache:
+    name: Warm HF cache
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+    runs-on: ${{ matrix.os }}
+    # Best-effort: an HF outage here must not cancel every PR. Test jobs
+    # `needs: warm-cache` but proceed regardless via continue-on-error.
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Hugging Face
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          # Cache key is bound to the hash of .ci/hf-prewarm.yaml so an edit
+          # to the list invalidates exactly one level of the cascade; the
+          # next-most-specific restore-key still catches the previous warmed
+          # cache so only the diff is re-downloaded.
+          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml') }}-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml') }}-
+            ${{ runner.os }}-hf-warmed-
+            ${{ runner.os }}-hf-
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+
+      - name: Run warm-cache script
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml python .ci/warm_hf_cache.py
+
+  unit-tests:
+    name: unit-tests
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
+
+  test-embedder:
+    name: test-embedder
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/embedder/ tests/callback/
+      extras: --extra sentence-transformers --extra transformers
+
+  test-scorers:
+    name: test-scorers
+    needs: warm-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        dependency-group: [ "base", "transformers", "peft", "catboost" ]
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/modules/scoring/
+      extras: ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}
+
+  test-presets:
+    name: test-presets
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_presets.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  test-optimization:
+    name: test-optimization
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_optimization.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  test-inference:
+    name: test-inference
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_inference.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
