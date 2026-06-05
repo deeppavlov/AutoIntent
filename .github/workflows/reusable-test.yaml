@@ -70,5 +70,14 @@ jobs:
     - name: Run tests
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # The warm-cache job has already populated ~/.cache/huggingface with
+        # every model and dataset in .ci/hf-prewarm-*.yaml. Force offline mode
+        # so transformers / sentence-transformers / huggingface_hub don't make
+        # any "is the cached revision still latest?" API calls — those calls
+        # ignore the cache and 429 as soon as parallel matrix jobs spin up.
+        # If a test needs an HF resource that isn't in the prewarm list this
+        # surfaces immediately as OfflineModeIsEnabled rather than silently
+        # falling through to a rate-limited download.
+        HF_HUB_OFFLINE: "1"
       run: |
         uv run ${{ inputs.test_command }}
