@@ -16,7 +16,7 @@ on:
         required: false
         type: string
         default: ''
-        description: 'Newline-separated list of HF models to pre-download with retries before tests run. Each entry: "repo_id[@revision]" (revision defaults to main).'
+        description: 'Newline-separated list of HF repos to pre-download with retries before tests run. Each entry: "[type:]repo_id[@revision]" where type is "model" (default) or "dataset", and revision defaults to main.'
 
 concurrency:
   group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
@@ -41,29 +41,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Namespace the HF cache by the (extras, prewarm_models) tuple so that
-    # different reusable-test callers (e.g. test-embedder vs test-optimization vs
-    # unit-tests) don't poison each other's caches. The wildcard restore-keys
-    # used previously matched ANY workflow's most recent cache, so a 2.5 GB
-    # cache from test-optimization could be restored into test-embedder without
-    # any of the embedder models inside, forcing a fresh download every run.
-    - name: Compute HF cache namespace
-      id: cache-ns
-      shell: bash
-      run: |
-        ns="$(printf '%s|%s' "${{ inputs.extras }}" "${{ inputs.prewarm_models }}" | sha256sum | cut -c1-12)"
-        echo "ns=${ns}" >> "$GITHUB_OUTPUT"
-        echo "Cache namespace: ${ns}"
-
+    # The HF cache is shared across all reusable-test callers (unit-tests,
+    # test-embedder, test-scorers, etc.). This is intentional: whichever
+    # workflow finishes first warms the cache for every other workflow, so the
+    # 1000-req/5-min HF quota only gets hit on the first cold start. The
+    # prewarm step is what guarantees the right models land in cache for each
+    # workflow that needs them — the cache key itself does not need to
+    # distinguish callers.
     - name: Cache Hugging Face
       id: cache-hf
       uses: actions/cache@v4
       with:
         path: ~/.cache/huggingface
-        key: ${{ runner.os }}-hf-${{ steps.cache-ns.outputs.ns }}-${{ matrix.python-version }}-${{ github.run_id }}
+        key: ${{ runner.os }}-hf-${{ github.run_id }}-${{ matrix.python-version }}
         restore-keys: |
-          ${{ runner.os }}-hf-${{ steps.cache-ns.outputs.ns }}-${{ matrix.python-version }}-
-          ${{ runner.os }}-hf-${{ steps.cache-ns.outputs.ns }}-
+          ${{ runner.os }}-hf-${{ github.run_id }}-
+          ${{ runner.os }}-hf-
 
     - name: Install uv
       uses: astral-sh/setup-uv@v6
@@ -98,6 +91,14 @@ jobs:
           line="${line%%#*}"
           line="$(echo "$line" | xargs || true)"
           [ -z "$line" ] && continue
+          # Format: "[type:]repo[@revision]" — type is "model" (default) or "dataset"
+          repo_type="model"
+          if [[ "$line" == "dataset:"* ]]; then
+            repo_type="dataset"
+            line="${line#dataset:}"
+          elif [[ "$line" == "model:"* ]]; then
+            line="${line#model:}"
+          fi
           if [[ "$line" == *"@"* ]]; then
             repo="${line%@*}"
             rev="${line##*@}"
@@ -105,13 +106,13 @@ jobs:
             repo="$line"
             rev="main"
           fi
-          echo "::group::Pre-warm $repo @ $rev"
+          echo "::group::Pre-warm ${repo_type}:${repo} @ ${rev}"
           ok=0
           # Fast path: if the cache already has every file for this revision,
           # --local-files-only succeeds without any network call. Skips the
           # whole API+download dance on warm-cache CI runs and avoids
           # contributing to the 1000-req/5-min HF quota.
-          if uv run huggingface-cli download "$repo" --revision "$rev" --local-files-only >/dev/null 2>&1; then
+          if uv run huggingface-cli download "$repo" --revision "$rev" --repo-type "$repo_type" --local-files-only >/dev/null 2>&1; then
             ok=1
             echo "Already cached, no download needed"
           else
@@ -119,7 +120,7 @@ jobs:
             # window for authenticated users), since shorter waits usually
             # hit the same throttle bucket and burn through retries.
             for attempt in 1 2 3 4; do
-              if uv run huggingface-cli download "$repo" --revision "$rev"; then
+              if uv run huggingface-cli download "$repo" --revision "$rev" --repo-type "$repo_type"; then
                 ok=1
                 echo "Success on attempt $attempt"
                 break
@@ -133,7 +134,7 @@ jobs:
           fi
           echo "::endgroup::"
           if [ "$ok" -ne 1 ]; then
-            echo "::warning::Could not pre-warm $repo @ $rev after 4 attempts; tests will fall back to live HF or cached files."
+            echo "::warning::Could not pre-warm ${repo_type}:${repo} @ ${rev} after 4 attempts; tests will fall back to live HF or cached files."
           fi
         done <<< "$PREWARM_MODELS"
 
