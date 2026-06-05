@@ -35,6 +35,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # GitHub-hosted Ubuntu runners ship with ~25 GB of pre-installed
+      # tooling (Android SDK, .NET, GHC, large Docker images, etc.) and
+      # only ~14 GB free on /. Downloading the full prewarm list (~8 GB of
+      # models) plus the Python env and actions/cache working space blows
+      # past that and trips "No space left on device" mid-download. Free
+      # the unused tooling first; no-op on Windows.
+      - name: Free disk space on Linux runner
+        if: runner.os == 'Linux'
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false  # /opt/hostedtoolcache holds the Python we use; keep it.
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false  # leave swap; cheap insurance against OOM.
+
       - name: Cache Hugging Face
         uses: actions/cache@v4
         with:
