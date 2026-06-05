@@ -1223,7 +1223,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": "refs/pr/16"
+                "revision": "79779625a0a40f1eee8496e16056bc0d7766df22"
             }
         },
         "hpo_config": {
