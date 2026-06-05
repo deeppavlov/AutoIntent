@@ -12,6 +12,11 @@ on:
         type: string
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
+      prewarm_models:
+        required: false
+        type: string
+        default: ''
+        description: 'Newline-separated list of HF models to pre-download with retries before tests run. Each entry: "repo_id[@revision]" (revision defaults to main).'
 
 concurrency:
   group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
@@ -51,6 +56,51 @@ jobs:
         uv python pin ${{ matrix.python-version }}
         uv sync --group test ${{ inputs.extras }}
 
+    - name: Pre-warm Hugging Face models
+      if: inputs.prewarm_models != ''
+      shell: bash
+      env:
+        PREWARM_MODELS: ${{ inputs.prewarm_models }}
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        HF_HUB_DOWNLOAD_TIMEOUT: "60"
+      run: |
+        set -euo pipefail
+        failed=0
+        while IFS= read -r line; do
+          line="${line%%#*}"
+          line="$(echo "$line" | xargs || true)"
+          [ -z "$line" ] && continue
+          if [[ "$line" == *"@"* ]]; then
+            repo="${line%@*}"
+            rev="${line##*@}"
+          else
+            repo="$line"
+            rev="main"
+          fi
+          echo "::group::Pre-warm $repo @ $rev"
+          ok=0
+          for attempt in 1 2 3 4 5; do
+            if uv run huggingface-cli download "$repo" --revision "$rev"; then
+              ok=1
+              echo "Success on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -lt 5 ]; then
+              delay=$((attempt * 15))
+              echo "Attempt $attempt failed, sleeping ${delay}s before retry..."
+              sleep "$delay"
+            fi
+          done
+          echo "::endgroup::"
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Failed to pre-warm $repo @ $rev after 5 attempts"
+            failed=1
+          fi
+        done <<< "$PREWARM_MODELS"
+        exit "$failed"
+
     - name: Run tests
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
         uv run ${{ inputs.test_command }}
