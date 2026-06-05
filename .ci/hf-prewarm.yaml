@@ -1,0 +1,22 @@
+# Single source of truth for every HF model and dataset that the autointent
+# test suite needs to have on disk. Used by .ci/warm_hf_cache.py to populate
+# the actions/cache@v4 HF cache before any test job runs.
+#
+# Format: "<repo_id>@<sha>". The SHA must be a 40-char hex commit — this is
+# what lets the warm-cache fast path skip the HF API entirely (a revision
+# string that looks like a SHA is locally verifiable without a model_info
+# call). Adding an unpinned entry is a validation error in the script.
+models:
+  - prajjwal1/bert-tiny@79779625a0a40f1eee8496e16056bc0d7766df22
+  - sentence-transformers/all-MiniLM-L6-v2@1110a243fdf4706b3f48f1d95db1a4f5529b4d41
+  - intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3
+  - intfloat/multilingual-e5-large-instruct@274baa43b0e13e37fafa6428dbc7938e62e5c439
+  - cross-encoder/ms-marco-MiniLM-L6-v2@c5ee24cb16019beea0893ab7796b1df96625c6b8
+  - avsolatorio/GIST-small-Embedding-v0@75e62fd210b9fde790430e0b2f040b0b00a021b1
+  - BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a
+  - BAAI/bge-reranker-v2-m3@953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e
+  - sergeyzh/rubert-tiny-turbo@93769a3baad2b037e5c2e4312fccf6bcfe082bf1
+  - microsoft/deberta-v3-small@a36c739020e01763fe789b4b85e2df55d6180012
+  - microsoft/deberta-v3-large@64a8c8eab3e352a784c658aef62be1662607476f
+datasets:
+  - DeepPavlov/clinc150@d835118ecd5ffe5488d22e9e58d1c23d18c33229
