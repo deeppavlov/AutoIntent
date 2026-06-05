@@ -16,7 +16,7 @@ from autointent.modules import TunableDecision
         (
             "multilabel_fit_data",
             np.array([[0.1, 0.9, 0, 0.1], [0.8, 0, 0.1, 0.1], [0, 0.2, 0.7, 0.1]]),
-            [[0, 1, 0, 0], [1, 0, 0, 0], None],
+            [[0, 1, 0, 0], None, [0, 0, 1, 0]],
         ),
     ],
 )
