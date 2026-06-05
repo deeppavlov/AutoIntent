@@ -13,9 +13,14 @@ on:
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
 
-concurrency:
-  group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
-  cancel-in-progress: true
+# No concurrency block here. The parent workflow (ci.yaml) owns the
+# concurrency group for the whole run; if reusable-test sets its own group
+# keyed on inputs.extras, every ci.yaml job that shares the same extras
+# (test-presets, test-optimization, test-inference all share `--extra
+# catboost --extra peft --extra transformers --extra sentence-transformers`)
+# collides on the same group and cancel-in-progress kills all but the last
+# starter — which is exactly the "18 jobs cancelled, same 3 workflows every
+# time" pattern observed before this comment was added.
 
 jobs:
   test:
