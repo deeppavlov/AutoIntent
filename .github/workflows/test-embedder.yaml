@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
     with:
       test_command: pytest -n auto tests/embedder/ tests/callback/
       extras: --extra sentence-transformers --extra transformers
