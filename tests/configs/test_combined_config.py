@@ -80,6 +80,28 @@ def test_deberta_v3_large_is_pinned():
     assert all(c in "0123456789abcdef" for c in sha), f"SHA must be hex; got {sha!r}"
 
 
+def test_canonical_test_models_have_pinned_revisions():
+    from autointent.configs._transformers import DEFAULT_REVISIONS
+    from tests.conftest import (
+        TINY_BERT,
+        TINY_CROSS_ENCODER,
+        TINY_SENTENCE_TRANSFORMER,
+        tiny_bert_config,
+        tiny_cross_encoder_config,
+        tiny_sentence_transformer_config,
+    )
+
+    for name in (TINY_BERT, TINY_CROSS_ENCODER, TINY_SENTENCE_TRANSFORMER):
+        sha = DEFAULT_REVISIONS.get(name)
+        assert sha is not None, f"{name} must be pinned in DEFAULT_REVISIONS"
+        assert len(sha) == 40, f"{name} SHA must be 40 chars; got {sha!r}"
+
+    # Each helper returns a config whose validator filled in the SHA.
+    assert tiny_bert_config().revision == DEFAULT_REVISIONS[TINY_BERT]
+    assert tiny_cross_encoder_config().revision == DEFAULT_REVISIONS[TINY_CROSS_ENCODER]
+    assert tiny_sentence_transformer_config().model_name == TINY_SENTENCE_TRANSFORMER
+
+
 def test_invalid_optimizer_config_wrong_type():
     """Test that an invalid field type raises ValidationError."""
     invalid_config = {

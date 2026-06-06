@@ -104,3 +104,46 @@ def get_test_embedder_config(**kwargs):
     }
     defaults.update(kwargs)
     return HashingVectorizerEmbeddingConfig(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# Canonical test models. See docs/superpowers/specs/2026-06-06-hf-test-refactor-design.md
+#
+# Every test that genuinely needs an HF model uses one of these three. The
+# SHAs are pinned in src/autointent/configs/_transformers.DEFAULT_REVISIONS,
+# so HFModelConfig._apply_default_revision auto-fills `revision` on each
+# config instantiated below and no HF API call is needed to resolve a tag.
+# ---------------------------------------------------------------------------
+
+TINY_BERT = "prajjwal1/bert-tiny"
+TINY_CROSS_ENCODER = "cross-encoder/ms-marco-MiniLM-L6-v2"
+TINY_SENTENCE_TRANSFORMER = "sergeyzh/rubert-tiny-turbo"
+
+
+def tiny_bert_config():
+    """HFModelConfig pinned at TINY_BERT; revision auto-filled by validator."""
+    from autointent.configs import HFModelConfig
+    return HFModelConfig(model_name=TINY_BERT)
+
+
+def tiny_cross_encoder_config():
+    """CrossEncoderConfig pinned at TINY_CROSS_ENCODER."""
+    from autointent.configs import CrossEncoderConfig
+    return CrossEncoderConfig(model_name=TINY_CROSS_ENCODER)
+
+
+def tiny_sentence_transformer_config(**overrides):
+    """SentenceTransformerEmbeddingConfig pinned at TINY_SENTENCE_TRANSFORMER.
+
+    Default kwargs match the lightweight test profile used in
+    tests/embedder/conftest.py: batch_size=4, device='cpu', use_cache=False.
+    """
+    from autointent.configs import SentenceTransformerEmbeddingConfig
+    base = {
+        "model_name": TINY_SENTENCE_TRANSFORMER,
+        "batch_size": 4,
+        "device": "cpu",
+        "use_cache": False,
+    }
+    base.update(overrides)
+    return SentenceTransformerEmbeddingConfig(**base)
