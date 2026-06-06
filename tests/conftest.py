@@ -147,3 +147,60 @@ def tiny_sentence_transformer_config(**overrides):
     }
     base.update(overrides)
     return SentenceTransformerEmbeddingConfig(**base)
+
+
+def apply_test_models(pipeline) -> None:
+    """Retarget every HF model slot in a Pipeline at the canonical test set.
+
+    Use this right after Pipeline.from_preset(...) in preset tests. After this
+    call:
+      - pipeline.embedder_config        -> SentenceTransformerEmbeddingConfig(TINY_SENTENCE_TRANSFORMER)
+      - pipeline.cross_encoder_config   -> CrossEncoderConfig(TINY_CROSS_ENCODER)
+      - pipeline.transformer_config     -> HFModelConfig(TINY_BERT)
+      - any search-space module entry that hardcodes a model_name (e.g. the
+        deberta entries in transformers-{light,heavy,no-hpo}) is rewritten to
+        TINY_BERT.
+
+    HashingVectorizer is intentionally NOT used here: the whole point of a
+    preset test is to exercise real SentenceTransformer / cross-encoder
+    machinery end-to-end. Non-preset tests where the embedder is incidental
+    should call get_test_embedder_config() directly instead.
+    """
+    pipeline.set_config(tiny_sentence_transformer_config())
+    pipeline.set_config(tiny_cross_encoder_config())
+    pipeline.set_config(tiny_bert_config())
+    _retarget_search_space_models(pipeline)
+
+
+def _retarget_search_space_models(pipeline) -> None:
+    """Walk pipeline.nodes -> NodeOptimizer.modules_search_spaces and rewrite
+    any embedded model_name fields to the canonical tiny equivalents.
+
+    The fields we touch are exactly those that presets are known to pin:
+      - classification_model_config (used by module_name='bert') -> TINY_BERT
+      - embedder_config (when used as a module-level override)   -> TINY_SENTENCE_TRANSFORMER
+      - cross_encoder_config (module-level)                      -> TINY_CROSS_ENCODER
+
+    Each field can be either a dict (single value) or a list of dicts
+    (Optuna categorical). We rewrite the model_name in every dict found.
+    """
+    # pipeline.nodes is a dict[NodeType, NodeOptimizer]; iterate values.
+    nodes = pipeline.nodes.values() if isinstance(pipeline.nodes, dict) else pipeline.nodes
+    for node in nodes:
+        for entry in node.modules_search_spaces:
+            _rewrite_field(entry, "classification_model_config", TINY_BERT)
+            _rewrite_field(entry, "embedder_config", TINY_SENTENCE_TRANSFORMER)
+            _rewrite_field(entry, "cross_encoder_config", TINY_CROSS_ENCODER)
+
+
+def _rewrite_field(entry: dict, field_name: str, new_model_name: str) -> None:
+    value = entry.get(field_name)
+    if value is None:
+        return
+    if isinstance(value, dict):
+        if "model_name" in value:
+            value["model_name"] = new_model_name
+    elif isinstance(value, list):
+        for cfg in value:
+            if isinstance(cfg, dict) and "model_name" in cfg:
+                cfg["model_name"] = new_model_name
