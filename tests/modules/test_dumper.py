@@ -10,7 +10,7 @@ from autointent import Embedder, Ranker, VectorIndex
 from autointent._dump_tools import Dumper
 from autointent.configs import CrossEncoderConfig, FaissConfig, TokenizerConfig
 from autointent.schemas import Tag, TagsList
-from tests.conftest import get_test_embedder_config
+from tests.conftest import get_test_embedder_config, tiny_cross_encoder_config
 
 
 class TestSimpleAttributes:
@@ -105,7 +105,7 @@ class TestSklearnEstimator:
 class TestRanker:
     def init_attributes(self):
         self.ranker = Ranker(
-            cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2", "train_head": True},
+            cross_encoder_config=tiny_cross_encoder_config().model_copy(update={"train_head": True}),
         )
         self.ranker.fit(
             ["hello", "world", "bye", "earth", "hello", "world", "bye", "earth"],
