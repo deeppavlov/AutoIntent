@@ -1,14 +1,9 @@
-# Windows-only HF prewarm list. Kept much smaller than the Linux list
-# because the HF cache on Windows uses file copies instead of symlinks,
-# inflating cache size ~2x. The 10 GB per-repo cache budget can't fit both
-# the full Linux warm-cache (~5 GB) and a full Windows warm-cache (~9 GB).
-#
-# Windows test jobs (reusable-test.yaml matrix include) are:
-#   - test-embedder windows-3.10: loads rubert-tiny-turbo + multilingual-e5-small
-#   - test-scorers (peft) windows-3.10: loads prajjwal1/bert-tiny
-#   - other test-scorers + test-presets + unit-tests + test-optimization +
-#     test-inference Windows entries: load bert-tiny via HFModelConfig defaults
+# Canonical test-model set. See docs/superpowers/specs/2026-06-06-hf-test-refactor-design.md.
+# Identical to .ci/hf-prewarm-linux.yaml after the test refactor: the
+# per-OS split is retained for the cache-key namespacing but the content
+# happens to be the same on both OSes now.
 models:
-  - sergeyzh/rubert-tiny-turbo@93769a3baad2b037e5c2e4312fccf6bcfe082bf1
-  - intfloat/multilingual-e5-small@614241f622f53c4eeff9890bdc4f31cfecc418b3
   - prajjwal1/bert-tiny@79779625a0a40f1eee8496e16056bc0d7766df22
+  - cross-encoder/ms-marco-MiniLM-L6-v2@c5ee24cb16019beea0893ab7796b1df96625c6b8
+  - sergeyzh/rubert-tiny-turbo@93769a3baad2b037e5c2e4312fccf6bcfe082bf1
+datasets: []
