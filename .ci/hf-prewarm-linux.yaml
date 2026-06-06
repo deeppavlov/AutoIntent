@@ -14,9 +14,14 @@ models:
   - cross-encoder/ms-marco-MiniLM-L6-v2@c5ee24cb16019beea0893ab7796b1df96625c6b8
   - avsolatorio/GIST-small-Embedding-v0@75e62fd210b9fde790430e0b2f040b0b00a021b1
   - BAAI/bge-base-en-v1.5@a5beb1e3e68b9ab74eb54cfd186867f64f240e1a
-  - BAAI/bge-reranker-v2-m3@953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e
   - sergeyzh/rubert-tiny-turbo@93769a3baad2b037e5c2e4312fccf6bcfe082bf1
   - microsoft/deberta-v3-small@a36c739020e01763fe789b4b85e2df55d6180012
-  - microsoft/deberta-v3-large@64a8c8eab3e352a784c658aef62be1662607476f
+  # NOTE: BAAI/bge-reranker-v2-m3 (~2.3 GB) and microsoft/deberta-v3-large
+  # (~1.6 GB) are intentionally excluded. The full list pushed the saved
+  # cache to ~10.95 GB which exceeds GitHub Actions' 10 GB per-cache limit,
+  # so the save was silently rejected/evicted. Tests that load these two
+  # (zero-shot-encoders + transformers-heavy presets, used by test-presets)
+  # download them live at test time and rely on huggingface_hub's
+  # Retry-After backoff to ride out parallel-matrix 429s.
 datasets:
   - DeepPavlov/clinc150@d835118ecd5ffe5488d22e9e58d1c23d18c33229
