@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import EmbedderFineTuningConfig, HFModelConfig
-from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
+from tests.conftest import TINY_SENTENCE_TRANSFORMER, tiny_sentence_transformer_config
 
 pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
 
@@ -19,12 +19,10 @@ def test_finetune_dump_load(dataset, on_windows):
     data_handler = DataHandler(dataset)
 
     # Setup config for fine-tuning
-    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)
-    embedder_config = EmbedderConfig(
-        **hf_config.model_dump(),
+    embedder_config = tiny_sentence_transformer_config(
+        trust_remote_code=True,
         default_prompt="Represent this text for retrieval:",
         similarity_fn_name="cosine",
-        use_cache=False,
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
@@ -63,8 +61,11 @@ def test_finetune_dump_load(dataset, on_windows):
 
         # Test that loaded embedder produces same embeddings as fine-tuned one
         loaded_embeddings = embedder_loaded.embed(test_utterances)
+        # atol absorbs the float32 round-trip noise on near-zero embedding
+        # components (rubert-tiny-turbo has a few coords ~1e-4 where pure rtol
+        # blows up at the ULP boundary).
         (
-            np.testing.assert_allclose(trained_embeddings, loaded_embeddings, rtol=1e-5),
+            np.testing.assert_allclose(trained_embeddings, loaded_embeddings, rtol=1e-5, atol=1e-6),
             "Loaded embedder should produce same embeddings as fine-tuned one",
         )
 
@@ -76,12 +77,10 @@ def test_dump_load_finetune(dataset, on_windows):
     data_handler = DataHandler(dataset)
 
     # Setup config
-    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)
-    embedder_config = EmbedderConfig(
-        **hf_config.model_dump(),
+    embedder_config = tiny_sentence_transformer_config(
+        trust_remote_code=True,
         default_prompt="Represent this text for retrieval:",
         similarity_fn_name="cosine",
-        use_cache=False,
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
@@ -135,15 +134,13 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
         temp_path = Path(temp_dir)
 
         # Step 1: Save a sentence transformer model to disk
-        model = SentenceTransformer("intfloat/multilingual-e5-small")
+        model = SentenceTransformer(TINY_SENTENCE_TRANSFORMER)
         model_disk_path = temp_path / "pretrained_model"
         model.save(str(model_disk_path))
 
-        embedder_config = EmbedderConfig(
+        embedder_config = tiny_sentence_transformer_config(
             model_name=str(model_disk_path),
             default_prompt="Represent this text for retrieval:",
-            batch_size=4,
-            use_cache=False,
             trust_remote_code=True,
         )
 
@@ -178,8 +175,10 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
 
         # Test that final loaded embedder produces same embeddings as fine-tuned one
         final_embeddings = embedder_final.embed(test_utterances)
+        # atol absorbs float32 round-trip noise on near-zero coords; see
+        # test_finetune_dump_load above for rationale.
         (
-            np.testing.assert_allclose(embeddings_after_training, final_embeddings, rtol=1e-5),
+            np.testing.assert_allclose(embeddings_after_training, final_embeddings, rtol=1e-5, atol=1e-6),
             "Final loaded embedder should produce same embeddings as fine-tuned one",
         )
 
@@ -191,12 +190,10 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
     data_handler = DataHandler(dataset)
 
     # Common config
-    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)
-    embedder_config = EmbedderConfig(
-        **hf_config.model_dump(),
+    embedder_config = tiny_sentence_transformer_config(
+        trust_remote_code=True,
         default_prompt="Represent this text for retrieval:",
         similarity_fn_name="cosine",
-        use_cache=False,
     )
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
@@ -235,12 +232,10 @@ def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
     data_handler = DataHandler(dataset)
 
-    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=4, trust_remote_code=True)
-    embedder_config = EmbedderConfig(
-        **hf_config.model_dump(),
+    embedder_config = tiny_sentence_transformer_config(
+        trust_remote_code=True,
         default_prompt="Represent this text for retrieval:",
         similarity_fn_name="cosine",
-        use_cache=False,
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
@@ -271,16 +266,17 @@ def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
         embedder_cycle2 = Embedder.load(dump_path2)
         cycle2_embeddings = embedder_cycle2.embed(test_utterances)
 
-        # All embeddings should be identical
+        # All embeddings should be identical. atol absorbs float32 round-trip
+        # noise on near-zero coords (rubert-tiny-turbo precision floor).
         (
-            np.testing.assert_allclose(fine_tuned_embeddings, cycle1_embeddings, rtol=1e-5),
+            np.testing.assert_allclose(fine_tuned_embeddings, cycle1_embeddings, rtol=1e-5, atol=1e-6),
             "First cycle should preserve embeddings",
         )
         (
-            np.testing.assert_allclose(cycle1_embeddings, cycle2_embeddings, rtol=1e-5),
+            np.testing.assert_allclose(cycle1_embeddings, cycle2_embeddings, rtol=1e-5, atol=1e-6),
             "Second cycle should preserve embeddings",
         )
         (
-            np.testing.assert_allclose(fine_tuned_embeddings, cycle2_embeddings, rtol=1e-5),
+            np.testing.assert_allclose(fine_tuned_embeddings, cycle2_embeddings, rtol=1e-5, atol=1e-6),
             "Multiple cycles should preserve fine-tuned embeddings",
         )

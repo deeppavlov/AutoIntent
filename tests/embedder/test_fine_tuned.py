@@ -2,8 +2,9 @@ import numpy as np
 import pytest
 
 from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
-from autointent.configs import EmbedderFineTuningConfig, HFModelConfig, SentenceTransformerEmbeddingConfig
+from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
+from tests.conftest import tiny_sentence_transformer_config
 
 
 def test_model_updates_after_training(dataset):
@@ -12,15 +13,13 @@ def test_model_updates_after_training(dataset):
 
     data_handler = DataHandler(dataset)
 
-    hf_config = HFModelConfig(model_name="intfloat/multilingual-e5-small", batch_size=8, trust_remote_code=True)
-
-    embedder_config = SentenceTransformerEmbeddingConfig(
-        **hf_config.model_dump(),
+    embedder_config = tiny_sentence_transformer_config(
+        batch_size=8,
+        trust_remote_code=True,
         default_prompt="Represent this text for retrieval:",
         query_prompt="Search query:",
         passage_prompt="Document:",
         similarity_fn_name="cosine",
-        use_cache=False,
     )
 
     train_config = EmbedderFineTuningConfig(epoch_num=3, batch_size=8)
