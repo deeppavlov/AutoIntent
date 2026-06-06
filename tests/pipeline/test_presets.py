@@ -4,7 +4,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
-from tests.conftest import setup_environment
+from tests.conftest import apply_test_models, setup_environment
 
 
 @pytest.mark.parametrize(
@@ -26,6 +26,7 @@ def test_presets(dataset, preset):
     project_dir = setup_environment()
 
     pipeline_optimizer = Pipeline.from_preset(preset)
+    apply_test_models(pipeline_optimizer)
 
     if preset == "zero-shot-llm" and not (os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_MODEL_NAME")):
         pytest.skip(reason="OpenAI API key or model name is missing.")
