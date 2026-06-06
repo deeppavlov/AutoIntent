@@ -72,6 +72,14 @@ def test_invalid_optimizer_config_missing_field():
         NodeOptimizer(**invalid_config)
 
 
+def test_deberta_v3_large_is_pinned():
+    from autointent.configs._transformers import DEFAULT_REVISIONS
+    sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-large")
+    assert sha is not None, "microsoft/deberta-v3-large must be pinned (used by transformers-heavy preset)"
+    assert len(sha) == 40, f"SHA must be 40 chars; got {sha!r}"
+    assert all(c in "0123456789abcdef" for c in sha), f"SHA must be hex; got {sha!r}"
+
+
 def test_invalid_optimizer_config_wrong_type():
     """Test that an invalid field type raises ValidationError."""
     invalid_config = {

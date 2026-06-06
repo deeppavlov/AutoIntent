@@ -32,6 +32,7 @@ DEFAULT_REVISIONS: dict[str, str] = {
     # so sentence-transformers never asks the Hub for "main" — which 429s
     # under parallel matrix load even when the model files are cached.
     "sergeyzh/rubert-tiny-turbo": "93769a3baad2b037e5c2e4312fccf6bcfe082bf1",
+    "microsoft/deberta-v3-large": "64a8c8eab3e352a784c658aef62be1662607476f",
 }
 
 
