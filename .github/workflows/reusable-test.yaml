@@ -70,15 +70,16 @@ jobs:
     - name: Run tests
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        # warm_hf_cache.py now populates BOTH caches (hub via snapshot_download
-        # + datasets via load_dataset). With every required snapshot and dataset
-        # on disk, force offline mode in test jobs so the library can't make
-        # any revision-validation API call that would 429 under parallel matrix
-        # load. If a test needs an HF resource that isn't in the prewarm list
-        # this surfaces as LocalEntryNotFoundError rather than a transient
-        # 429 + cryptic OSError.
-        HF_HUB_OFFLINE: "1"
-        HF_DATASETS_OFFLINE: "1"
+        # Not offline mode. Two reasons:
+        #   1. We can't fit the full prewarm list in the 10 GB per-cache
+        #      budget, so two models (bge-reranker-v2-m3, deberta-v3-large)
+        #      need live download. Offline mode would hard-fail those tests.
+        #   2. datasets.load_dataset's HfFileSystem path makes a repo_info
+        #      API call before consulting the cache, which raises in offline
+        #      mode even when the snapshot is on disk.
+        # The cache covers ~95% of HF requests so the residual API traffic
+        # is small enough for huggingface_hub's Retry-After backoff +
+        # pytest-rerunfailures (--reruns 3) to ride out the 5-min window.
         HF_HUB_DOWNLOAD_TIMEOUT: "60"
       run: |
         uv run ${{ inputs.test_command }}
