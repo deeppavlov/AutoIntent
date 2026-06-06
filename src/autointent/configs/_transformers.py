@@ -27,6 +27,11 @@ DEFAULT_REVISIONS: dict[str, str] = {
     "avsolatorio/GIST-small-Embedding-v0": "75e62fd210b9fde790430e0b2f040b0b00a021b1",
     "BAAI/bge-base-en-v1.5": "a5beb1e3e68b9ab74eb54cfd186867f64f240e1a",
     "BAAI/bge-reranker-v2-m3": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+    # Used heavily in the embedder test suite (tests/embedder/conftest.py).
+    # Pinning the SHA here lets HFModelConfig auto-fill it via the validator
+    # so sentence-transformers never asks the Hub for "main" — which 429s
+    # under parallel matrix load even when the model files are cached.
+    "sergeyzh/rubert-tiny-turbo": "93769a3baad2b037e5c2e4312fccf6bcfe082bf1",
 }
 
 
