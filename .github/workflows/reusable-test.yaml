@@ -15,12 +15,11 @@ on:
 
 # No concurrency block here. The parent workflow (ci.yaml) owns the
 # concurrency group for the whole run; if reusable-test sets its own group
-# keyed on inputs.extras, every ci.yaml job that shares the same extras
-# (test-presets, test-optimization, test-inference all share `--extra
-# catboost --extra peft --extra transformers --extra sentence-transformers`)
-# collides on the same group and cancel-in-progress kills all but the last
-# starter — which is exactly the "18 jobs cancelled, same 3 workflows every
-# time" pattern observed before this comment was added.
+# keyed on inputs.extras, ci.yaml jobs that share the same extras
+# (test-presets, test-optimization, test-inference all share
+# `--extra catboost --extra peft --extra transformers --extra sentence-transformers`)
+# collide on the same group and cancel-in-progress kills all but the last
+# starter.
 
 jobs:
   test:
@@ -38,13 +37,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # The HF cache is populated by ci.yaml's warm-cache job, which runs before
-    # any reusable-test caller. We use the restore-only action variant (no
-    # post-step save) so test jobs never write their own duplicate caches —
-    # historically that filled the 10 GB per-repo budget and evicted the
-    # warm-cache write itself. The first restore-key prefers the same-hash
-    # warmed cache; the fallbacks cover branches whose warm-cache hasn't run
-    # yet or where the prewarm configs were just edited.
+    # The HF cache is populated by ci.yaml's warm-cache job, which runs
+    # before any reusable-test caller. We use the restore-only action
+    # variant (no post-step save) so test jobs never write their own
+    # duplicate caches.
     - name: Restore Hugging Face cache
       id: cache-hf
       uses: actions/cache/restore@v4
@@ -70,16 +66,12 @@ jobs:
     - name: Run tests
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        # Not offline mode. Two reasons:
-        #   1. We can't fit the full prewarm list in the 10 GB per-cache
-        #      budget, so two models (bge-reranker-v2-m3, deberta-v3-large)
-        #      need live download. Offline mode would hard-fail those tests.
-        #   2. datasets.load_dataset's HfFileSystem path makes a repo_info
-        #      API call before consulting the cache, which raises in offline
-        #      mode even when the snapshot is on disk.
-        # The cache covers ~95% of HF requests so the residual API traffic
-        # is small enough for huggingface_hub's Retry-After backoff +
-        # pytest-rerunfailures (--reruns 3) to ride out the 5-min window.
+        # Not offline mode: datasets.load_dataset's HfFileSystem path makes
+        # a repo_info API call before consulting the cache, which would
+        # raise in offline mode even when the snapshot is on disk. The
+        # session-scoped guard in tests/conftest.py turns any unpinned HF
+        # call into a deterministic AssertionError, so we don't need
+        # offline mode as a backstop.
         HF_HUB_DOWNLOAD_TIMEOUT: "60"
       run: |
         uv run ${{ inputs.test_command }}

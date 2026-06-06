@@ -16,13 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Per-OS split retained for cache-key namespacing; the content of
+        # both prewarm configs is currently identical (3 small SHA-pinned
+        # models, <250 MB total).
         include:
-          # Linux gets the full prewarm list. The 10 GB per-repo cache budget
-          # forces Windows to a much smaller subset (rubert-tiny-turbo +
-          # multilingual-e5-small) because the HF cache on Windows uses file
-          # copies instead of symlinks and so doubles in size — caching the
-          # full list on both OSes pushed us over the budget and evicted the
-          # Linux warmed cache as soon as Windows saved.
           - os: ubuntu-latest
             config: .ci/hf-prewarm-linux.yaml
           - os: windows-latest
@@ -35,41 +32,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # GitHub-hosted Ubuntu runners ship with ~25 GB of pre-installed
-      # tooling (Android SDK, .NET, GHC, large Docker images, etc.) and
-      # only ~14 GB free on /. Downloading the full prewarm list (~8 GB of
-      # models) plus the Python env and actions/cache working space blows
-      # past that and trips "No space left on device" mid-download. Free
-      # the unused tooling first; no-op on Windows.
-      - name: Free disk space on Linux runner
-        if: runner.os == 'Linux'
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false  # /opt/hostedtoolcache holds the Python we use; keep it.
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: false  # leave swap; cheap insurance against OOM.
-
       - name: Cache Hugging Face
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          # Key hashes BOTH prewarm configs so a change to either file
-          # invalidates exactly one level of the cascade; the next restore-key
-          # still catches the previous warmed cache so only the diff is
-          # re-downloaded.
+          # Hashing both prewarm configs invalidates the cache on either
+          # file's change; the restore-keys cascade catches the previous
+          # warmed cache so only the diff is re-downloaded.
           key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-${{ github.run_id }}
-          # Do NOT include the broad `${{ runner.os }}-hf-` wildcard here.
-          # The warm-cache job is the canonical source of the cache content;
-          # if it restores some other workflow's cache (especially the old
-          # pre-split Windows test-job caches that were ~9 GB) it ends up
-          # re-saving 9 GB of content the prewarm list doesn't even mention,
-          # blowing the 10 GB per-repo budget and LRU-evicting the Linux
-          # warm-cache save. Stick to warmed-only restores so the cache
-          # content stays bounded by hf-prewarm-*.yaml.
           restore-keys: |
             ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-
             ${{ runner.os }}-hf-warmed-
