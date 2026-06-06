@@ -7,7 +7,7 @@ from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import DNNCScorer
 
-pytest.importorskip("sentence-transformers")
+pytest.importorskip("sentence_transformers")
 
 
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1)])

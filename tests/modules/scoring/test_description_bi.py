@@ -7,7 +7,7 @@ from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BiEncoderDescriptionScorer
 
-pytest.importorskip("sentence-transformers")
+pytest.importorskip("sentence_transformers")
 
 
 @pytest.mark.parametrize(
