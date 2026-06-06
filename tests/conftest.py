@@ -184,9 +184,8 @@ def _retarget_search_space_models(pipeline) -> None:
     Each field can be either a dict (single value) or a list of dicts
     (Optuna categorical). We rewrite the model_name in every dict found.
     """
-    # pipeline.nodes is a dict[NodeType, NodeOptimizer]; iterate values.
-    nodes = pipeline.nodes.values() if isinstance(pipeline.nodes, dict) else pipeline.nodes
-    for node in nodes:
+    # pipeline.nodes is a dict[NodeType, NodeOptimizer] (see Pipeline.__init__).
+    for node in pipeline.nodes.values():
         for entry in node.modules_search_spaces:
             _rewrite_field(entry, "classification_model_config", TINY_BERT)
             _rewrite_field(entry, "embedder_config", TINY_SENTENCE_TRANSFORMER)
@@ -227,9 +226,7 @@ def _make_hf_guard(orig, label: str):
         if revision is None or not _HF_SHA.match(revision):
             msg = (
                 f"Unpinned HF call: {label}({repo_id!r}, ..., revision={revision!r}). "
-                "Pin the SHA via DEFAULT_REVISIONS or pass revision=<40-hex-sha> explicitly. "
-                "If a test legitimately needs an unpinned call, mark it with "
-                "@pytest.mark.allow_unpinned_hf."
+                "Pin the SHA via DEFAULT_REVISIONS or pass revision=<40-hex-sha> explicitly."
             )
             raise AssertionError(msg)
         return orig(repo_id, *args, revision=revision, **kwargs)
@@ -239,7 +236,15 @@ def _make_hf_guard(orig, label: str):
 @pytest.fixture(autouse=True, scope="session")
 def _forbid_unpinned_hf_calls():
     """Session-scoped autouse guard: every call into huggingface_hub goes through
-    a wrapper that fails if revision isn't a 40-hex SHA."""
+    a wrapper that fails if revision isn't a 40-hex SHA.
+
+    The guard patches module-level attributes on ``huggingface_hub`` and on
+    ``huggingface_hub.HfApi``. For the guard to apply, src code must reach
+    those attributes through the module (``import huggingface_hub; ...
+    huggingface_hub.snapshot_download(...)``) rather than rebinding them at
+    import time (``from huggingface_hub import snapshot_download``). Keep
+    src code on the dot-attribute form so this guard stays effective.
+    """
     import huggingface_hub
     from _pytest.monkeypatch import MonkeyPatch
 
@@ -257,7 +262,7 @@ def _forbid_unpinned_hf_calls():
             if revision is None or not _HF_SHA.match(revision):
                 msg = (
                     f"Unpinned HF call: HfApi.model_info({repo_id!r}, revision={revision!r}). "
-                    "Pin the SHA or mark the test with @pytest.mark.allow_unpinned_hf."
+                    "Pin the SHA via DEFAULT_REVISIONS."
                 )
                 raise AssertionError(msg)
             return orig_api_model_info(self, repo_id, *args, revision=revision, **kwargs)
