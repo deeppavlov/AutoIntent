@@ -84,3 +84,30 @@ def test_apply_test_models_rewrites_search_space_bert_entries():
                 f"search-space bert.classification_model_config.model_name must be "
                 f"retargeted to {TINY_BERT}; got {cfg.get('model_name')!r}"
             )
+
+
+def test_apply_test_models_drops_stale_revision_in_search_space():
+    """When a search-space entry pins model_name AND revision (e.g. catboost
+    in tests/assets/configs/multiclass.yaml), the walker rewrites the
+    model_name but must also drop the now-wrong revision so the
+    HFModelConfig validator refills it from DEFAULT_REVISIONS.
+    """
+    from autointent import Pipeline
+
+    from tests.conftest import apply_test_models, get_search_space
+
+    pipeline = Pipeline.from_search_space(get_search_space("multiclass"))
+    apply_test_models(pipeline)
+
+    for node in pipeline.nodes.values():
+        for entry in node.modules_search_spaces:
+            for field in ("classification_model_config", "embedder_config", "cross_encoder_config"):
+                value = entry.get(field)
+                if isinstance(value, list):
+                    for cfg in value:
+                        if isinstance(cfg, dict) and "revision" in cfg:
+                            msg = (
+                                f"{field!r} entry still has a stale revision after retarget: {cfg!r}. "
+                                "_rewrite_field must pop revision when it rewrites model_name."
+                            )
+                            raise AssertionError(msg)

@@ -197,10 +197,16 @@ def _rewrite_field(entry: dict, field_name: str, new_model_name: str) -> None:
     value = entry.get(field_name)
     if value is None:
         return
+    # When rewriting model_name, also drop any explicit revision: the YAML's
+    # revision was pinned to the OLD model and is wrong for the new one. The
+    # HFModelConfig validator will refill `revision` from DEFAULT_REVISIONS
+    # when the config is finally instantiated.
     if isinstance(value, dict):
         if "model_name" in value:
             value["model_name"] = new_model_name
+            value.pop("revision", None)
     elif isinstance(value, list):
         for cfg in value:
             if isinstance(cfg, dict) and "model_name" in cfg:
                 cfg["model_name"] = new_model_name
+                cfg.pop("revision", None)
