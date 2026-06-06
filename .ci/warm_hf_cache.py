@@ -95,6 +95,28 @@ def load_config(path: Path) -> list[Entry]:
     return entries
 
 
+def _populate_datasets_cache(repo_id: str) -> None:
+    """Populate the ``datasets`` library cache for ``repo_id``.
+
+    ``huggingface_hub.snapshot_download`` puts raw repo files under
+    ``~/.cache/huggingface/hub/datasets--<repo>``. ``datasets.load_dataset``
+    looks in a completely different location (``~/.cache/huggingface/datasets/``,
+    plus its own metadata index), and won't find a dataset just because the
+    Hub snapshot is on disk. We invoke ``load_dataset`` for every config of
+    the dataset here so the datasets cache is populated too — that's what
+    lets ``autointent.Dataset.from_hub`` work in HF_HUB_OFFLINE mode.
+    """
+    from datasets import get_dataset_config_names, load_dataset
+
+    try:
+        configs = get_dataset_config_names(repo_id) or ["default"]
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("%s - get_dataset_config_names failed (%s); falling back to 'default'", repo_id, exc)
+        configs = ["default"]
+    for config in configs:
+        load_dataset(repo_id, config, download_mode="reuse_dataset_if_exists")
+
+
 def prewarm_entry(entry: Entry) -> Outcome:
     """Ensure ``entry`` is fully present in the local HF cache.
 
@@ -118,6 +140,10 @@ def prewarm_entry(entry: Entry) -> Outcome:
     except (LocalEntryNotFoundError, FileNotFoundError, OSError):
         pass  # Fall through to network download.
     else:
+        if entry.repo_type == "dataset":
+            # Snapshot present, but the datasets cache may not be — populate
+            # it. load_dataset will short-circuit on its own cache hit.
+            _populate_datasets_cache(entry.repo_id)
         logger.info("%s - cached", label)
         return "cached"
 
@@ -138,6 +164,8 @@ def prewarm_entry(entry: Entry) -> Outcome:
             logger.info("%s - sleeping %ds before retry", label, delay)
             time.sleep(delay)
         else:
+            if entry.repo_type == "dataset":
+                _populate_datasets_cache(entry.repo_id)
             logger.info("%s - downloaded", label)
             return "downloaded"
     return "failed"  # unreachable, keeps the type checker happy

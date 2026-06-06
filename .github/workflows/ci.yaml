@@ -82,7 +82,7 @@ jobs:
       - name: Run warm-cache script
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml python .ci/warm_hf_cache.py --config ${{ matrix.config }}
+        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config ${{ matrix.config }}
 
   unit-tests:
     name: unit-tests
