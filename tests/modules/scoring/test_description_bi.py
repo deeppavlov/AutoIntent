@@ -6,15 +6,26 @@ import pytest
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BiEncoderDescriptionScorer
-
-pytest.importorskip("sentence_transformers")
+from tests.conftest import get_test_embedder_config
 
 
 @pytest.mark.parametrize(
     ("expected_prediction", "multilabel"),
     [
-        ([[0.9, 0.9, 0.9, 0.9], [0.9, 0.9, 0.9, 0.9]], True),
-        ([[0.2, 0.3, 0.2, 0.2], [0.2, 0.3, 0.2, 0.2]], False),
+        (
+            [
+                [0.5, 0.5764377329006045, 0.5, 0.5692390885095254],
+                [0.5, 0.5, 0.5, 0.5],
+            ],
+            True,
+        ),
+        (
+            [
+                [0.2135656304559859, 0.2906474381879909, 0.2135656304559859, 0.2822213009000372],
+                [0.25, 0.25, 0.25, 0.25],
+            ],
+            False,
+        ),
     ],
 )
 def test_description_scorer(dataset, expected_prediction, multilabel):
@@ -23,7 +34,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
     data_handler = DataHandler(dataset)
 
     scorer = BiEncoderDescriptionScorer(
-        embedder_config="sergeyzh/rubert-tiny-turbo", temperature=0.3, multilabel=multilabel
+        embedder_config=get_test_embedder_config(), temperature=0.3, multilabel=multilabel
     )
 
     scorer.fit(
@@ -45,7 +56,7 @@ def test_description_scorer(dataset, expected_prediction, multilabel):
         np.testing.assert_almost_equal(np.sum(predictions), len(test_utterances))
 
     assert predictions.shape == (len(test_utterances), len(data_handler.intent_descriptions))
-    np.testing.assert_almost_equal(predictions, np.array(expected_prediction).reshape(predictions.shape), decimal=1)
+    np.testing.assert_almost_equal(predictions, np.array(expected_prediction).reshape(predictions.shape), decimal=5)
 
     predictions, metadata = scorer.predict_with_metadata(test_utterances)
     assert len(predictions) == len(test_utterances)
@@ -68,7 +79,7 @@ def test_description_bi_in_pipeline(dataset):
             "search_space": [
                 {
                     "module_name": "description_bi",
-                    "embedder_config": [{"model_name": "sergeyzh/rubert-tiny-turbo"}],
+                    "embedder_config": [{"n_features": 512, "use_cache": False}],
                     "temperature": [0.3],
                 }
             ],
