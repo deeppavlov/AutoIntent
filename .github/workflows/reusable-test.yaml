@@ -70,14 +70,14 @@ jobs:
     - name: Run tests
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        # The warm-cache job has already populated ~/.cache/huggingface with
-        # every model and dataset in .ci/hf-prewarm-*.yaml. Force offline mode
-        # so transformers / sentence-transformers / huggingface_hub don't make
-        # any "is the cached revision still latest?" API calls — those calls
-        # ignore the cache and 429 as soon as parallel matrix jobs spin up.
-        # If a test needs an HF resource that isn't in the prewarm list this
-        # surfaces immediately as OfflineModeIsEnabled rather than silently
-        # falling through to a rate-limited download.
-        HF_HUB_OFFLINE: "1"
+        # NOT setting HF_HUB_OFFLINE=1. Tried it; it broke unit-tests because
+        # autointent.Dataset.from_hub uses datasets.load_dataset which calls
+        # HfFileSystem.resolve_path → repo_info (an HF API call) BEFORE it
+        # ever touches the cache — so even with the snapshot already on disk
+        # the offline mode raises ConnectionError. The warm-cache restore
+        # plus the conftest mistral patch handle the high-volume API calls;
+        # whatever remains is small enough for huggingface_hub's built-in
+        # Retry-After backoff to survive parallel matrix runs.
+        HF_HUB_DOWNLOAD_TIMEOUT: "60"
       run: |
         uv run ${{ inputs.test_command }}
