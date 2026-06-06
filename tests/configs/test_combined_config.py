@@ -102,6 +102,31 @@ def test_canonical_test_models_have_pinned_revisions():
     assert tiny_sentence_transformer_config().model_name == TINY_SENTENCE_TRANSFORMER
 
 
+def test_hf_guard_blocks_unpinned_revision():
+    from tests.conftest import _make_hf_guard
+
+    sentinel = object()
+    guard = _make_hf_guard(lambda *a, **k: sentinel, label="fake")
+
+    import pytest
+    for bad in (None, "main", "v1.0", "abc"):
+        with pytest.raises(AssertionError, match="Unpinned HF call"):
+            guard("repo/id", "file.bin", revision=bad)
+
+
+def test_hf_guard_allows_sha_pinned_revision():
+    from tests.conftest import _make_hf_guard
+
+    sentinel = object()
+    guard = _make_hf_guard(lambda *a, **k: sentinel, label="fake")
+
+    sha = "0" * 40
+    assert guard("repo/id", "file.bin", revision=sha) is sentinel
+    sha2 = "abcdef0123456789" * 2 + "abcdef01"  # 40 hex
+    assert len(sha2) == 40
+    assert guard("repo/id", "file.bin", revision=sha2) is sentinel
+
+
 def test_invalid_optimizer_config_wrong_type():
     """Test that an invalid field type raises ValidationError."""
     invalid_config = {

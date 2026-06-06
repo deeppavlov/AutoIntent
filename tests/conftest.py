@@ -210,3 +210,58 @@ def _rewrite_field(entry: dict, field_name: str, new_model_name: str) -> None:
             if isinstance(cfg, dict) and "model_name" in cfg:
                 cfg["model_name"] = new_model_name
                 cfg.pop("revision", None)
+
+
+# ---------------------------------------------------------------------------
+# Unpinned-HF-call guard. See spec §6.5.
+# ---------------------------------------------------------------------------
+
+import re as _re  # noqa: E402
+
+_HF_SHA = _re.compile(r"^[0-9a-f]{40}$")
+
+
+def _make_hf_guard(orig, label: str):
+    """Wrap an HF entry point so calls with revision not matching a 40-hex SHA raise."""
+    def guarded(repo_id, *args, revision=None, **kwargs):
+        if revision is None or not _HF_SHA.match(revision):
+            msg = (
+                f"Unpinned HF call: {label}({repo_id!r}, ..., revision={revision!r}). "
+                "Pin the SHA via DEFAULT_REVISIONS or pass revision=<40-hex-sha> explicitly. "
+                "If a test legitimately needs an unpinned call, mark it with "
+                "@pytest.mark.allow_unpinned_hf."
+            )
+            raise AssertionError(msg)
+        return orig(repo_id, *args, revision=revision, **kwargs)
+    return guarded
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _forbid_unpinned_hf_calls():
+    """Session-scoped autouse guard: every call into huggingface_hub goes through
+    a wrapper that fails if revision isn't a 40-hex SHA."""
+    import huggingface_hub
+    from _pytest.monkeypatch import MonkeyPatch
+
+    mp = MonkeyPatch()
+    try:
+        mp.setattr(huggingface_hub, "hf_hub_download",
+                   _make_hf_guard(huggingface_hub.hf_hub_download, "hf_hub_download"))
+        mp.setattr(huggingface_hub, "snapshot_download",
+                   _make_hf_guard(huggingface_hub.snapshot_download, "snapshot_download"))
+        mp.setattr(huggingface_hub, "model_info",
+                   _make_hf_guard(huggingface_hub.model_info, "model_info"))
+        # HfApi.model_info is a bound method; wrap as a regular function on the class.
+        orig_api_model_info = huggingface_hub.HfApi.model_info
+        def _guarded_api_model_info(self, repo_id, *args, revision=None, **kwargs):
+            if revision is None or not _HF_SHA.match(revision):
+                msg = (
+                    f"Unpinned HF call: HfApi.model_info({repo_id!r}, revision={revision!r}). "
+                    "Pin the SHA or mark the test with @pytest.mark.allow_unpinned_hf."
+                )
+                raise AssertionError(msg)
+            return orig_api_model_info(self, repo_id, *args, revision=revision, **kwargs)
+        mp.setattr(huggingface_hub.HfApi, "model_info", _guarded_api_model_info)
+        yield
+    finally:
+        mp.undo()
