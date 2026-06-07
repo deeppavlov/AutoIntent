@@ -16,17 +16,7 @@ from tests.conftest import apply_test_models, setup_environment
         pytest.param("transformers-heavy", marks=pytest.mark.transformers),
         pytest.param("transformers-light", marks=pytest.mark.transformers),
         pytest.param("transformers-no-hpo", marks=pytest.mark.transformers),
-        pytest.param(
-            "zero-shot-llm",
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason=(
-                    "LLMDescriptionScorer.dump/load drops generator_config; "
-                    "preset's dump_modules+clear_ram cycle then fails on predict. See "
-                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
-                ),
-            ),
-        ),
+        "zero-shot-llm",
         "zero-shot-encoders",
     ],
 )
