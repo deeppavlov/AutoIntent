@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  warm-cache:
+    name: Warm HF cache
+    strategy:
+      fail-fast: false
+      matrix:
+        # Per-OS runners are needed because actions/cache pins by ${{ runner.os }}
+        # so Linux test jobs only restore caches saved by a Linux runner (likewise
+        # for Windows). The prewarm config itself is shared (.ci/hf-prewarm.yaml).
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    # Best-effort: an HF outage here must not cancel every PR. Test jobs
+    # `needs: warm-cache` but proceed regardless via continue-on-error.
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache Hugging Face
+        id: cache-hf
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          # Stable key (no github.run_id): when the prewarm config and the
+          # SHA pins are unchanged from a previous run, the cache restores
+          # with cache-hit=true and the warm script is skipped entirely.
+          # Bumping a pinned SHA invalidates the cache automatically since
+          # hashFiles includes _pinned_revisions.py.
+          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml', 'src/autointent/configs/_pinned_revisions.py') }}
+
+      - name: Install uv
+        if: steps.cache-hf.outputs.cache-hit != 'true'
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.10.0"
+
+      - name: Run warm-cache script
+        if: steps.cache-hf.outputs.cache-hit != 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # --no-project: skip the autointent install. The warm script loads
+        # _pinned_revisions.py via importlib.util.spec_from_file_location
+        # specifically so it doesn't need autointent on sys.path; without
+        # --no-project, `uv run` syncs the full project dep tree (~83
+        # packages, ~20s) before running.
+        run: uv run --no-project --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config .ci/hf-prewarm.yaml
+
+  unit-tests:
+    name: unit-tests
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
+
+  test-embedder:
+    name: test-embedder
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/embedder/ tests/callback/
+      extras: --extra sentence-transformers --extra transformers
+
+  test-scorers:
+    name: test-scorers
+    needs: warm-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        dependency-group: [ "base", "transformers", "peft", "catboost" ]
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/modules/scoring/
+      extras: ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}
+
+  test-presets:
+    name: test-presets
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_presets.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  test-optimization:
+    name: test-optimization
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_optimization.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  test-inference:
+    name: test-inference
+    needs: warm-cache
+    uses: ./.github/workflows/reusable-test.yaml
+    secrets: inherit
+    with:
+      test_command: pytest -n auto tests/pipeline/test_inference.py
+      extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  # Single aggregator over every test fan-out so the GitHub ruleset only
+  # needs one required check ("all-tests") instead of 54 matrix entries.
+  # needs.<job>.result for a matrix caller is already the aggregate, so
+  # six needs cover all combinations. `if: always()` makes this job run
+  # even when an upstream failed, and the inner step fails on
+  # failure/cancelled/skipped — so a skipped required check (which most
+  # rulesets treat as not-passing) can't slip through.
+  all-tests:
+    name: all-tests
+    if: always()
+    needs:
+      - unit-tests
+      - test-embedder
+      - test-presets
+      - test-optimization
+      - test-inference
+      - test-scorers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that every test job succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: |
+          echo "One or more test jobs did not succeed:"
+          echo '${{ toJson(needs) }}'
+          exit 1

@@ -4,7 +4,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
-from tests.conftest import setup_environment
+from tests.conftest import apply_test_models, setup_environment
 
 
 @pytest.mark.parametrize(
@@ -26,6 +26,7 @@ def test_presets(dataset, preset):
     project_dir = setup_environment()
 
     pipeline_optimizer = Pipeline.from_preset(preset)
+    apply_test_models(pipeline_optimizer)
 
     if preset == "zero-shot-llm" and not (os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_MODEL_NAME")):
         pytest.skip(reason="OpenAI API key or model name is missing.")
@@ -35,3 +36,77 @@ def test_presets(dataset, preset):
     pipeline_optimizer.set_config(HPOConfig(timeout=60))  # limit budget time because we want tests to be fast
 
     pipeline_optimizer.fit(dataset, refit_after=False)
+
+
+def test_apply_test_models_retargets_pipeline_slots():
+    from autointent import Pipeline
+    from tests.conftest import (
+        TINY_BERT,
+        TINY_CROSS_ENCODER,
+        TINY_SENTENCE_TRANSFORMER,
+        apply_test_models,
+    )
+
+    pipeline = Pipeline.from_preset("zero-shot-encoders")
+    # Before: zero-shot-encoders sets embedder=multilingual-e5-large-instruct,
+    # cross-encoder=bge-reranker-v2-m3.
+    apply_test_models(pipeline)
+
+    assert pipeline.embedder_config.model_name == TINY_SENTENCE_TRANSFORMER
+    assert pipeline.cross_encoder_config.model_name == TINY_CROSS_ENCODER
+    assert pipeline.transformer_config.model_name == TINY_BERT
+
+
+def test_apply_test_models_rewrites_search_space_bert_entries():
+    from autointent import Pipeline
+    from tests.conftest import TINY_BERT, apply_test_models
+
+    pipeline = Pipeline.from_preset("transformers-heavy")
+    # Before: search_space has module_name='bert' with
+    # classification_model_config: [{model_name: 'microsoft/deberta-v3-large'}]
+    apply_test_models(pipeline)
+
+    bert_entries = [
+        entry
+        for node in pipeline.nodes.values()
+        for entry in node.modules_search_spaces
+        if entry.get("module_name") == "bert"
+    ]
+    assert bert_entries, "transformers-heavy preset must have a bert module entry"
+
+    for entry in bert_entries:
+        cmc = entry.get("classification_model_config")
+        # The field is a list of dicts in YAML (Optuna categorical search space).
+        assert isinstance(cmc, list), f"unexpected shape: {cmc!r}"
+        assert cmc, f"unexpected shape: {cmc!r}"
+        for cfg in cmc:
+            assert cfg.get("model_name") == TINY_BERT, (
+                f"search-space bert.classification_model_config.model_name must be "
+                f"retargeted to {TINY_BERT}; got {cfg.get('model_name')!r}"
+            )
+
+
+def test_apply_test_models_drops_stale_revision_in_search_space():
+    """When a search-space entry pins model_name AND revision (e.g. catboost
+    in tests/assets/configs/multiclass.yaml), the walker rewrites the
+    model_name but must also drop the now-wrong revision so the
+    HFModelConfig validator refills it from DEFAULT_REVISIONS.
+    """
+    from autointent import Pipeline
+    from tests.conftest import apply_test_models, get_search_space
+
+    pipeline = Pipeline.from_search_space(get_search_space("multiclass"))
+    apply_test_models(pipeline)
+
+    for node in pipeline.nodes.values():
+        for entry in node.modules_search_spaces:
+            for field in ("classification_model_config", "embedder_config", "cross_encoder_config"):
+                value = entry.get(field)
+                if isinstance(value, list):
+                    for cfg in value:
+                        if isinstance(cfg, dict) and "revision" in cfg:
+                            msg = (
+                                f"{field!r} entry still has a stale revision after retarget: {cfg!r}. "
+                                "_rewrite_field must pop revision when it rewrites model_name."
+                            )
+                            raise AssertionError(msg)

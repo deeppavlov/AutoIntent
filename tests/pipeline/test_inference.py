@@ -5,7 +5,7 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embedder_config
 from autointent.custom_types import NodeType
-from tests.conftest import get_search_space, setup_environment
+from tests.conftest import apply_test_models, get_search_space, setup_environment
 
 
 @pytest.fixture
@@ -33,6 +33,7 @@ def test_inference_from_config(dataset, task_type, project_dir):
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     logging_config = LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True)
     pipeline_optimizer.set_config(logging_config)
@@ -86,6 +87,7 @@ def test_inference_on_the_fly(dataset, task_type, project_dir):
     search_space = get_search_space(task_type)
 
     pipeline = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline)
 
     logging_config = LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False)
     pipeline.set_config(logging_config)
@@ -120,6 +122,7 @@ def test_load_with_overrided_params(dataset):
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     logging_config = LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True)
     pipeline_optimizer.set_config(logging_config)
@@ -160,6 +163,7 @@ def test_no_saving(dataset):
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     logging_config = LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=True)
     pipeline_optimizer.set_config(logging_config)

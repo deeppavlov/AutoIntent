@@ -1,11 +1,13 @@
 import importlib.resources as ires
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from autointent import Dataset, Ranker
+from autointent.configs import CrossEncoderConfig
 from autointent.context.data_handler import DataHandler
 
-pytest.importorskip("sentence-transformers")
+pytest.importorskip("sentence_transformers")
 
 
 @pytest.fixture
@@ -82,3 +84,19 @@ def test_nli_transformer_predict_default_with_fit(data_handler):
 
     ranked = model.rank(texts[0], texts[1:])
     check_ranking(ranked, labels)
+
+
+def test_ranker_passes_revision_to_cross_encoder():
+    # CrossEncoderConfig defaults to ms-marco-MiniLM-L6-v2; the validator
+    # fills `revision` from DEFAULT_REVISIONS automatically.
+    cfg = CrossEncoderConfig()
+    assert cfg.revision is not None  # sanity: validator did its job
+
+    with patch("sentence_transformers.CrossEncoder") as mock_ce:
+        mock_ce.return_value = MagicMock()
+        Ranker(cross_encoder_config=cfg)
+
+    _, kwargs = mock_ce.call_args
+    assert kwargs.get("revision") == cfg.revision, (
+        f"Ranker must forward revision={cfg.revision!r} to CrossEncoder(); actual kwargs={kwargs}"
+    )

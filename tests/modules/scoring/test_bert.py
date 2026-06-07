@@ -10,7 +10,7 @@ from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules import BertScorer
 
-_config = HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
+_config = HFModelConfig(model_name="prajjwal1/bert-tiny")
 
 pytest.importorskip("transformers", reason="Transformers library is required for BertScorer tests")
 
