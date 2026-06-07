@@ -1,5 +1,4 @@
 import importlib.util
-import os
 import platform
 
 import pytest
@@ -11,9 +10,6 @@ from autointent.configs import (
     SentenceTransformerEmbeddingConfig,
     VllmEmbeddingConfig,
 )
-
-# Check if OpenAI API key is available for testing
-openai_available = os.getenv("OPENAI_API_KEY") is not None
 
 # Check if vLLM is installed and CUDA is available
 vllm_available = importlib.util.find_spec("vllm") is not None and torch.cuda.is_available()
@@ -49,10 +45,6 @@ backend_configs = [
             use_cache=False,
             max_retries=1,
             timeout=10.0,
-        ),
-        marks=pytest.mark.skipif(
-            not openai_available,
-            reason="OpenAI API key not available (set OPENAI_API_KEY environment variable)",
         ),
         id="openai",
     ),
@@ -122,3 +114,8 @@ def create_vllm_config(**kwargs) -> VllmEmbeddingConfig:
     }
     defaults.update(kwargs)
     return VllmEmbeddingConfig(**defaults)
+
+
+@pytest.fixture(autouse=True)
+def _autouse_fake_openai_embedding(patch_openai_embedding_backend):
+    """Within tests/embedder/, every OpenaiEmbeddingConfig resolves to FakeOpenaiEmbeddingBackend."""

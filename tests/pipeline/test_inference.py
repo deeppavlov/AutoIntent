@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from autointent import Pipeline
@@ -22,14 +20,18 @@ def project_dir(task_type):
         "description_no_llm",
         pytest.param(
             "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
             ),
         ),
     ],
 )
-def test_inference_from_config(dataset, task_type, project_dir):
+def test_inference_from_config(dataset, task_type, project_dir, patch_llm_scorer_generator):
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -76,14 +78,18 @@ def test_inference_from_config(dataset, task_type, project_dir):
         "description_no_llm",
         pytest.param(
             "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
             ),
         ),
     ],
 )
-def test_inference_on_the_fly(dataset, task_type, project_dir):
+def test_inference_on_the_fly(dataset, task_type, project_dir, patch_llm_scorer_generator):
     search_space = get_search_space(task_type)
 
     pipeline = Pipeline.from_search_space(search_space)

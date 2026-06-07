@@ -1,5 +1,4 @@
 import importlib.resources as ires
-import os
 
 import pytest
 
@@ -78,16 +77,10 @@ def test_bayes(dataset, sampler):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        pytest.param(
-            "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
-            ),
-        ),
+        "description_with_llm",
     ],
 )
-def test_cv(dataset, task_type):
+def test_cv(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -112,16 +105,10 @@ def test_cv(dataset, task_type):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        pytest.param(
-            "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
-            ),
-        ),
+        "description_with_llm",
     ],
 )
-def test_no_context_optimization(dataset, task_type):
+def test_no_context_optimization(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
@@ -146,14 +133,18 @@ def test_no_context_optimization(dataset, task_type):
         "description_no_llm",
         pytest.param(
             "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
             ),
         ),
     ],
 )
-def test_dump_modules(dataset, task_type):
+def test_dump_modules(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 

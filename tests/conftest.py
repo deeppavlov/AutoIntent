@@ -34,7 +34,7 @@ def _disable_transformers_mistral_regex_patch() -> None:
     if base is None or not hasattr(base, "_patch_mistral_regex"):
         return
 
-    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):  # noqa: ARG001
+    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):
         return tokenizer
 
     base._patch_mistral_regex = classmethod(_noop_patch_mistral_regex)
@@ -305,3 +305,20 @@ def _forbid_unpinned_hf_calls():
         yield
     finally:
         mp.undo()
+
+
+# ---------------------------------------------------------------------------
+# Shared mocking fixtures for live-API substitution (OpenAI, OpenSearch).
+# ---------------------------------------------------------------------------
+
+from tests._fixtures.fake_openai_embedding import (  # noqa: E402, F401
+    FakeOpenaiEmbeddingBackend,
+    patch_openai_embedding_backend,
+)
+from tests._fixtures.mock_generator import (  # noqa: E402, F401
+    mock_async_generator,
+    mock_generator,
+    patch_llm_scorer_generator,
+)
+from tests._fixtures.opensearch_container import opensearch_container  # noqa: E402, F401
+from tests._fixtures.respx_openai import respx_openai  # noqa: E402, F401
