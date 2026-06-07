@@ -261,9 +261,7 @@ ft_cfg = EmbedderFineTuningConfig(
 )
 
 # Example (does not run training here): construct an embedder and call train when you have data.
-_embedder_for_ft = Embedder(
-    SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2")
-)
+_embedder_for_ft = Embedder(SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2"))
 # _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)
 
 # %%

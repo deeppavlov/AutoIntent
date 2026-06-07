@@ -13,9 +13,13 @@ on:
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
 
-concurrency:
-  group: reusable-test-${{ github.workflow }}-${{ github.ref }}-${{ inputs.extras }}
-  cancel-in-progress: true
+# No concurrency block here. The parent workflow (ci.yaml) owns the
+# concurrency group for the whole run; if reusable-test sets its own group
+# keyed on inputs.extras, ci.yaml jobs that share the same extras
+# (test-presets, test-optimization, test-inference all share
+# `--extra catboost --extra peft --extra transformers --extra sentence-transformers`)
+# collide on the same group and cancel-in-progress kills all but the last
+# starter.
 
 jobs:
   test:
@@ -31,17 +35,27 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
-    - name: Cache Hugging Face
+    # The HF cache is populated by ci.yaml's warm-cache job, which runs
+    # before any reusable-test caller. We use the restore-only action
+    # variant (no post-step save) so test jobs never write their own
+    # duplicate caches.
+    - name: Restore Hugging Face cache
       id: cache-hf
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v5
       with:
         path: ~/.cache/huggingface
-        key: ${{ runner.os }}-hf
+        # Exact-match the key that the warm-cache job saved this run (same
+        # hashFiles inputs → same key). restore-keys is a single prefix
+        # fallback so a failed warm-cache run can still reuse the prior
+        # week's cache instead of forcing tests to hit HF directly.
+        key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml', 'src/autointent/configs/_pinned_revisions.py') }}
+        restore-keys: |
+          ${{ runner.os }}-hf-warmed-
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v6
+      uses: astral-sh/setup-uv@v7
       with:
         version: "0.10.0"
         enable-cache: "true"
@@ -52,5 +66,14 @@ jobs:
         uv sync --group test ${{ inputs.extras }}
 
     - name: Run tests
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        # Not offline mode: datasets.load_dataset's HfFileSystem path makes
+        # a repo_info API call before consulting the cache, which would
+        # raise in offline mode even when the snapshot is on disk. The
+        # session-scoped guard in tests/conftest.py turns any unpinned HF
+        # call into a deterministic AssertionError, so we don't need
+        # offline mode as a backstop.
+        HF_HUB_DOWNLOAD_TIMEOUT: "60"
       run: |
         uv run ${{ inputs.test_command }}

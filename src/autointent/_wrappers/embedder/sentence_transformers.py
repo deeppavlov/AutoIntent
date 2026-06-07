@@ -48,20 +48,36 @@ def _set_training_seed(seed: int) -> None:
     set_seed(seed)
 
 
+_HF_COMMIT_SHA_LENGTH = 40
+
+
 @lru_cache(maxsize=128)
-def _get_latest_commit_hash(model_name: str) -> str:
-    """Get the latest commit hash for a given Hugging Face model.
+def _get_latest_commit_hash(model_name: str, revision: str | None = None) -> str:
+    """Resolve a stable identifier for a Hugging Face model, used for cache-key hashing.
 
-    Args:
-        model_name: The name of the model to get the latest commit hash for.
-
-    Returns:
-        The latest commit hash for the given model name or the model name if the commit hash is not found.
+    If ``revision`` already looks like an immutable commit SHA (40 hex chars), it is
+    returned without a network call. Otherwise the function queries the HF Hub for
+    the resolved SHA of the given revision (defaulting to ``main``). On network
+    errors (rate limiting, no connection) the revision string is returned as a
+    fallback so callers can proceed; the cache key won't auto-invalidate on
+    upstream changes in that case.
     """
-    commit_hash = huggingface_hub.model_info(model_name, revision="main").sha
+    rev = revision or "main"
+    if len(rev) == _HF_COMMIT_SHA_LENGTH and all(c in "0123456789abcdef" for c in rev.lower()):
+        return rev
+    try:
+        commit_hash = huggingface_hub.model_info(model_name, revision=rev).sha
+    except Exception as exc:  # noqa: BLE001
+        logger.warning(
+            "Could not resolve commit hash for %s@%s (%s); using revision string for cache key.",
+            model_name,
+            rev,
+            exc,
+        )
+        return rev
     if commit_hash is None:
         logger.warning("No commit hash found for model %s", model_name)
-        return model_name
+        return rev
     return commit_hash
 
 
@@ -116,7 +132,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         """
         hasher = Hasher()
         if not Path(self.config.model_name).exists():
-            commit_hash = _get_latest_commit_hash(self.config.model_name)
+            commit_hash = _get_latest_commit_hash(self.config.model_name, self.config.revision)
             hasher.update(commit_hash)
         else:
             model = self._load_model()

@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, PositiveInt
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt, model_validator
 from typing_extensions import assert_never
 
+# DEFAULT_REVISIONS is the canonical SHA pin dict; the leaf module has
+# zero non-__future__ imports so .ci/warm_hf_cache.py can load it via a
+# sys.path shim without installing autointent. See _pinned_revisions.py.
+from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
@@ -56,6 +60,12 @@ class HFModelConfig(BaseModel):
     trust_remote_code: bool = Field(False, description="Whether to trust the remote code when loading the model.")
     revision: str | None = Field(None, description="Revision from HF repo")
 
+    @model_validator(mode="after")
+    def _apply_default_revision(self) -> Self:
+        if self.revision is None and self.model_name in DEFAULT_REVISIONS:
+            self.revision = DEFAULT_REVISIONS[self.model_name]
+        return self
+
     @classmethod
     def from_search_config(cls, values: dict[str, Any] | str | BaseModel | None) -> Self:
         """Validate the model configuration.
@@ -78,7 +88,7 @@ class HFModelConfig(BaseModel):
 
 
 def get_default_hfmodel_config() -> HFModelConfig:
-    return HFModelConfig(model_name="prajjwal1/bert-tiny", revision="refs/pr/16")
+    return HFModelConfig()
 
 
 class CrossEncoderConfig(HFModelConfig):
