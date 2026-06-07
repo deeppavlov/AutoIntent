@@ -79,6 +79,10 @@ def get_test_embedder_config(**kwargs):
 # Shared mocking fixtures. See docs/superpowers/specs/2026-06-07-live-api-test-mocking-strategy.md
 # ---------------------------------------------------------------------------
 
+from tests._fixtures.fake_openai_embedding import (  # noqa: E402, F401
+    FakeOpenaiEmbeddingBackend,
+    patch_openai_embedding_backend,
+)
 from tests._fixtures.mock_generator import (  # noqa: E402, F401
     mock_async_generator,
     mock_generator,
