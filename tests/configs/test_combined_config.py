@@ -103,6 +103,18 @@ def test_canonical_test_models_have_pinned_revisions():
     assert tiny_sentence_transformer_config().model_name == TINY_SENTENCE_TRANSFORMER
 
 
+def test_bert_tiny_config_in_scoring_tests_gets_pinned_revision():
+    """test_bert/lora/ptuning.py rely on _apply_default_revision to fill
+    revision when they omit it. Lock that contract in here so a future
+    change to the validator doesn't silently make the scoring tests
+    contact HF Hub for revision resolution."""
+    from autointent.configs import HFModelConfig
+    from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
+
+    cfg = HFModelConfig(model_name="prajjwal1/bert-tiny")
+    assert cfg.revision == DEFAULT_REVISIONS["prajjwal1/bert-tiny"]
+
+
 def test_hf_guard_blocks_unpinned_revision():
     from tests.conftest import _make_hf_guard
 

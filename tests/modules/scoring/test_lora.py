@@ -12,7 +12,7 @@ from autointent.modules import BERTLoRAScorer
 
 pytest.importorskip("peft")
 
-_config = HFModelConfig(model_name="prajjwal1/bert-tiny", revision="79779625a0a40f1eee8496e16056bc0d7766df22")
+_config = HFModelConfig(model_name="prajjwal1/bert-tiny")
 
 
 def test_lora_scorer_dump_load(dataset):
