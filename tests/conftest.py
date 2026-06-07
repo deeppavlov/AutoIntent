@@ -152,6 +152,26 @@ def tiny_sentence_transformer_config(**overrides):
     return SentenceTransformerEmbeddingConfig(**base)
 
 
+def tiny_sentence_transformer():
+    """Pinned SentenceTransformer instance for tests that need the raw class.
+
+    Use this instead of ``SentenceTransformer(TINY_SENTENCE_TRANSFORMER)``.
+    sentence-transformers imports ``snapshot_download`` from huggingface_hub
+    via ``from X import Y`` at module-load time, which captures a direct
+    reference — the autouse guard in this conftest patches the
+    ``huggingface_hub`` module attribute *after* sentence-transformers has
+    already captured its own binding, so the guard never sees these calls
+    and they regress to fetching ``/resolve/main/...`` (HF 429 under matrix
+    load). Passing ``revision=`` here keeps the call on the SHA-pinned path,
+    which is satisfied entirely from the warm cache.
+    """
+    from sentence_transformers import SentenceTransformer
+
+    from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
+
+    return SentenceTransformer(TINY_SENTENCE_TRANSFORMER, revision=DEFAULT_REVISIONS[TINY_SENTENCE_TRANSFORMER])
+
+
 def apply_test_models(pipeline) -> None:
     """Retarget every HF model slot in a Pipeline at the canonical test set.
 
@@ -249,6 +269,13 @@ def _forbid_unpinned_hf_calls():
     huggingface_hub.snapshot_download(...)``) rather than rebinding them at
     import time (``from huggingface_hub import snapshot_download``). Keep
     src code on the dot-attribute form so this guard stays effective.
+
+    KNOWN GAP: sentence-transformers does ``from huggingface_hub import
+    snapshot_download`` and so escapes this guard. Direct calls into
+    ``SentenceTransformer(<repo_id>)`` without ``revision=`` therefore
+    bypass the guard AND the SHA pin, and will hit HF for
+    ``/resolve/main/...``. Use ``tiny_sentence_transformer()`` above for
+    tests that need a raw ``SentenceTransformer`` instance.
     """
     import huggingface_hub
     from _pytest.monkeypatch import MonkeyPatch

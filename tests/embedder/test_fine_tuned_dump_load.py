@@ -7,7 +7,7 @@ import pytest
 from autointent._wrappers.embedder import Embedder
 from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
-from tests.conftest import TINY_SENTENCE_TRANSFORMER, tiny_sentence_transformer_config
+from tests.conftest import tiny_sentence_transformer, tiny_sentence_transformer_config
 
 pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
 
@@ -126,15 +126,13 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
     """Test scenario: load sentence transformer from disk -> fine-tune -> dump -> load."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
-    from sentence_transformers import SentenceTransformer
-
     data_handler = DataHandler(dataset)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Step 1: Save a sentence transformer model to disk
-        model = SentenceTransformer(TINY_SENTENCE_TRANSFORMER)
+        model = tiny_sentence_transformer()
         model_disk_path = temp_path / "pretrained_model"
         model.save(str(model_disk_path))
 
