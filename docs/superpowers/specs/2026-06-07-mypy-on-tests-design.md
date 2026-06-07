@@ -65,7 +65,7 @@ The `typing` group already pulls the extras needed to import the modules `tests/
 
 ### `pyproject.toml`
 
-Add one override to mirror what `src/autointent.server.*` already gets:
+Add a `tests.server.*` exemption (mirrors `src/autointent.server.*`):
 
 ```toml
 [[tool.mypy.overrides]]
@@ -73,16 +73,29 @@ module = ["tests.server.*"]
 ignore_errors = true
 ```
 
-Rationale: the server modules themselves carry `ignore_errors = true` (pyproject.toml lines 307–312). Strict-typing tests for code that's exempt from strict typing is meaningless — the test signatures depend on untyped server symbols.
+Rationale: the server modules themselves carry `ignore_errors = true` (pyproject.toml lines 307–312). Strict-typing tests for code that's exempt from strict typing is meaningless.
 
-No other test-side overrides. No new dependencies (pytest ships its own stubs since 6.x; we pin ≥8.3).
+Extend the existing `ignore_missing_imports` override (lines 275–298) to add modules that test code imports but lack stubs and aren't worth typing on this branch:
+
+```toml
+# add to the existing [[tool.mypy.overrides]] module list:
+"testcontainers.opensearch",
+"warm_hf_cache",  # tests/ci/test_warm_hf_cache.py imports from .ci/ script via sys.path manipulation
+```
+
+These are the only two `[import-untyped]` / `[import-not-found]` cases in the baseline. If a subagent surfaces another genuinely-missing-stubs case, it goes here (Phase C decision); subagents do not edit `pyproject.toml` directly.
+
+No new dependencies (pytest ships its own stubs since 6.x; we pin ≥8.3).
 
 ## Policy for hard-to-type pytest patterns
 
-1. **Fixtures**: declare return types. pytest-provided fixtures (`tmp_path: Path`, `caplog: LogCaptureFixture`, `monkeypatch: MonkeyPatch`, `capsys: CaptureFixture[str]`) come typed; rely on those signatures.
+1. **Fixtures**: declare return types. pytest-provided fixtures (`tmp_path: Path`, `caplog: LogCaptureFixture`, `monkeypatch: MonkeyPatch`, `capsys: CaptureFixture[str]`) come typed; rely on those signatures. For yield-style fixtures, annotate the return type as `Iterator[T]` (from `collections.abc`) — not `Generator[T, None, None]` unless `send()`/`throw()` semantics are actually used.
 2. **`@pytest.mark.parametrize`**: keep `argvalues` as homogeneous tuples or lists; annotate the test fn parameters. If a parametrize set genuinely mixes types, split into multiple parametrize blocks rather than `Any`-ing the parameter.
 3. **`unittest.mock.patch` / `MagicMock`**: at the call site, annotate the bound name as `MagicMock`, or `cast(Foo, mock)` when downstream code needs the real type. Do **not** widen test fn signatures to `Any` to accommodate mocks.
-4. **Escape hatch**: `# type: ignore[<specific-code>]` is allowed but must (a) carry a specific error code, (b) carry an inline `# reason: ...` comment on the same line or the line above. Bare `# type: ignore` is forbidden — `warn_unused_ignores` (implied by strict) will already reject it. Each subagent's diff is reviewed for ignore usage in Phase C.
+4. **Escape hatch**: `# type: ignore[<code>]` (or `# type: ignore[<code1>, <code2>]` when one suppression spans multiple codes) is allowed but must (a) carry specific error codes, never bare, (b) carry an inline `# reason: ...` comment on the same line or the line above. Bare `# type: ignore` is forbidden — `warn_unused_ignores` (implied by strict) will already reject it. Each subagent's diff is reviewed for ignore usage in Phase C.
+5. **Pydantic `**kwargs` spread**: `pyproject.toml` sets `init_forbid_extra = true` for the `pydantic.mypy` plugin, which rejects `Model(**kwargs)` as `[call-arg]` even when `kwargs: dict[str, Any]`. Test factories that spread `**overrides` into a model constructor must instead either (a) enumerate the relevant fields explicitly, or (b) build a typed `dict` matching the model's field set and spread that, or (c) at the call site, `cast(<Model>, Model.model_construct(**overrides))` when the test specifically wants to bypass validation. Do not weaken `init_forbid_extra` for tests — that would hide real call-site mistakes.
+6. **`pytest.skip` and `warn_unreachable`**: a common pattern is `if not feature_available: pytest.skip(...)` followed by code that mypy considers unreachable after narrowing. `pytest.skip` is typed `NoReturn`, but mypy's narrowing of module-level guards can still mark *test body* code as unreachable in some configurations. When this triggers, prefer `pytest.importorskip("pkg")` (returns the module typed as `ModuleType`) or guard via `pytest.mark.skipif` (decorator) so the test body remains reachable. As a last resort, `# type: ignore[unreachable]` with a reason.
+7. **`disable_error_code = ["override"]` is a known blind spot**: the global config disables Liskov-violation warnings, so tests that subclass `BaseModel` / `nn.Module` with mismatched signatures will type-check even when the signatures genuinely diverge. Subagents must not rely on `[override]` to catch base-class signature drift. (This is shared with `src/`; not test-specific. Documented here so reviewers don't assume strict catches it.)
 
 ## Execution plan (high-level)
 
@@ -91,9 +104,10 @@ Detailed step-by-step ordering, dependencies, and verification commands belong i
 ### Phase A — Main thread, sequential
 
 1. Worktree off fresh `dev` on branch `b/mypy-on-tests` (done before this spec was written).
-2. Commit this spec.
-3. **Infra commit**: edit `typing.yml` to add `tests` to the mypy invocation, add the `tests.server.*` override to `pyproject.toml`, and set the mypy step `continue-on-error: true` so warn-only mode protects the branch during fan-out.
-4. **Shared-surface fixes (sequential, must precede fan-out)**: type the modules that subagents depend on transitively:
+2. **Commit 1** — this spec.
+3. **Commit 2** — implementation plan (produced by `writing-plans` skill, lives at `docs/superpowers/plans/`).
+4. **Commit 3 — Infra**: edit `typing.yml` to add `tests` to the mypy invocation; add the `tests.server.*` override + the two `ignore_missing_imports` additions (`testcontainers.opensearch`, `warm_hf_cache`) to `pyproject.toml`; set the mypy step `continue-on-error: true` so warn-only mode protects the branch during fan-out.
+5. **Commit 4 — Shared-surface fixes (sequential, must precede fan-out)**: type the modules that subagents depend on transitively:
    - `tests/conftest.py` (38)
    - `tests/_fixtures/**` (10)
    - `tests/_transformers/**` (19)
@@ -101,29 +115,37 @@ Detailed step-by-step ordering, dependencies, and verification commands belong i
 
    Total: 67 errors. These produce a stable type surface for every other test file. After this commit, `mypy src/autointent tests/conftest.py tests/_fixtures tests/_helpers tests/_transformers` must exit clean.
 
+**Phase B subagent worktrees fork from Commit 4 (the shared-surface fix commit).** No subagent starts before Phase A is fully committed.
+
 ### Phase B — Subagent fan-out, parallel
 
-Eight subagents, each in its own git worktree off the Phase A head, each tasked with **zero mypy errors in its assigned subdirectory**.
+Ten subagents, each in its own git worktree off the Phase A head (specifically, off Commit 4 — the shared-surface-fix commit), each tasked with **zero mypy errors in its assigned subdirectory**.
 
 | # | Worktree branch | Scope | Baseline errors |
 |---|---|---|---|
-| 1 | `b/mypy-on-tests-modules` | `tests/modules` | 249 |
-| 2 | `b/mypy-on-tests-embedder` | `tests/embedder` | 108 |
-| 3 | `b/mypy-on-tests-data` | `tests/data` | 78 |
-| 4 | `b/mypy-on-tests-generation` | `tests/generation` | 65 |
-| 5 | `b/mypy-on-tests-configs` | `tests/configs` | 60 |
-| 6 | `b/mypy-on-tests-pipeline` | `tests/pipeline` | 41 |
-| 7 | `b/mypy-on-tests-context` | `tests/context` | 24 |
-| 8 | `b/mypy-on-tests-misc` | `tests/{callback,ci,metrics}` (server excluded via override; assets/logs/`__init__.py` have no checkable code) | 34 (7+10+17) |
+| 1 | `b/mypy-on-tests-modules-scoring` | `tests/modules/scoring` | 153 |
+| 2 | `b/mypy-on-tests-modules-decision` | `tests/modules/decision` (incl. `decision/conftest.py`) | 51 |
+| 3 | `b/mypy-on-tests-modules-rest` | `tests/modules/{embedding,test_dumper.py,test_regex.py}` | 45 (19+21+5) |
+| 4 | `b/mypy-on-tests-embedder` | `tests/embedder` (incl. `embedder/conftest.py`) | 108 |
+| 5 | `b/mypy-on-tests-data` | `tests/data` | 78 |
+| 6 | `b/mypy-on-tests-generation` | `tests/generation` | 65 |
+| 7 | `b/mypy-on-tests-configs` | `tests/configs` | 60 |
+| 8 | `b/mypy-on-tests-pipeline` | `tests/pipeline` | 41 |
+| 9 | `b/mypy-on-tests-context` | `tests/context` | 24 |
+| 10 | `b/mypy-on-tests-misc` | `tests/{callback,ci,metrics}` (incl. `ci/conftest.py`; server excluded via override; assets/logs/`__init__.py` have no checkable code) | 34 (7+10+17) |
+
+**`tests/modules` is pre-split into 3 subagents** because (a) a single 249-error / 32-file subdirectory risks subagent context blowout, (b) the natural `scoring`/`decision`/other split lines up with the module taxonomy, and (c) splitting up-front costs nothing and avoids the failed-subagent-round reactive recovery.
+
+**Per-subdir `conftest.py` ownership**: each subagent owns the `conftest.py` *inside its subdirectory* (e.g., `tests/embedder/conftest.py` belongs to subagent 4, `tests/modules/decision/conftest.py` to subagent 2, `tests/ci/conftest.py` to subagent 10). Only the *root* `tests/conftest.py` is frozen by Phase A. Subagents may re-type the arguments their per-subdir conftests *consume from* the frozen root conftest (e.g., a fixture that takes `dataset: Dataset` as a parameter) — that is annotating, not modifying the frozen surface.
 
 Each subagent contract (full text in the impl plan):
 - Read this spec.
 - Run `uv run --group typing mypy tests/<dir>` to confirm baseline.
 - Fix errors per the policy above.
 - Re-run mypy on its dir → expect 0 errors.
-- Run `uv run pytest tests/<dir>` (with appropriate `--extra` flags) to confirm no behavioral regression.
+- Run `uv run pytest --collect-only tests/<dir>` as cheap fixture/import verification. Full pytest runs happen on CI in Phase C — see Risks for why.
 - Report: diff, mypy exit status, pytest exit status, list of `# type: ignore` usages added (with codes and reasons).
-- **Hard limits**: subagent must not modify `src/`, `tests/conftest.py`, `tests/_fixtures/`, `tests/_helpers/`, `tests/_transformers/`, `pyproject.toml`, or any CI file. If a fix needs one of these, the subagent records the request in its report and leaves the test untouched.
+- **Hard limits**: subagent must not modify `src/`, the root `tests/conftest.py`, `tests/_fixtures/`, `tests/_helpers/`, `tests/_transformers/`, `pyproject.toml`, or any CI file. The subagent's *own* per-subdir `conftest.py` is owned by it (in scope). If a fix needs to touch a frozen path, the subagent records the request in its report and applies a local `cast()` or scoped `# type: ignore[...]` to avoid blocking on it; Phase C decides whether to honor the request.
 
 ### Phase C — Main thread, sequential
 
@@ -137,15 +159,26 @@ Each subagent contract (full text in the impl plan):
 
 ## Risks
 
-- **Subagent silently changes behavior while "fixing types"** (narrows `Any` to wrong concrete type, swallows a failure path, replaces a real call with a mock). Mitigation: each subagent runs `pytest tests/<dir>` post-fix and reports the exit; Phase C reviews diffs and any test that flips from failing-with-ignore to passing-with-wrong-type is a code smell to question.
+- **Subagent silently changes behavior while "fixing types"** (narrows `Any` to wrong concrete type, swallows a failure path, replaces a real call with a mock). Mitigation: each subagent runs `pytest --collect-only tests/<dir>` post-fix and reports the exit (catches fixture wiring and import-time breakage); Phase C reviews diffs, and the full pytest jobs on the eventual PR CI are the real backstop. Any test that flips from failing-with-ignore to passing-with-wrong-type is a code smell to question during review.
 - **Cross-subdir conflicts via shared fixtures**. Mitigation: Phase A freezes the shared surface; subagents are prohibited from touching it.
-- **A subagent runs out of context fixing 274 errors in `tests/modules`**. Mitigation: if the modules subagent reports partial completion, Phase C splits the remainder by sub-subdirectory (`tests/modules/scoring`, `tests/modules/decision`, etc.) into a follow-up subagent pass.
+- **A subagent runs out of context fixing its assigned subdir**. Mitigation: `tests/modules` is pre-split into 3 (scoring/decision/rest); the largest remaining single-subagent load is `tests/modules/scoring` at 153 errors across 17 files, which prior bulk-type-fix sessions handle comfortably. If any subagent reports partial completion, Phase C splits the remainder by file count into a follow-up subagent pass.
 - **Real src/ type bugs surface**. Mitigation: documented escalation path (Phase C step 5).
+- **Subagent pytest runs are too slow** (e.g., `tests/modules/scoring` with full ML extras can take many minutes). Mitigation: each subagent runs `pytest --collect-only tests/<dir>` as the mandatory cheap verification (catches import-time and fixture wiring breakage), and at most a smoke subset of fast tests; full pytest runs happen on CI when Phase C pushes the branch.
+- **uv sync contention across 10 parallel worktrees**. Mitigation: subagents are launched with `Agent({isolation: "worktree"})`, which serializes worktree creation; uv's global cache (`~/.cache/uv` / `~/Library/Caches/uv`) shares downloaded artifacts across worktrees so each subsequent sync is mostly hardlink work. If contention shows up in practice, Phase B falls back to staggered launches (sets of 5).
 - **Pytest types regressing under a future pytest upgrade** (out-of-scope risk, but worth a note). Mitigation: the gate is enforced; an upgrade that breaks types fails CI loudly.
 
 ## Rollback
 
 Warn-only mode in Phase A through Phase B keeps `b/mypy-on-tests` from ever being CI-red mid-flight. The final flip is one line in `typing.yml`. If the PR is rejected, deleting the branch reverts everything; no other branch is affected.
+
+## Open questions deferred to the implementation plan
+
+These are real questions the impl plan or Phase A discovery must answer; they are not blockers for the spec.
+
+- **Helper signature conflict at Commit 4.** If a subagent in Phase B needs a *different* annotation for a fixture in the (frozen) `tests/_fixtures/` than what Commit 4 chose, the subagent applies a local `cast()` and records the request in its report. Phase C decides whether to widen the helper's type and re-run mypy across affected subdirs. No subagent re-runs because of this.
+- **Pytest plugin coverage**: `pytest-asyncio` and `pytest-rerunfailures` are pinned in deps. The impl plan must spot-check that their public types resolve under the `typing` group; if not, add to `ignore_missing_imports` in Commit 3.
+- **Per-extra pytest invocation in Phase B**: each subagent runs `pytest --collect-only tests/<dir>`. The impl plan specifies *which* `--extra` flags each subagent needs to install (e.g., subagent 1 (`modules/scoring`) needs `--extra catboost --extra peft --extra transformers --extra sentence-transformers`). The CI workflow already encodes these mappings — the plan can crib from `.github/workflows/ci.yaml`.
+- **Mock-patching private `src/` modules**: tests like `tests/_fixtures/mock_generator.py` patch `autointent.modules.scoring._description.llm_encoder`. Strict typing of patched-attribute access may need `cast(Any, ...)` patterns. Policy applies (escape hatch with code + reason); call out in the impl plan that this pattern is *expected* in the frozen `_fixtures/` work in Commit 4.
 
 ## Done criteria
 
