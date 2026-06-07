@@ -1,10 +1,11 @@
-"""Tests for structured output functionality."""
+"""Tests for structured output retry semantics."""
 
 from __future__ import annotations
 
-import os
+import json
 from typing import Literal
 
+import httpx
 import pytest
 from pydantic import BaseModel, Field, model_validator
 
@@ -33,55 +34,90 @@ class Person(BaseModel):
         return self
 
 
+VALID_PERSON_JSON = json.dumps(
+    {
+        "reasoning": "ok",
+        "name": "Alice Example",
+        "age": 30,
+        "email": "alice@example.com",
+        "occupation": "office worker",
+        "is_active": True,
+        "status": "pending",
+        "hobbies": ["reading", "hiking", "cooking", "gaming", "cycling"],
+    }
+)
+INVALID_PERSON_JSON = json.dumps(
+    {
+        "reasoning": "bad",
+        "name": "x",
+        "age": 0,
+        "email": "x@y",
+        "occupation": "wrong",
+        "is_active": True,
+        "status": "active",
+        "hobbies": [],
+    }
+)
+
+
+def _resp(content: str) -> httpx.Response:
+    return httpx.Response(
+        200,
+        json={
+            "id": "chatcmpl-test",
+            "object": "chat.completion",
+            "created": 0,
+            "model": "gpt-test",
+            "choices": [{"index": 0, "message": {"role": "assistant", "content": content}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+        },
+    )
+
+
 @pytest.fixture
-def generator():
-    """Create a generator instance for testing."""
+def generator(respx_openai):
     return Generator(max_tokens=1000, use_cache=False)
 
 
-@pytest.mark.skipif(
-    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
-    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
-)
 class TestStructuredOutput:
-    """Test structured output functionality for different backends."""
-
-    def test_structured_output_sync_success_with_enough_retries(self, generator):
-        """Test structured output sync that succeeds with enough retries."""
+    def test_structured_output_sync_success_with_enough_retries(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(
+            side_effect=[_resp(INVALID_PERSON_JSON), _resp(INVALID_PERSON_JSON), _resp(VALID_PERSON_JSON)]
+        )
         result = generator.get_structured_output_sync(
-            messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+            messages=[{"role": Role.USER, "content": "ok"}],
             output_model=Person,
             max_retries=5,
         )
-
         assert isinstance(result, Person)
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_success_with_enough_retries(self, generator):
-        """Test structured output async that succeeds with enough retries."""
+    async def test_structured_output_async_success_with_enough_retries(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(
+            side_effect=[_resp(INVALID_PERSON_JSON), _resp(INVALID_PERSON_JSON), _resp(VALID_PERSON_JSON)]
+        )
         result = await generator.get_structured_output_async(
-            messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+            messages=[{"role": Role.USER, "content": "ok"}],
             output_model=Person,
             max_retries=5,
         )
-
         assert isinstance(result, Person)
 
-    def test_structured_output_sync_failure_with_insufficient_retries(self, generator):
-        """Test structured output sync that fails with insufficient retries."""
+    def test_structured_output_sync_failure_with_insufficient_retries(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_resp(INVALID_PERSON_JSON))
         with pytest.raises(RetriesExceededError):
             generator.get_structured_output_sync(
-                messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+                messages=[{"role": Role.USER, "content": "ok"}],
                 output_model=Person,
                 max_retries=2,
             )
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_failure_with_insufficient_retries(self, generator):
-        """Test structured output async that fails with insufficient retries."""
+    async def test_structured_output_async_failure_with_insufficient_retries(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_resp(INVALID_PERSON_JSON))
         with pytest.raises(RetriesExceededError):
             await generator.get_structured_output_async(
-                messages=[{"role": Role.USER, "content": "How would a nice student look like?"}],
+                messages=[{"role": Role.USER, "content": "ok"}],
                 output_model=Person,
                 max_retries=2,
             )
