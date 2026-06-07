@@ -30,9 +30,7 @@ def _make_categorization(most_probable_index: int = 0) -> IntentCategorization:
 def mock_generator():
     """Return a Mock(spec=Generator) whose sync structured-output returns canned categorization."""
     gen = Mock(spec=Generator)
-    gen.get_structured_output_sync.side_effect = lambda _messages, _output_model, _max_retries: _make_categorization(
-        _n_intents=10
-    )
+    gen.get_structured_output_sync.side_effect = lambda **kwargs: _make_categorization()
     gen.get_chat_completion.return_value = "mocked response"
     return gen
 
@@ -41,9 +39,7 @@ def mock_generator():
 def mock_async_generator():
     """Return an AsyncMock-spec'd Generator whose async structured-output returns canned categorization."""
     gen = Mock(spec=Generator)
-    gen.get_structured_output_async = AsyncMock(
-        side_effect=lambda _messages, _output_model, _max_retries: _make_categorization()
-    )
+    gen.get_structured_output_async = AsyncMock(side_effect=lambda **kwargs: _make_categorization())
     gen.get_chat_completion_async = AsyncMock(return_value="mocked response")
     return gen
 
@@ -59,12 +55,8 @@ def patch_llm_scorer_generator(monkeypatch):
     from autointent.modules.scoring._description import llm_encoder
 
     combined = Mock(spec=Generator)
-    combined.get_structured_output_sync.side_effect = (
-        lambda _messages, _output_model, _max_retries: _make_categorization()
-    )
-    combined.get_structured_output_async = AsyncMock(
-        side_effect=lambda _messages, _output_model, _max_retries: _make_categorization()
-    )
+    combined.get_structured_output_sync.side_effect = lambda **kwargs: _make_categorization()
+    combined.get_structured_output_async = AsyncMock(side_effect=lambda **kwargs: _make_categorization())
     combined.get_chat_completion.return_value = "mocked response"
     combined.get_chat_completion_async = AsyncMock(return_value="mocked response")
 
