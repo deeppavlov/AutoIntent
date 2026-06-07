@@ -17,44 +17,10 @@ from tests.conftest import get_test_embedder_config
 if TYPE_CHECKING:
     from autointent.configs import EmbedderConfig
 
-# Check if opensearch-py is available
-opensearch_available = True
-try:
-    import opensearchpy
-except ImportError:
-    opensearch_available = False
-
-
-def is_opensearch_running() -> bool:
-    """Check if OpenSearch is running on localhost:9200."""
-    if not opensearch_available:
-        return False
-
-    try:
-        client = opensearchpy.OpenSearch(hosts=[{"host": "localhost", "port": 9200}], timeout=1, max_retries=0)
-        client.cluster.health(timeout=1)
-    except opensearchpy.ConnectionError as e:
-        if "Connection refused" in str(e):
-            return False
-        raise
-    else:
-        return True
-
-
 # Backend configurations for parametrization
 backend_configs = [
     pytest.param(FaissConfig(), id="faiss"),
-    pytest.param(
-        OpenSearchConfig(
-            hosts=[{"host": "localhost", "port": 9200}],
-            index_name=None,  # Will be auto-generated
-        ),
-        marks=pytest.mark.skipif(
-            not opensearch_available or not is_opensearch_running(),
-            reason="OpenSearch not available or not running on localhost:9200",
-        ),
-        id="opensearch",
-    ),
+    pytest.param("opensearch_lazy", id="opensearch"),  # resolved to real config in vector_index fixture
 ]
 
 
@@ -68,10 +34,18 @@ class TestVectorIndex:
         return get_test_embedder_config()
 
     @pytest.fixture
-    def vector_index(self, embedder_config: EmbedderConfig, vector_config) -> VectorIndex:
+    def vector_index(
+        self, embedder_config: EmbedderConfig, vector_config, opensearch_container
+    ) -> VectorIndex:
         """Create a VectorIndex instance for testing."""
-        # For OpenSearch, ensure unique index names to avoid test interference
-        if isinstance(vector_config, OpenSearchConfig):
+        if vector_config == "opensearch_lazy":
+            host, port = opensearch_container
+            unique_id = str(uuid.uuid4())[:8]
+            vector_config = OpenSearchConfig(
+                hosts=[{"host": host, "port": port}],
+                index_name=f"test_index_{unique_id}",
+            )
+        elif isinstance(vector_config, OpenSearchConfig):
             unique_id = str(uuid.uuid4())[:8]
             vector_config.index_name = f"test_index_{unique_id}"
 
@@ -95,9 +69,11 @@ class TestVectorIndex:
 
     def test_initialization(self, vector_index: VectorIndex, vector_config):
         """Test VectorIndex initialization."""
-        assert vector_index.config == vector_config
+        if isinstance(vector_config, str):  # placeholder for opensearch
+            assert isinstance(vector_index.config, OpenSearchConfig)
+        else:
+            assert vector_index.config == vector_config
         assert hasattr(vector_index, "embedder")
-        # Index should not be created until first add
         assert not hasattr(vector_index, "index")
 
     def test_add_texts_and_labels(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
