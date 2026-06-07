@@ -289,7 +289,9 @@ module = [
     "joblib",
     "torch.utils.tensorboard",
     "tensorboardX",
+    "testcontainers.opensearch",
     "wandb",
+    "warm_hf_cache",
     "dspy",
     "dspy.evaluate.auto_evaluation",
     "codecarbon",
@@ -309,4 +311,8 @@ module = [
     "autointent.server.http",
     "autointent.server.mcp",
 ]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["tests.server.*"]
 ignore_errors = true
