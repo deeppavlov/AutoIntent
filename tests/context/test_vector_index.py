@@ -35,11 +35,11 @@ class TestVectorIndex:
 
     @pytest.fixture
     def vector_index(
-        self, embedder_config: EmbedderConfig, vector_config, opensearch_container
+        self, embedder_config: EmbedderConfig, vector_config, request
     ) -> VectorIndex:
         """Create a VectorIndex instance for testing."""
         if vector_config == "opensearch_lazy":
-            host, port = opensearch_container
+            host, port = request.getfixturevalue("opensearch_container")
             unique_id = str(uuid.uuid4())[:8]
             vector_config = OpenSearchConfig(
                 hosts=[{"host": host, "port": port}],
