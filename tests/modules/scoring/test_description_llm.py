@@ -41,14 +41,6 @@ def test_description_scorer_llm(dataset, multilabel, patch_llm_scorer_generator)
     assert metadata is None
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "LLMDescriptionScorer.dump silently drops generator_config (dict not in "
-        "ModuleSimpleAttributes); loaded scorer is broken. See "
-        "https://github.com/deeppavlov/AutoIntent/issues/299. Flip to xpass when fixed."
-    ),
-)
 @pytest.mark.parametrize("multilabel", [True, False])
 def test_description_scorer_llm_dump_load_roundtrip(dataset, multilabel, patch_llm_scorer_generator):
     if multilabel:
