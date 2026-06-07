@@ -28,8 +28,8 @@ Do not relax these tests to add an import.
 
 Update an entry below when you intentionally want to move a default to a
 newer revision. To add a new pinned model, add a new entry here, then
-(optionally) list its repo ID in .ci/hf-prewarm-linux.yaml /
-hf-prewarm-windows.yaml if it should be CI-prewarmed.
+(optionally) list its repo ID in .ci/hf-prewarm.yaml if it should be
+CI-prewarmed.
 """
 
 from __future__ import annotations

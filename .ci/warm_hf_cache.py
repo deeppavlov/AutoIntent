@@ -7,7 +7,9 @@
 Reads ``.ci/hf-prewarm.yaml`` and ensures every listed model / dataset is
 present in ``~/.cache/huggingface`` at the pinned revision. The CI workflow
 runs this in a dedicated job before any test job so tests find every HF
-resource on disk and never make HF API calls themselves.
+resource on disk and never make HF API calls themselves. A single config
+serves both Linux and Windows runners; the cache is OS-namespaced by the
+workflow's ``${{ runner.os }}`` key prefix.
 
 Entries in the YAML are bare repo IDs. SHAs are resolved against
 ``autointent.configs._pinned_revisions.DEFAULT_REVISIONS`` at runtime
@@ -79,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--config",
         type=Path,
-        default=Path(".ci/hf-prewarm-linux.yaml"),
+        default=Path(".ci/hf-prewarm.yaml"),
         help="Path to the prewarm config YAML (default: %(default)s).",
     )
     parser.add_argument(
@@ -125,7 +127,7 @@ def _resolve_entry(repo_id: str, repo_type: RepoType) -> Entry:
         msg = (
             f"{repo_id!r} ({repo_type}) not in DEFAULT_REVISIONS. Add a pin "
             "to src/autointent/configs/_pinned_revisions.py before listing "
-            "the repo in .ci/hf-prewarm-*.yaml."
+            "the repo in .ci/hf-prewarm.yaml."
         )
         raise ConfigError(msg)
     return Entry(repo_type=repo_type, repo_id=repo_id, revision=DEFAULT_REVISIONS[repo_id])

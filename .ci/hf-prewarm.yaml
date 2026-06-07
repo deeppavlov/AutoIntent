@@ -3,6 +3,10 @@
 # every other test path either uses HashingVectorizerEmbeddingConfig (via
 # tests/conftest.py::get_test_embedder_config) or loads from a local asset.
 #
+# Single file for both Linux and Windows runners — the warm-cache job's
+# matrix uses one runner per OS but they share this config; the cache is
+# OS-namespaced by the workflow's ${{ runner.os }} key prefix.
+#
 # Entries are BARE repo IDs. SHAs are looked up from
 # src/autointent/configs/_pinned_revisions.py::DEFAULT_REVISIONS by
 # .ci/warm_hf_cache.py at runtime. Adding a repo here without adding a

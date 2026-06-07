@@ -77,10 +77,7 @@ class TestPrewarmConfigsAreSubsetOfDefaultRevisions:
     CI time. This test catches the same drift at unit-test time so a
     misconfigured YAML never reaches the warm-cache job."""
 
-    @pytest.mark.parametrize(
-        "yaml_path",
-        [".ci/hf-prewarm-linux.yaml", ".ci/hf-prewarm-windows.yaml"],
-    )
+    @pytest.mark.parametrize("yaml_path", [".ci/hf-prewarm.yaml"])
     def test_every_model_is_pinned_in_default_revisions(self, yaml_path):
         from pathlib import Path
 
@@ -97,10 +94,7 @@ class TestPrewarmConfigsAreSubsetOfDefaultRevisions:
             f"src/autointent/configs/_pinned_revisions.py."
         )
 
-    @pytest.mark.parametrize(
-        "yaml_path",
-        [".ci/hf-prewarm-linux.yaml", ".ci/hf-prewarm-windows.yaml"],
-    )
+    @pytest.mark.parametrize("yaml_path", [".ci/hf-prewarm.yaml"])
     def test_no_sha_suffix_in_repo_ids(self, yaml_path):
         """The new YAML format is bare repo IDs. A '@' in an entry means
         someone added an entry in the old 'repo@sha' format — likely
