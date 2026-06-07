@@ -103,7 +103,7 @@ jobs:
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
-      test_command: pytest -n auto tests/pipeline/test_optimization.py
+      test_command: pytest -n auto tests/pipeline/test_optimization.py tests/pipeline/test_pipeline_interruption.py tests/pipeline/test_validation.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
 
   test-inference:
