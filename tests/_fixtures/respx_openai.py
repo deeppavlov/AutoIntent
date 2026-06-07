@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 import pytest
 import respx
+from respx.router import MockRouter
 
 
 @pytest.fixture
-def respx_openai(monkeypatch):
+def respx_openai(monkeypatch: pytest.MonkeyPatch) -> Iterator[MockRouter]:
     """Yield a respx.MockRouter scoped to https://api.openai.com.
 
     Ensures Generator/OpenaiEmbeddingBackend find a valid OPENAI_API_KEY and a model

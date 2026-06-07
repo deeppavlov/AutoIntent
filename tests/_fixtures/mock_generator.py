@@ -9,6 +9,7 @@ at module load time, so patching the original module is too late).
 
 from __future__ import annotations
 
+from typing import Any, cast
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -27,25 +28,25 @@ def _make_categorization(most_probable_index: int = 0) -> IntentCategorization:
 
 
 @pytest.fixture
-def mock_generator():
+def mock_generator() -> Generator:
     """Return a Mock(spec=Generator) whose sync structured-output returns canned categorization."""
     gen = Mock(spec=Generator)
     gen.get_structured_output_sync.side_effect = lambda **kwargs: _make_categorization()
     gen.get_chat_completion.return_value = "mocked response"
-    return gen
+    return cast(Generator, gen)
 
 
 @pytest.fixture
-def mock_async_generator():
+def mock_async_generator() -> Generator:
     """Return an AsyncMock-spec'd Generator whose async structured-output returns canned categorization."""
     gen = Mock(spec=Generator)
     gen.get_structured_output_async = AsyncMock(side_effect=lambda **kwargs: _make_categorization())
     gen.get_chat_completion_async = AsyncMock(return_value="mocked response")
-    return gen
+    return cast(Generator, gen)
 
 
 @pytest.fixture
-def patch_llm_scorer_generator(monkeypatch):
+def patch_llm_scorer_generator(monkeypatch: pytest.MonkeyPatch) -> Generator:
     """Patch the Generator symbol inside llm_encoder so LLMDescriptionScorer uses the mock.
 
     Both sync and async code paths on the same instance are exercised; we return a
@@ -60,8 +61,8 @@ def patch_llm_scorer_generator(monkeypatch):
     combined.get_chat_completion.return_value = "mocked response"
     combined.get_chat_completion_async = AsyncMock(return_value="mocked response")
 
-    def _patched_constructor(*args, **kwargs):
+    def _patched_constructor(*args: Any, **kwargs: Any) -> Mock:
         return combined
 
     monkeypatch.setattr(llm_encoder, "Generator", _patched_constructor)
-    return combined
+    return cast(Generator, combined)

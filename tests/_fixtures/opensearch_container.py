@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 import pytest
 
 
 @pytest.fixture(scope="session")
-def opensearch_container():
+def opensearch_container() -> Iterator[tuple[str, int]]:
     """Boot an OpenSearch container for the test session; yield (host, port)."""
     from testcontainers.opensearch import OpenSearchContainer
 
