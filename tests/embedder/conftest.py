@@ -119,4 +119,3 @@ def create_vllm_config(**kwargs) -> VllmEmbeddingConfig:
 @pytest.fixture(autouse=True)
 def _autouse_fake_openai_embedding(patch_openai_embedding_backend):
     """Within tests/embedder/, every OpenaiEmbeddingConfig resolves to FakeOpenaiEmbeddingBackend."""
-    yield

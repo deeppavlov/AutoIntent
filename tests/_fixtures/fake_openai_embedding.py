@@ -88,12 +88,10 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
         self._client = self._client or object()
         dim = getattr(self.config, "dimensions", None) or 1536
 
-        # Prompt seed differs per task_type so test_prompts_application sees a difference.
-        if task_type is None:
-            seed_extra = self.config.model_name
-        else:
-            prompt = getattr(self.config, f"{task_type.value}_prompt", None) or ""
-            seed_extra = f"{self.config.model_name}|{task_type.value}|{prompt}"
+        # Prompt seed mirrors BaseEmbedderConfig.get_prompt() so that two task types
+        # sharing the same default_prompt produce identical vectors.
+        prompt = self.config.get_prompt(task_type)
+        seed_extra = f"{self.config.model_name}|{prompt or ''}"
 
         vectors = np.stack([_seeded_vector(text, dim, seed_extra=seed_extra) for text in utterances])
         if return_tensors:

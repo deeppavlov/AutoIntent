@@ -34,7 +34,7 @@ def _disable_transformers_mistral_regex_patch() -> None:
     if base is None or not hasattr(base, "_patch_mistral_regex"):
         return
 
-    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):  # noqa: ARG001
+    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):
         return tokenizer
 
     base._patch_mistral_regex = classmethod(_noop_patch_mistral_regex)

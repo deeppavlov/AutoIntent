@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import shutil
+import subprocess
 import sys
 import tempfile
 import uuid
@@ -17,10 +19,32 @@ from tests.conftest import get_test_embedder_config
 if TYPE_CHECKING:
     from autointent.configs import EmbedderConfig
 
+def _docker_available() -> bool:
+    """Detect whether Docker is reachable for testcontainers (skipped on most Windows CI)."""
+    if shutil.which("docker") is None:
+        return False
+    try:
+        result = subprocess.run(
+            ["docker", "info"], capture_output=True, timeout=5, check=False
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0
+
+
+_DOCKER_AVAILABLE = _docker_available()
+
 # Backend configurations for parametrization
 backend_configs = [
     pytest.param(FaissConfig(), id="faiss"),
-    pytest.param("opensearch_lazy", id="opensearch"),  # resolved to real config in vector_index fixture
+    pytest.param(
+        "opensearch_lazy",
+        id="opensearch",
+        marks=pytest.mark.skipif(
+            not _DOCKER_AVAILABLE,
+            reason="Docker not available; testcontainers cannot boot OpenSearch",
+        ),
+    ),  # resolved to real config in vector_index fixture
 ]
 
 

@@ -64,6 +64,7 @@ jobs:
     secrets: inherit
     with:
       test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
+      extras: --extra openai
 
   test-embedder:
     name: test-embedder
