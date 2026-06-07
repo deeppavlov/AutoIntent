@@ -9,11 +9,13 @@ present in ``~/.cache/huggingface`` at the pinned revision. The CI workflow
 runs this in a dedicated job before any test job so tests find every HF
 resource on disk and never make HF API calls themselves.
 
-Entries are ``"<repo_id>@<sha>"`` where ``sha`` is a 40-char hex commit
-hash. Pinning to a SHA lets the fast path (``snapshot_download`` with
-``local_files_only=True``) decide "cache is complete" without calling the
-HF API, which is what avoids the 1000-req/5-min rate limit on cold-cache
-CI runs.
+Entries in the YAML are bare repo IDs. SHAs are resolved against
+``autointent.configs._pinned_revisions.DEFAULT_REVISIONS`` at runtime
+via a ``sys.path`` shim (see the import block below). Pinning the
+revision lets the fast path (``snapshot_download`` with
+``local_files_only=True``) decide "cache is complete" without calling
+the HF API, which is what avoids the 1000-req/5-min rate limit on
+cold-cache CI runs.
 
 This module is also imported by ``tests/ci/test_warm_hf_cache.py``, so
 keep top-level imports cheap and side-effect-free.
@@ -105,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _resolve_entry(repo_id: str, repo_type: str) -> Entry:
+def _resolve_entry(repo_id: str, repo_type: RepoType) -> Entry:
     """Resolve a repo ID to a pinned Entry via DEFAULT_REVISIONS.
 
     Raises:
