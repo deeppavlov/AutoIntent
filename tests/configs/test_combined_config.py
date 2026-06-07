@@ -73,7 +73,7 @@ def test_invalid_optimizer_config_missing_field():
 
 
 def test_deberta_v3_large_is_pinned():
-    from autointent.configs._transformers import DEFAULT_REVISIONS
+    from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-large")
     assert sha is not None, "microsoft/deberta-v3-large must be pinned (used by transformers-heavy preset)"
@@ -82,7 +82,7 @@ def test_deberta_v3_large_is_pinned():
 
 
 def test_canonical_test_models_have_pinned_revisions():
-    from autointent.configs._transformers import DEFAULT_REVISIONS
+    from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
     from tests.conftest import (
         TINY_BERT,
         TINY_CROSS_ENCODER,
@@ -142,7 +142,7 @@ def test_hf_guard_allows_sha_pinned_revision():
 
 
 def test_deberta_v3_small_is_pinned():
-    from autointent.configs._transformers import DEFAULT_REVISIONS
+    from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-small")
     assert sha is not None, (
@@ -172,13 +172,18 @@ def test_invalid_optimizer_config_wrong_type():
 
 
 def test_pinned_revisions_module_has_no_runtime_imports():
-    """The leaf module must be loadable without autointent's deps installed.
+    """The leaf module must stay minimal — no imports beyond __future__.
 
-    .ci/warm_hf_cache.py imports it via a sys.path shim that does NOT
-    install pydantic, datasets, or any other autointent dep. If a future
-    edit adds e.g. `import json` to _pinned_revisions, the warm-cache job
-    silently keeps working in environments that happen to have json
-    available but breaks in stricter ones; this test prevents that drift.
+    .ci/warm_hf_cache.py loads it via importlib.util.spec_from_file_location,
+    which DOES execute any imports the leaf module declares. The
+    spec_from_file_location load path keeps the warm-cache job working
+    today even with extra imports, but a future contributor adding e.g.
+    `import json` would couple the warm-cache env to whatever that
+    transitive import needs. Keep the surface zero so the contract is
+    obvious: this file is just data.
+
+    See test_leaf_module_loadable_without_autointent_package below for
+    the load-path correctness test.
     """
     import ast
     from pathlib import Path
@@ -199,3 +204,47 @@ def test_pinned_revisions_module_has_no_runtime_imports():
                 f"_pinned_revisions.py must not contain `import` statements; "
                 f"found: {modules}"
             )
+
+
+def test_leaf_module_loadable_without_autointent_package():
+    """The warm-cache CI job loads _pinned_revisions.py via
+    importlib.util.spec_from_file_location in an environment where the
+    autointent package is NOT installed. Run that exact load mechanism
+    in a clean subprocess to catch regressions in the import path.
+
+    Without this test, a refactor that re-introduced
+    `from autointent.configs._pinned_revisions import ...` in
+    warm_hf_cache.py would pass all in-process tests (because the dev
+    venv has autointent installed) but break CI silently.
+    """
+    import subprocess
+    import sys
+    import textwrap
+    from pathlib import Path
+
+    leaf = Path(__file__).resolve().parents[2] / "src" / "autointent" / "configs" / "_pinned_revisions.py"
+    assert leaf.is_file(), f"expected leaf module at {leaf}"
+
+    script = textwrap.dedent(
+        f"""
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('_pr', r'{leaf}')
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert isinstance(mod.DEFAULT_REVISIONS, dict), 'DEFAULT_REVISIONS must be a dict'
+        assert mod.DEFAULT_REVISIONS, 'DEFAULT_REVISIONS must be non-empty'
+        """
+    )
+    # Use -S to skip site-packages too, so we approximate the warm-cache
+    # job's slim env as closely as possible from inside the dev venv.
+    # The leaf module's only import is `from __future__ import annotations`
+    # which is a syntax directive and doesn't touch sys.path.
+    result = subprocess.run(
+        [sys.executable, "-S", "-c", script],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        f"Hermetic load failed:\nstdout={result.stdout}\nstderr={result.stderr}"
+    )

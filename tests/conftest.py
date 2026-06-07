@@ -110,7 +110,7 @@ def get_test_embedder_config(**kwargs):
 # Canonical test models. See docs/superpowers/specs/2026-06-06-hf-test-refactor-design.md
 #
 # Every test that genuinely needs an HF model uses one of these three. The
-# SHAs are pinned in src/autointent/configs/_transformers.DEFAULT_REVISIONS,
+# SHAs are pinned in src/autointent/configs/_pinned_revisions.DEFAULT_REVISIONS,
 # so HFModelConfig._apply_default_revision auto-fills `revision` on each
 # config instantiated below and no HF API call is needed to resolve a tag.
 # ---------------------------------------------------------------------------

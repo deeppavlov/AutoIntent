@@ -24,6 +24,7 @@ keep top-level imports cheap and side-effect-free.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import logging
 import sys
 import time
@@ -33,14 +34,17 @@ from typing import Literal
 
 import yaml
 
-# sys.path shim: load DEFAULT_REVISIONS from the autointent leaf module
-# without installing the package. The leaf module is by contract
-# zero-dependency (enforced by
-# tests/configs/test_combined_config.py::test_pinned_revisions_module_has_no_runtime_imports)
-# so this import succeeds in the warm-cache job's slim environment.
-_REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(_REPO_ROOT / "src"))
-from autointent.configs._pinned_revisions import DEFAULT_REVISIONS  # noqa: E402
+# Load DEFAULT_REVISIONS from the autointent leaf module WITHOUT going
+# through the package's import machinery. A plain
+# `from autointent.configs._pinned_revisions import ...` would execute
+# autointent/__init__.py first, which imports pydantic/numpy/etc and
+# crashes in the warm-cache job's slim env. importlib.util loads the
+# file directly by path, bypassing the parent package entirely.
+_LEAF = Path(__file__).resolve().parent.parent / "src" / "autointent" / "configs" / "_pinned_revisions.py"
+_spec = importlib.util.spec_from_file_location("_pinned_revisions", _LEAF)
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+DEFAULT_REVISIONS: dict[str, str] = _mod.DEFAULT_REVISIONS
 
 logger = logging.getLogger("warm_hf_cache")
 
