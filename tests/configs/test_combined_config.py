@@ -127,6 +127,17 @@ def test_hf_guard_allows_sha_pinned_revision():
     assert guard("repo/id", "file.bin", revision=sha2) is sentinel
 
 
+def test_deberta_v3_small_is_pinned():
+    from autointent.configs._transformers import DEFAULT_REVISIONS
+    sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-small")
+    assert sha is not None, (
+        "microsoft/deberta-v3-small must be pinned "
+        "(used by transformers-light + transformers-no-hpo presets)"
+    )
+    assert len(sha) == 40
+    assert all(c in "0123456789abcdef" for c in sha), f"SHA must be lowercase hex; got {sha!r}"
+
+
 def test_invalid_optimizer_config_wrong_type():
     """Test that an invalid field type raises ValidationError."""
     invalid_config = {
