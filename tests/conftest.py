@@ -73,3 +73,14 @@ def get_test_embedder_config(**kwargs):
     }
     defaults.update(kwargs)
     return HashingVectorizerEmbeddingConfig(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# Shared mocking fixtures. See docs/superpowers/specs/2026-06-07-live-api-test-mocking-strategy.md
+# ---------------------------------------------------------------------------
+
+from tests._fixtures.mock_generator import (  # noqa: E402, F401
+    mock_async_generator,
+    mock_generator,
+    patch_llm_scorer_generator,
+)
