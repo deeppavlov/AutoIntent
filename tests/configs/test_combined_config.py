@@ -183,7 +183,7 @@ def test_pinned_revisions_module_has_no_runtime_imports():
             )
         elif isinstance(node, ast.Import):
             modules = [alias.name for alias in node.names]
-            raise AssertionError(
+            assert not modules, (
                 f"_pinned_revisions.py must not contain `import` statements; "
                 f"found: {modules}"
             )

@@ -5,7 +5,10 @@ from typing import TYPE_CHECKING, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, model_validator
 from typing_extensions import assert_never
 
-from autointent.configs._pinned_revisions import DEFAULT_REVISIONS  # noqa: F401
+# DEFAULT_REVISIONS is the canonical SHA pin dict; the leaf module has
+# zero non-__future__ imports so .ci/warm_hf_cache.py can load it via a
+# sys.path shim without installing autointent. See _pinned_revisions.py.
+from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
