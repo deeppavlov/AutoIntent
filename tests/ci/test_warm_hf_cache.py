@@ -69,3 +69,52 @@ class TestLoadConfig:
         )
         with pytest.raises(wc.ConfigError, match="not in DEFAULT_REVISIONS"):
             wc._load_config(cfg)
+
+
+class TestPrewarmConfigsAreSubsetOfDefaultRevisions:
+    """Defense-in-depth: the warm-cache job itself raises ConfigError on
+    unknown repo IDs (via _resolve_entry), but that error only fires at
+    CI time. This test catches the same drift at unit-test time so a
+    misconfigured YAML never reaches the warm-cache job."""
+
+    @pytest.mark.parametrize(
+        "yaml_path",
+        [".ci/hf-prewarm-linux.yaml", ".ci/hf-prewarm-windows.yaml"],
+    )
+    def test_every_model_is_pinned_in_default_revisions(self, yaml_path):
+        from pathlib import Path
+
+        import yaml as pyyaml
+
+        from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
+
+        repo_root = Path(__file__).resolve().parents[2]
+        data = pyyaml.safe_load((repo_root / yaml_path).read_text()) or {}
+        models = data.get("models") or []
+        missing = [m for m in models if m not in DEFAULT_REVISIONS]
+        assert not missing, (
+            f"{yaml_path}: {missing} not in DEFAULT_REVISIONS. Add a pin to "
+            f"src/autointent/configs/_pinned_revisions.py."
+        )
+
+    @pytest.mark.parametrize(
+        "yaml_path",
+        [".ci/hf-prewarm-linux.yaml", ".ci/hf-prewarm-windows.yaml"],
+    )
+    def test_no_sha_suffix_in_repo_ids(self, yaml_path):
+        """The new YAML format is bare repo IDs. A '@' in an entry means
+        someone added an entry in the old 'repo@sha' format — likely
+        because they copy-pasted from git history. Catch it explicitly so
+        the error message points at the right fix."""
+        from pathlib import Path
+
+        import yaml as pyyaml
+
+        repo_root = Path(__file__).resolve().parents[2]
+        data = pyyaml.safe_load((repo_root / yaml_path).read_text()) or {}
+        with_sha = [m for m in (data.get("models") or []) if "@" in m]
+        assert not with_sha, (
+            f"{yaml_path}: {with_sha} use the old 'repo@sha' format. "
+            "Drop the '@<sha>' suffix; SHAs are looked up from "
+            "DEFAULT_REVISIONS by warm_hf_cache.py."
+        )
