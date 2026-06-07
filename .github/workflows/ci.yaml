@@ -16,14 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Per-OS split retained for cache-key namespacing; the content of
-        # both prewarm configs is currently identical (3 small SHA-pinned
-        # models, <250 MB total).
-        include:
-          - os: ubuntu-latest
-            config: .ci/hf-prewarm-linux.yaml
-          - os: windows-latest
-            config: .ci/hf-prewarm-windows.yaml
+        # Per-OS runners are needed because actions/cache pins by ${{ runner.os }}
+        # so Linux test jobs only restore caches saved by a Linux runner (likewise
+        # for Windows). The prewarm config itself is shared (.ci/hf-prewarm.yaml).
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     # Best-effort: an HF outage here must not cancel every PR. Test jobs
     # `needs: warm-cache` but proceed regardless via continue-on-error.
@@ -33,27 +29,28 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Hugging Face
+        id: cache-hf
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          # Hash both the prewarm configs (which list repo IDs to warm)
-          # AND _pinned_revisions.py (which holds the SHAs the warm
-          # script resolves against). Bumping a pinned SHA must
-          # invalidate the cache even when the YAML is unchanged.
-          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-
-            ${{ runner.os }}-hf-warmed-
+          # Stable key (no github.run_id): when the prewarm config and the
+          # SHA pins are unchanged from a previous run, the cache restores
+          # with cache-hit=true and the warm script is skipped entirely.
+          # Bumping a pinned SHA invalidates the cache automatically since
+          # hashFiles includes _pinned_revisions.py.
+          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm.yaml', 'src/autointent/configs/_pinned_revisions.py') }}
 
       - name: Install uv
+        if: steps.cache-hf.outputs.cache-hit != 'true'
         uses: astral-sh/setup-uv@v6
         with:
           version: "0.10.0"
 
       - name: Run warm-cache script
+        if: steps.cache-hf.outputs.cache-hit != 'true'
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config ${{ matrix.config }}
+        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config .ci/hf-prewarm.yaml
 
   unit-tests:
     name: unit-tests
