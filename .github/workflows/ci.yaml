@@ -50,7 +50,12 @@ jobs:
         if: steps.cache-hf.outputs.cache-hit != 'true'
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: uv run --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config .ci/hf-prewarm.yaml
+        # --no-project: skip the autointent install. The warm script loads
+        # _pinned_revisions.py via importlib.util.spec_from_file_location
+        # specifically so it doesn't need autointent on sys.path; without
+        # --no-project, `uv run` syncs the full project dep tree (~83
+        # packages, ~20s) before running.
+        run: uv run --no-project --with 'huggingface_hub[hf_xet]' --with pyyaml --with datasets python .ci/warm_hf_cache.py --config .ci/hf-prewarm.yaml
 
   unit-tests:
     name: unit-tests
