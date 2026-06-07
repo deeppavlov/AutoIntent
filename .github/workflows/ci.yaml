@@ -113,3 +113,29 @@ jobs:
     with:
       test_command: pytest -n auto tests/pipeline/test_inference.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+
+  # Single aggregator over every test fan-out so the GitHub ruleset only
+  # needs one required check ("all-tests") instead of 54 matrix entries.
+  # needs.<job>.result for a matrix caller is already the aggregate, so
+  # six needs cover all combinations. `if: always()` makes this job run
+  # even when an upstream failed, and the inner step fails on
+  # failure/cancelled/skipped — so a skipped required check (which most
+  # rulesets treat as not-passing) can't slip through.
+  all-tests:
+    name: all-tests
+    if: always()
+    needs:
+      - unit-tests
+      - test-embedder
+      - test-presets
+      - test-optimization
+      - test-inference
+      - test-scorers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check that every test job succeeded
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: |
+          echo "One or more test jobs did not succeed:"
+          echo '${{ toJson(needs) }}'
+          exit 1
