@@ -98,6 +98,5 @@ def test_ranker_passes_revision_to_cross_encoder():
 
     _, kwargs = mock_ce.call_args
     assert kwargs.get("revision") == cfg.revision, (
-        f"Ranker must forward revision={cfg.revision!r} to CrossEncoder(); "
-        f"actual kwargs={kwargs}"
+        f"Ranker must forward revision={cfg.revision!r} to CrossEncoder(); actual kwargs={kwargs}"
     )

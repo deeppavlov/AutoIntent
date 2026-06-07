@@ -1,4 +1,5 @@
 """Put the .ci/ directory on sys.path so tests can import warm_hf_cache.py."""
+
 from __future__ import annotations
 
 import sys

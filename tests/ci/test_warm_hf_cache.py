@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 import warm_hf_cache as wc
 
 

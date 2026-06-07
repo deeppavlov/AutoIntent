@@ -74,6 +74,7 @@ def test_invalid_optimizer_config_missing_field():
 
 def test_deberta_v3_large_is_pinned():
     from autointent.configs._transformers import DEFAULT_REVISIONS
+
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-large")
     assert sha is not None, "microsoft/deberta-v3-large must be pinned (used by transformers-heavy preset)"
     assert len(sha) == 40, f"SHA must be 40 chars; got {sha!r}"
@@ -109,6 +110,7 @@ def test_hf_guard_blocks_unpinned_revision():
     guard = _make_hf_guard(lambda *a, **k: sentinel, label="fake")
 
     import pytest
+
     for bad in (None, "main", "v1.0", "abc"):
         with pytest.raises(AssertionError, match="Unpinned HF call"):
             guard("repo/id", "file.bin", revision=bad)
@@ -129,10 +131,10 @@ def test_hf_guard_allows_sha_pinned_revision():
 
 def test_deberta_v3_small_is_pinned():
     from autointent.configs._transformers import DEFAULT_REVISIONS
+
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-small")
     assert sha is not None, (
-        "microsoft/deberta-v3-small must be pinned "
-        "(used by transformers-light + transformers-no-hpo presets)"
+        "microsoft/deberta-v3-small must be pinned (used by transformers-light + transformers-no-hpo presets)"
     )
     assert len(sha) == 40
     assert all(c in "0123456789abcdef" for c in sha), f"SHA must be lowercase hex; got {sha!r}"

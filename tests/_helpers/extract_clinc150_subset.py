@@ -24,12 +24,7 @@ from pathlib import Path
 
 from autointent import Dataset
 
-OUTPUT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "assets"
-    / "data"
-    / "clinc150_oos_input.json"
-)
+OUTPUT_PATH = Path(__file__).resolve().parents[1] / "assets" / "data" / "clinc150_oos_input.json"
 
 
 def main() -> None:

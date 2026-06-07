@@ -93,7 +93,6 @@ def test_apply_test_models_drops_stale_revision_in_search_space():
     HFModelConfig validator refills it from DEFAULT_REVISIONS.
     """
     from autointent import Pipeline
-
     from tests.conftest import apply_test_models, get_search_space
 
     pipeline = Pipeline.from_search_space(get_search_space("multiclass"))

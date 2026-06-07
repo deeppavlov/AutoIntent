@@ -123,12 +123,14 @@ TINY_SENTENCE_TRANSFORMER = "sergeyzh/rubert-tiny-turbo"
 def tiny_bert_config():
     """HFModelConfig pinned at TINY_BERT; revision auto-filled by validator."""
     from autointent.configs import HFModelConfig
+
     return HFModelConfig(model_name=TINY_BERT)
 
 
 def tiny_cross_encoder_config():
     """CrossEncoderConfig pinned at TINY_CROSS_ENCODER."""
     from autointent.configs import CrossEncoderConfig
+
     return CrossEncoderConfig(model_name=TINY_CROSS_ENCODER)
 
 
@@ -139,6 +141,7 @@ def tiny_sentence_transformer_config(**overrides):
     tests/embedder/conftest.py: batch_size=4, device='cpu', use_cache=False.
     """
     from autointent.configs import SentenceTransformerEmbeddingConfig
+
     base = {
         "model_name": TINY_SENTENCE_TRANSFORMER,
         "batch_size": 4,
@@ -222,6 +225,7 @@ _HF_SHA = _re.compile(r"^[0-9a-f]{40}$")
 
 def _make_hf_guard(orig, label: str):
     """Wrap an HF entry point so calls with revision not matching a 40-hex SHA raise."""
+
     def guarded(repo_id, *args, revision=None, **kwargs):
         if revision is None or not _HF_SHA.match(revision):
             msg = (
@@ -230,6 +234,7 @@ def _make_hf_guard(orig, label: str):
             )
             raise AssertionError(msg)
         return orig(repo_id, *args, revision=revision, **kwargs)
+
     return guarded
 
 
@@ -250,14 +255,16 @@ def _forbid_unpinned_hf_calls():
 
     mp = MonkeyPatch()
     try:
-        mp.setattr(huggingface_hub, "hf_hub_download",
-                   _make_hf_guard(huggingface_hub.hf_hub_download, "hf_hub_download"))
-        mp.setattr(huggingface_hub, "snapshot_download",
-                   _make_hf_guard(huggingface_hub.snapshot_download, "snapshot_download"))
-        mp.setattr(huggingface_hub, "model_info",
-                   _make_hf_guard(huggingface_hub.model_info, "model_info"))
+        mp.setattr(
+            huggingface_hub, "hf_hub_download", _make_hf_guard(huggingface_hub.hf_hub_download, "hf_hub_download")
+        )
+        mp.setattr(
+            huggingface_hub, "snapshot_download", _make_hf_guard(huggingface_hub.snapshot_download, "snapshot_download")
+        )
+        mp.setattr(huggingface_hub, "model_info", _make_hf_guard(huggingface_hub.model_info, "model_info"))
         # HfApi.model_info is a bound method; wrap as a regular function on the class.
         orig_api_model_info = huggingface_hub.HfApi.model_info
+
         def _guarded_api_model_info(self, repo_id, *args, revision=None, **kwargs):
             if revision is None or not _HF_SHA.match(revision):
                 msg = (
@@ -266,6 +273,7 @@ def _forbid_unpinned_hf_calls():
                 )
                 raise AssertionError(msg)
             return orig_api_model_info(self, repo_id, *args, revision=revision, **kwargs)
+
         mp.setattr(huggingface_hub.HfApi, "model_info", _guarded_api_model_info)
         yield
     finally:
