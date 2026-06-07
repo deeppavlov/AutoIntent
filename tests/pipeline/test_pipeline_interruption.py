@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import DataConfig, LoggingConfig
+from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space
 
@@ -48,6 +48,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
+    pipeline_optimizer.set_config(HPOConfig(sampler="random"))
     original_objective = pipeline_optimizer.nodes[NodeType.scoring].objective
 
     def exception_raising_objective(trial, *args, **kwargs):
@@ -68,7 +69,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
         patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=exception_raising_objective),
         pytest.raises(InterruptAfterNCallsError),
     ):
-        pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
+        pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
     # Verify that some trials were completed in the first run
     assert call_count > 0, "No trials were completed in the first run"
@@ -85,6 +86,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
+    pipeline_optimizer.set_config(HPOConfig(sampler="random"))
 
     # Add tracking for second run to see which trials are executed
     second_run_trials = set()
@@ -100,7 +102,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
     with patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=tracking_objective2):
         # This run should complete without exceptions
-        pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
+        pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
     # Verify the Optuna storage exists and has more trials
     db_files_second_run = list(optuna_storage_dir.glob("*.db"))
@@ -138,7 +140,8 @@ def test_resuming_with_memory_storage_warning(dataset_no_oos, tmp_path, caplog):
     pipeline_optimizer = Pipeline.from_search_space(search_space)
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None, n_folds=2, validation_size=0.2))
-    pipeline_optimizer.fit(dataset_no_oos, refit_after=False, sampler="random")
+    pipeline_optimizer.set_config(HPOConfig(sampler="random"))
+    pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
     assert any(
         "Memory storage is not compatible with resuming optimization" in record.message for record in caplog.records
