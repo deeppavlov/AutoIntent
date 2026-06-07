@@ -292,13 +292,13 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
     def dump(self, path: str) -> None:
         dump_path = Path(path)
-        # Round-trip the Generator via generator_config (a dict, which the generic
-        # Dumper can't serialize). Temporarily detach _generator so the Dumper
-        # doesn't try to handle it via GeneratorDumper — load() recreates it from
-        # generator_config.
+        # generator_config is handled below via a JSON sidecar; excluding `dict`
+        # from the generic Dumper silences its "cannot be dumped" error log.
+        # _generator is temporarily detached so the Dumper doesn't try to handle
+        # it via GeneratorDumper — load() recreates it from generator_config.
         generator = self.__dict__.pop("_generator", None)
         try:
-            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop])
+            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, dict])
         finally:
             if generator is not None:
                 self._generator = generator
