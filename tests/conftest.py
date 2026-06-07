@@ -308,7 +308,7 @@ def _forbid_unpinned_hf_calls():
 
 
 # ---------------------------------------------------------------------------
-# Shared mocking fixtures. See docs/superpowers/specs/2026-06-07-live-api-test-mocking-strategy.md
+# Shared mocking fixtures for live-API substitution (OpenAI, OpenSearch).
 # ---------------------------------------------------------------------------
 
 from tests._fixtures.fake_openai_embedding import (  # noqa: E402, F401

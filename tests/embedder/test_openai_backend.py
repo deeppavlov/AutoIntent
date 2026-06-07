@@ -1,9 +1,8 @@
 """Tests for the OpenAI embedder backend contract.
 
-Per docs/superpowers/specs/2026-06-07-live-api-test-mocking-strategy.md the
-real backend is never exercised in CI; this file pins the shape contract that
-FakeOpenaiEmbeddingBackend must uphold so consumers (Embedder, VectorIndex)
-keep working when patched.
+The real OpenaiEmbeddingBackend is never exercised in CI; this file pins the
+shape contract that FakeOpenaiEmbeddingBackend must uphold so consumers
+(Embedder, VectorIndex) keep working when patched.
 """
 
 import numpy as np
