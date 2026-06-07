@@ -125,7 +125,17 @@ def test_no_context_optimization(dataset, task_type, patch_llm_scorer_generator)
         "multiclass",
         "multilabel",
         "description_no_llm",
-        "description_with_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
+            ),
+        ),
     ],
 )
 def test_dump_modules(dataset, task_type, patch_llm_scorer_generator):

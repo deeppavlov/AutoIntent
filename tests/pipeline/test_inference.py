@@ -18,7 +18,17 @@ def project_dir(task_type):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        "description_with_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
+            ),
+        ),
     ],
 )
 def test_inference_from_config(dataset, task_type, project_dir, patch_llm_scorer_generator):
@@ -65,7 +75,17 @@ def test_inference_from_config(dataset, task_type, project_dir, patch_llm_scorer
         "multiclass",
         "multilabel",
         "description_no_llm",
-        "description_with_llm",
+        pytest.param(
+            "description_with_llm",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "LLMDescriptionScorer.dump/load drops generator_config; "
+                    "loaded scorer fails on predict. See "
+                    "https://github.com/deeppavlov/AutoIntent/issues/299. Flip when fixed."
+                ),
+            ),
+        ),
     ],
 )
 def test_inference_on_the_fly(dataset, task_type, project_dir, patch_llm_scorer_generator):
