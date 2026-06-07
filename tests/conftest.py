@@ -320,3 +320,4 @@ from tests._fixtures.mock_generator import (  # noqa: E402, F401
     mock_generator,
     patch_llm_scorer_generator,
 )
+from tests._fixtures.respx_openai import respx_openai  # noqa: E402, F401
