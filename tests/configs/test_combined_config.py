@@ -157,3 +157,33 @@ def test_invalid_optimizer_config_wrong_type():
 
     with pytest.raises(TypeError):
         NodeOptimizer(**invalid_config)
+
+
+def test_pinned_revisions_module_has_no_runtime_imports():
+    """The leaf module must be loadable without autointent's deps installed.
+
+    .ci/warm_hf_cache.py imports it via a sys.path shim that does NOT
+    install pydantic, datasets, or any other autointent dep. If a future
+    edit adds e.g. `import json` to _pinned_revisions, the warm-cache job
+    silently keeps working in environments that happen to have json
+    available but breaks in stricter ones; this test prevents that drift.
+    """
+    import ast
+    from pathlib import Path
+
+    from autointent.configs import _pinned_revisions
+
+    source = Path(_pinned_revisions.__file__).read_text()
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert node.module == "__future__", (
+                f"_pinned_revisions.py must not import {node.module!r} "
+                f"(only `from __future__ import ...` is allowed)"
+            )
+        elif isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+            raise AssertionError(
+                f"_pinned_revisions.py must not contain `import` statements; "
+                f"found: {modules}"
+            )

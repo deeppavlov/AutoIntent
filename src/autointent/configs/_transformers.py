@@ -5,36 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt, model_validator
 from typing_extensions import assert_never
 
+from autointent.configs._pinned_revisions import DEFAULT_REVISIONS  # noqa: F401
 from autointent.custom_types import FloatFromZeroToOne
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 
 if TYPE_CHECKING:
     from typing_extensions import Self
-
-
-# Pinned commit SHAs for the Hugging Face models that ship as defaults in
-# autointent. When a config is constructed with one of these model_name values
-# and no explicit ``revision``, the SHA below is filled in automatically so the
-# library never has to call the HF API just to resolve ``main`` to a hash for
-# cache keying. Update an entry here when you intentionally want to move a
-# default to a newer revision.
-DEFAULT_REVISIONS: dict[str, str] = {
-    "prajjwal1/bert-tiny": "79779625a0a40f1eee8496e16056bc0d7766df22",
-    "sentence-transformers/all-MiniLM-L6-v2": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
-    "intfloat/multilingual-e5-large-instruct": "274baa43b0e13e37fafa6428dbc7938e62e5c439",
-    "intfloat/multilingual-e5-small": "614241f622f53c4eeff9890bdc4f31cfecc418b3",
-    "cross-encoder/ms-marco-MiniLM-L6-v2": "c5ee24cb16019beea0893ab7796b1df96625c6b8",
-    "avsolatorio/GIST-small-Embedding-v0": "75e62fd210b9fde790430e0b2f040b0b00a021b1",
-    "BAAI/bge-base-en-v1.5": "a5beb1e3e68b9ab74eb54cfd186867f64f240e1a",
-    "BAAI/bge-reranker-v2-m3": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
-    # Used heavily in the embedder test suite (tests/embedder/conftest.py).
-    # Pinning the SHA here lets HFModelConfig auto-fill it via the validator
-    # so sentence-transformers never asks the Hub for "main" — which 429s
-    # under parallel matrix load even when the model files are cached.
-    "sergeyzh/rubert-tiny-turbo": "93769a3baad2b037e5c2e4312fccf6bcfe082bf1",
-    "microsoft/deberta-v3-large": "64a8c8eab3e352a784c658aef62be1662607476f",
-    "microsoft/deberta-v3-small": "a36c739020e01763fe789b4b85e2df55d6180012",
-}
 
 
 class TokenizerConfig(BaseModel):
