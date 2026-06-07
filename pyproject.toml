@@ -109,6 +109,7 @@ test = [
     "pytest-rerunfailures (>=15.0,<16.0)",
     "pytest-xdist (>=3.6.1,<4.0.0)",
     "respx (>=0.21.0,<1.0.0)",
+    "testcontainers[opensearch] (>=4.5.0,<5.0.0)",
 ]
 typing = [
     "mypy (>=1,<2)",
