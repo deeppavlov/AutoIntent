@@ -39,7 +39,6 @@
       features_type: ["embedding"]
       embedder_config:
         - model_name: prajjwal1/bert-tiny
-          revision: 79779625a0a40f1eee8496e16056bc0d7766df22
     - module_name: bert
       classification_model_config:
         - model_name: avsolatorio/GIST-small-Embedding-v0
@@ -64,7 +63,6 @@
     - module_name: ptuning
       classification_model_config:
         - model_name: "prajjwal1/bert-tiny"
-          revision: 79779625a0a40f1eee8496e16056bc0d7766df22
       num_train_epochs: [1]
       batch_size: [8, 16]
       num_virtual_tokens: [10, 20]
