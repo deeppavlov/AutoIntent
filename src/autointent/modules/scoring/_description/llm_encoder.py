@@ -278,9 +278,13 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
     def _init_event_loop(self) -> None:
         if self.max_concurrent is not None:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
                 loop = asyncio.new_event_loop()
+            else:
+                if loop.is_closed():
+                    loop = asyncio.new_event_loop()
             self._event_loop = loop
 
     def dump(self, path: str) -> None:
