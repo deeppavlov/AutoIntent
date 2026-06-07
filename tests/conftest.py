@@ -107,7 +107,7 @@ def get_test_embedder_config(**kwargs):
 
 
 # ---------------------------------------------------------------------------
-# Canonical test models. See docs/superpowers/specs/2026-06-06-hf-test-refactor-design.md
+# Canonical test models.
 #
 # Every test that genuinely needs an HF model uses one of these three. The
 # SHAs are pinned in src/autointent/configs/_pinned_revisions.DEFAULT_REVISIONS,
@@ -235,7 +235,7 @@ def _rewrite_field(entry: dict, field_name: str, new_model_name: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Unpinned-HF-call guard. See spec §6.5.
+# Unpinned-HF-call guard.
 # ---------------------------------------------------------------------------
 
 import re as _re  # noqa: E402
