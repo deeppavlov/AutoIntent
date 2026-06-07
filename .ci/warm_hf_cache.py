@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import re
 import sys
 import time
 from dataclasses import dataclass
@@ -32,7 +31,14 @@ from typing import Literal
 
 import yaml
 
-_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+# sys.path shim: load DEFAULT_REVISIONS from the autointent leaf module
+# without installing the package. The leaf module is by contract
+# zero-dependency (enforced by
+# tests/configs/test_combined_config.py::test_pinned_revisions_module_has_no_runtime_imports)
+# so this import succeeds in the warm-cache job's slim environment.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_REPO_ROOT / "src"))
+from autointent.configs._pinned_revisions import DEFAULT_REVISIONS  # noqa: E402
 
 logger = logging.getLogger("warm_hf_cache")
 
@@ -99,28 +105,35 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _parse_entry(text: str) -> tuple[str, str]:
-    """Split ``"<repo>@<sha>"`` into ``(repo, sha)`` and validate the SHA shape.
+def _resolve_entry(repo_id: str, repo_type: str) -> Entry:
+    """Resolve a repo ID to a pinned Entry via DEFAULT_REVISIONS.
 
     Raises:
-        ConfigError: if no ``@`` is present, or if the revision is not a
-            40-char lowercase hex string.
+        ConfigError: if ``repo_id`` is not pinned in DEFAULT_REVISIONS.
+            DEFAULT_REVISIONS covers models only today, so any
+            ``repo_type="dataset"`` entry will raise here until the dict
+            is extended; that's intentional (a dataset in the YAML must
+            not silently regress to an unpinned download).
     """
-    if "@" not in text:
-        msg = f"Entry {text!r} must be pinned to a SHA (use 'repo@<40-char hex>')"
+    if repo_id not in DEFAULT_REVISIONS:
+        msg = (
+            f"{repo_id!r} ({repo_type}) not in DEFAULT_REVISIONS. Add a pin "
+            "to src/autointent/configs/_pinned_revisions.py before listing "
+            "the repo in .ci/hf-prewarm-*.yaml."
+        )
         raise ConfigError(msg)
-    repo, _, rev = text.partition("@")
-    if not _SHA_RE.fullmatch(rev):
-        msg = f"Entry {text!r}: revision {rev!r} is not a 40-char hex SHA"
-        raise ConfigError(msg)
-    return repo, rev
+    return Entry(repo_type=repo_type, repo_id=repo_id, revision=DEFAULT_REVISIONS[repo_id])
 
 
 def _load_config(path: Path) -> list[Entry]:
     """Load ``hf-prewarm.yaml`` and return a flat list of entries.
 
+    Entries in the YAML are bare repo IDs (no ``@sha`` suffix); SHAs are
+    looked up from DEFAULT_REVISIONS in _resolve_entry.
+
     Raises:
-        ConfigError: on unknown top-level keys or malformed entries.
+        ConfigError: on unknown top-level keys, or on a repo_id that's
+            not pinned in DEFAULT_REVISIONS.
     """
     data = yaml.safe_load(path.read_text()) or {}
     known = {"models", "datasets"}
@@ -130,9 +143,7 @@ def _load_config(path: Path) -> list[Entry]:
         raise ConfigError(msg)
     entries: list[Entry] = []
     for key, repo_type in (("models", "model"), ("datasets", "dataset")):
-        for raw in data.get(key, []) or []:
-            repo, rev = _parse_entry(raw)
-            entries.append(Entry(repo_type=repo_type, repo_id=repo, revision=rev))
+        entries.extend(_resolve_entry(repo_id, repo_type) for repo_id in data.get(key, []) or [])
     return entries
 
 
