@@ -46,9 +46,9 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: ~/.cache/huggingface
-        key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-
+        key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-
         restore-keys: |
-          ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-
+          ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-
           ${{ runner.os }}-hf-warmed-
           ${{ runner.os }}-hf-
 

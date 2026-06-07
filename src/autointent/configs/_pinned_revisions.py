@@ -4,18 +4,27 @@ This module is the canonical source of truth for every SHA pin in the
 project. The dict is consumed by:
 
   - autointent.configs._transformers.HFModelConfig._apply_default_revision,
-    which auto-fills `revision` on configs whose model_name is a key here
+    which auto-fills `revision` on configs whose model_name is a key here.
+    _transformers.py also re-exports DEFAULT_REVISIONS for backward
+    compatibility; do not remove that re-export without updating consumers.
   - .ci/warm_hf_cache.py, which joins repo IDs from the prewarm YAML
-    against this dict to produce pinned entries for the cache warmer
+    against this dict to produce pinned entries for the cache warmer.
+    warm_hf_cache loads this file via importlib.util.spec_from_file_location
+    (bypassing autointent's package init) so it works in the slim
+    warm-cache CI env that has no pydantic/numpy/etc.
 
 LEAF MODULE INVARIANT: this file must contain only `from __future__`
-imports (no other imports of any kind). It is loaded by warm_hf_cache.py
-via a sys.path shim in an environment where the autointent package is
-NOT installed; any non-__future__ import will break that consumer.
+imports (no other imports of any kind). spec_from_file_location does
+execute regular imports if added, so non-__future__ imports would couple
+the warm-cache job's slim env to whatever those transitive imports need.
+Keep the surface zero so the contract stays obvious: this file is data.
 
-A unit test (tests/configs/test_combined_config.py::
-test_pinned_revisions_module_has_no_runtime_imports) enforces this
-invariant via ast parsing. Do not relax the test to add an import.
+Two unit tests in tests/configs/test_combined_config.py enforce the
+contract:
+  - test_pinned_revisions_module_has_no_runtime_imports (AST structural)
+  - test_leaf_module_loadable_without_autointent_package (hermetic load
+    via subprocess; the actual mechanism the warm-cache job uses)
+Do not relax these tests to add an import.
 
 Update an entry below when you intentionally want to move a default to a
 newer revision. To add a new pinned model, add a new entry here, then

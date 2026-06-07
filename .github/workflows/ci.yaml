@@ -36,12 +36,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          # Hashing both prewarm configs invalidates the cache on either
-          # file's change; the restore-keys cascade catches the previous
-          # warmed cache so only the diff is re-downloaded.
-          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-${{ github.run_id }}
+          # Hash both the prewarm configs (which list repo IDs to warm)
+          # AND _pinned_revisions.py (which holds the SHAs the warm
+          # script resolves against). Bumping a pinned SHA must
+          # invalidate the cache even when the YAML is unchanged.
+          key: ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml') }}-
+            ${{ runner.os }}-hf-warmed-${{ hashFiles('.ci/hf-prewarm-*.yaml', 'src/autointent/configs/_pinned_revisions.py') }}-
             ${{ runner.os }}-hf-warmed-
 
       - name: Install uv
