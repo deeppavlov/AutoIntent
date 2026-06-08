@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import shutil
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
@@ -8,14 +11,20 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
-from autointent.modules import BertScorer
+from autointent.modules.scoring import BertScorer
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
+
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
 
 _config = HFModelConfig(model_name="prajjwal1/bert-tiny")
 
 pytest.importorskip("transformers", reason="Transformers library is required for BertScorer tests")
 
 
-def test_bert_scorer_dump_load(dataset):
+def test_bert_scorer_dump_load(dataset: Dataset) -> None:
     """Test that BertScorer can be saved and loaded while preserving predictions."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -23,7 +32,8 @@ def test_bert_scorer_dump_load(dataset):
 
     # Create and train scorer
     scorer_original = BertScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
-    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer_original.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     # Test data
     test_data = [
@@ -61,7 +71,7 @@ def test_bert_scorer_dump_load(dataset):
         shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
-def test_bert_prediction(dataset):
+def test_bert_prediction(dataset: Dataset) -> None:
     """Test that the transformer model can fit and make predictions."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -69,7 +79,8 @@ def test_bert_prediction(dataset):
 
     scorer = BertScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = [
         "why is there a hold on my american saving bank account",
@@ -95,12 +106,15 @@ def test_bert_prediction(dataset):
 
     # Test metadata function if available
     if hasattr(scorer, "predict_with_metadata"):
-        predictions, metadata = scorer.predict_with_metadata(test_data)
+        # cast: base predict_with_metadata signature is wider than scoring subclasses actually return.
+        predictions, metadata = cast(
+            "tuple[npt.NDArray[Any], list[dict[str, Any]] | None]", scorer.predict_with_metadata(test_data)
+        )
         assert len(predictions) == len(test_data)
         assert metadata is None
 
 
-def test_bert_cache_clearing(dataset):
+def test_bert_cache_clearing(dataset: Dataset) -> None:
     """Test that the transformer model properly handles cache clearing."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -108,7 +122,8 @@ def test_bert_cache_clearing(dataset):
 
     scorer = BertScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = ["test text"]
 
@@ -127,7 +142,7 @@ def test_bert_cache_clearing(dataset):
         scorer.predict(test_data)
 
 
-def test_bert_in_pipeline(dataset):
+def test_bert_in_pipeline(dataset: Dataset) -> None:
     """Test BertScorer as part of an AutoML pipeline."""
     search_space = [
         {

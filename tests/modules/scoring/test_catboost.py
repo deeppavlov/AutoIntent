@@ -1,34 +1,42 @@
+from __future__ import annotations
+
 import shutil
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import CatBoostScorer
+from autointent.modules.scoring import CatBoostScorer
 from tests.conftest import get_test_embedder_config
+
+if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
 
 pytest.importorskip("catboost")
 
 
-def test_catboost_scorer_dump_load(dataset):
+def test_catboost_scorer_dump_load(dataset: Dataset) -> None:
     """Test that CatBoostScorer can be saved and loaded while preserving predictions."""
     data_handler = DataHandler(dataset)
 
     scorer_original = CatBoostScorer(
         embedder_config=get_test_embedder_config(),
         iterations=50,
-        learning_rate=0.05,
+        learning_rate=0.05,  # type: ignore[arg-type]  # reason: CatBoostScorer **catboost_kwargs mis-typed in src as dict[str, Any]; values are forwarded as scalar kwargs
         depth=6,
-        l2_leaf_reg=3,
-        eval_metric="Accuracy",
-        random_seed=42,
+        l2_leaf_reg=3,  # type: ignore[arg-type]  # reason: see learning_rate comment
+        eval_metric="Accuracy",  # type: ignore[arg-type]  # reason: see learning_rate comment
+        random_seed=42,  # type: ignore[arg-type]  # reason: see learning_rate comment
         verbose=False,
     )
 
-    scorer_original.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer_original.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = [
         "why is there a hold on my account",
@@ -53,23 +61,24 @@ def test_catboost_scorer_dump_load(dataset):
         shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
-def test_catboost_prediction_multilabel(dataset):
+def test_catboost_prediction_multilabel(dataset: Dataset) -> None:
     """Test that the transformer model can fit and make predictions."""
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = CatBoostScorer(
         embedder_config=get_test_embedder_config(),
         iterations=50,
-        learning_rate=0.05,
+        learning_rate=0.05,  # type: ignore[arg-type]  # reason: CatBoostScorer **catboost_kwargs mis-typed in src as dict[str, Any]; values are forwarded as scalar kwargs
         depth=6,
-        l2_leaf_reg=3,
-        eval_metric="Accuracy",
-        random_seed=42,
+        l2_leaf_reg=3,  # type: ignore[arg-type]  # reason: see learning_rate comment
+        eval_metric="Accuracy",  # type: ignore[arg-type]  # reason: see learning_rate comment
+        random_seed=42,  # type: ignore[arg-type]  # reason: see learning_rate comment
         verbose=False,
         val_fraction=None,
     )
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = [
         "why is there a hold on my american saving bank account",
@@ -97,24 +106,25 @@ def test_catboost_prediction_multilabel(dataset):
 
 @pytest.mark.parametrize("features_type", ["text", "embedding", "both"])
 @pytest.mark.parametrize("use_embedding_features", [True, False])
-def test_catboost_features_types(dataset, features_type, use_embedding_features):
+def test_catboost_features_types(dataset: Dataset, features_type: str, use_embedding_features: bool) -> None:
     """Test that CatBoostScorer works properly without an embedder (using BoW encoding)."""
     data_handler = DataHandler(dataset)
 
     scorer = CatBoostScorer(
         embedder_config=get_test_embedder_config(),
         iterations=50,
-        learning_rate=0.05,
+        learning_rate=0.05,  # type: ignore[arg-type]  # reason: CatBoostScorer **catboost_kwargs mis-typed in src as dict[str, Any]; values are forwarded as scalar kwargs
         depth=6,
-        l2_leaf_reg=3,
-        eval_metric="Accuracy",
-        random_seed=42,
-        features_type=features_type,
+        l2_leaf_reg=3,  # type: ignore[arg-type]  # reason: see learning_rate comment
+        eval_metric="Accuracy",  # type: ignore[arg-type]  # reason: see learning_rate comment
+        random_seed=42,  # type: ignore[arg-type]  # reason: see learning_rate comment
+        features_type=features_type,  # type: ignore[arg-type]  # reason: src signature uses FeaturesType enum; test passes the literal string form catboost accepts
         use_embedding_features=use_embedding_features,
         verbose=False,
     )
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = [
         "why is there a hold on my american saving bank account",
@@ -130,20 +140,21 @@ def test_catboost_features_types(dataset, features_type, use_embedding_features)
     assert 0.0 <= np.min(predictions) <= np.max(predictions) <= 1.0
 
 
-def test_catboost_cache_clearing(dataset):
+def test_catboost_cache_clearing(dataset: Dataset) -> None:
     """Test that the transformer model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
     scorer = CatBoostScorer(
         embedder_config=get_test_embedder_config(),
         iterations=50,
-        learning_rate=0.05,
+        learning_rate=0.05,  # type: ignore[arg-type]  # reason: CatBoostScorer **catboost_kwargs mis-typed in src as dict[str, Any]; values are forwarded as scalar kwargs
         depth=6,
-        l2_leaf_reg=3,
-        eval_metric="Accuracy",
-        random_seed=42,
+        l2_leaf_reg=3,  # type: ignore[arg-type]  # reason: see learning_rate comment
+        eval_metric="Accuracy",  # type: ignore[arg-type]  # reason: see learning_rate comment
+        random_seed=42,  # type: ignore[arg-type]  # reason: see learning_rate comment
         verbose=False,
     )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
     test_data = ["test text"]
     scorer.predict(test_data)
     scorer.clear_cache()
@@ -151,7 +162,7 @@ def test_catboost_cache_clearing(dataset):
         scorer.predict(test_data)
 
 
-def test_catboost_in_pipeline(dataset):
+def test_catboost_in_pipeline(dataset: Dataset) -> None:
     """Test CatBoostScorer as part of an AutoML pipeline."""
     search_space = [
         {

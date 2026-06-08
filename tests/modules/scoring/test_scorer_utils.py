@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 import pytest
 
 from autointent.modules.scoring._dnnc import build_result
 from autointent.modules.scoring._knn.count_neighbors import get_counts
 from autointent.modules.scoring._knn.weighting import closest_weighting
+
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
 
 @pytest.mark.parametrize(
@@ -58,7 +65,7 @@ from autointent.modules.scoring._knn.weighting import closest_weighting
         ),
     ],
 )
-def test_knn_get_counts(labels, n_classes, ground_truth):
+def test_knn_get_counts(labels: npt.NDArray[Any], n_classes: int, ground_truth: npt.NDArray[Any]) -> None:
     weights = np.ones_like(labels)
     np.testing.assert_array_equal(actual=get_counts(labels, n_classes, weights), desired=ground_truth)
 
@@ -92,7 +99,9 @@ def test_knn_get_counts(labels, n_classes, ground_truth):
         ),
     ],
 )
-def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
+def test_dnnc_build_result(
+    scores: npt.NDArray[Any], labels: npt.NDArray[Any], n_classes: int, ground_truth: npt.NDArray[Any]
+) -> None:
     np.testing.assert_array_equal(actual=build_result(scores, labels, n_classes), desired=ground_truth)
 
 
@@ -150,7 +159,13 @@ def test_dnnc_build_result(scores, labels, n_classes, ground_truth):
         ),
     ],
 )
-def test_closest_weighting(labels, distances, multilabel, n_classes, ground_truth):
+def test_closest_weighting(
+    labels: npt.NDArray[Any],
+    distances: npt.NDArray[Any],
+    multilabel: bool,
+    n_classes: int,
+    ground_truth: list[list[float]],
+) -> None:
     np.testing.assert_array_equal(
         actual=closest_weighting(labels, distances, multilabel, n_classes),
         desired=ground_truth,

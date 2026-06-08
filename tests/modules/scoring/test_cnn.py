@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import shutil
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
@@ -10,8 +13,14 @@ from autointent.configs import VocabConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import CNNScorer
 
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
-def test_cnn_prediction(dataset):
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
+
+
+def test_cnn_prediction(dataset: Dataset) -> None:
     """Test that the CNN model can fit and make predictions."""
     data_handler = DataHandler(dataset)
 
@@ -20,7 +29,8 @@ def test_cnn_prediction(dataset):
         num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = [
         "why is there a hold on my account",
@@ -45,12 +55,15 @@ def test_cnn_prediction(dataset):
 
     # Проверяем работу predict_with_metadata если метод существует
     if hasattr(scorer, "predict_with_metadata"):
-        predictions, metadata = scorer.predict_with_metadata(test_data)
+        # cast: base predict_with_metadata signature is wider than scoring subclasses actually return.
+        predictions, metadata = cast(
+            "tuple[npt.NDArray[Any], list[dict[str, Any]] | None]", scorer.predict_with_metadata(test_data)
+        )
         assert len(predictions) == len(test_data)
         assert metadata is None
 
 
-def test_cnn_cache_clearing(dataset):
+def test_cnn_cache_clearing(dataset: Dataset) -> None:
     """Test that the CNN model properly handles cache clearing."""
     data_handler = DataHandler(dataset)
 
@@ -59,7 +72,8 @@ def test_cnn_cache_clearing(dataset):
         num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     test_data = ["test text"]
 
@@ -77,7 +91,7 @@ def test_cnn_cache_clearing(dataset):
         scorer.predict(test_data)
 
 
-def test_cnn_scorer_dump_load(dataset):
+def test_cnn_scorer_dump_load(dataset: Dataset) -> None:
     """Test that BERTLoRAScorer can be saved and loaded while preserving predictions."""
     data_handler = DataHandler(dataset)
 
@@ -87,7 +101,8 @@ def test_cnn_scorer_dump_load(dataset):
         num_train_epochs=1,
         vocab_config=VocabConfig(max_seq_length=50),
     )
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
 
     # Test data
     test_data = [
@@ -123,7 +138,7 @@ def test_cnn_scorer_dump_load(dataset):
         shutil.rmtree(temp_dir_path, ignore_errors=True)  # workaround for windows permission error
 
 
-def test_cnn_in_pipeline(dataset):
+def test_cnn_in_pipeline(dataset: Dataset) -> None:
     """Test CNNScorer as part of an AutoML pipeline."""
     search_space = [
         {

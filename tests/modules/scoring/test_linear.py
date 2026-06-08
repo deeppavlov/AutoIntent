@@ -1,19 +1,29 @@
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import LinearScorer
+from autointent.modules.scoring import LinearScorer
 from tests.conftest import get_test_embedder_config
 
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
-def test_base_linear(dataset):
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
+
+
+def test_base_linear(dataset: Dataset) -> None:
     data_handler = DataHandler(dataset)
 
     scorer = LinearScorer(embedder_config=get_test_embedder_config())
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -36,7 +46,10 @@ def test_base_linear(dataset):
         decimal=2,
     )
 
-    predictions, metadata = scorer.predict_with_metadata(test_data)
+    # cast: base predict_with_metadata signature is wider than what scoring subclasses actually return.
+    predictions, metadata = cast(
+        "tuple[npt.NDArray[Any], list[dict[str, Any]] | None]", scorer.predict_with_metadata(test_data)
+    )
     assert len(predictions) == len(test_data)
     assert metadata is None
 
@@ -48,7 +61,7 @@ def test_base_linear(dataset):
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
 
-def test_linear_in_pipeline(dataset):
+def test_linear_in_pipeline(dataset: Dataset) -> None:
     """Test LinearScorer as part of an AutoML pipeline."""
     search_space = [
         {

@@ -1,16 +1,23 @@
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import RerankScorer
+from autointent.modules.scoring import RerankScorer
+
+if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
 
 pytest.importorskip("sentence_transformers")
 
 
-def test_base_rerank_scorer(dataset):
+def test_base_rerank_scorer(dataset: Dataset) -> None:
     data_handler = DataHandler(dataset)
 
     scorer = RerankScorer(
@@ -29,7 +36,8 @@ def test_base_rerank_scorer(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
     predictions = scorer.predict(test_data)
     assert (
         predictions
@@ -46,6 +54,7 @@ def test_base_rerank_scorer(dataset):
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)
+    assert metadata is not None
     assert "neighbors" in metadata[0]
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -56,7 +65,7 @@ def test_base_rerank_scorer(dataset):
         assert np.allclose(predictions, new_predictions)
 
 
-def test_rerank_in_pipeline(dataset):
+def test_rerank_in_pipeline(dataset: Dataset) -> None:
     """Test RerankScorer as part of an AutoML pipeline."""
     search_space = [
         {
