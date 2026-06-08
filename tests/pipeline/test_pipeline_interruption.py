@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 import sqlite3
+from typing import TYPE_CHECKING, Any, cast
 from unittest.mock import patch
 
 import pytest
@@ -9,6 +12,14 @@ from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from autointent.custom_types import NodeType
 from tests.conftest import get_search_space
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from optuna.trial import Trial
+
+    from autointent import Dataset
+    from autointent.nodes import NodeOptimizer
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -17,15 +28,15 @@ class InterruptAfterNCallsError(Exception):
     """Exception to simulate interruption."""
 
 
-def count_trials_in_database(db_path):
+def count_trials_in_database(db_path: Path) -> int:
     """Count the number of trials in an Optuna SQLite database."""
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM trials")
-        return cursor.fetchone()[0]
+        return cast("int", cursor.fetchone()[0])
 
 
-def get_completed_trial_numbers(db_path):
+def get_completed_trial_numbers(db_path: Path) -> set[int]:
     """Get the trial numbers that have been completed."""
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
@@ -33,11 +44,11 @@ def get_completed_trial_numbers(db_path):
         return {row[0] for row in cursor.fetchall()}
 
 
-def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
+def test_pipeline_with_exception_resume(dataset_no_oos: Dataset, tmp_path: Path) -> None:
     """Test that pipeline can resume after an exception and continues from where it left off."""
     project_dir = tmp_path
     search_space = get_search_space("optuna")
-    first_run_trials = set()
+    first_run_trials: set[int] = set()
 
     call_count = 0
     max_calls_before_exception = 2
@@ -49,9 +60,12 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
     pipeline_optimizer.set_config(HPOConfig(sampler="random"))
-    original_objective = pipeline_optimizer.nodes[NodeType.scoring].objective
+    # Pipeline.from_search_space() builds NodeOptimizer instances; the union
+    # with InferenceNode does not expose `objective`. Cast each accessed node.
+    scoring_optimizer = cast("NodeOptimizer", pipeline_optimizer.nodes[NodeType.scoring])
+    original_objective = scoring_optimizer.objective
 
-    def exception_raising_objective(trial, *args, **kwargs):
+    def exception_raising_objective(trial: Trial, *args: Any, **kwargs: Any) -> Any:
         nonlocal call_count
         call_count += 1
 
@@ -66,7 +80,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     # Replace the objective with our exception-raising version
     # pipeline_optimizer.nodes[NodeType.scoring].objective = exception_raising_objective
     with (
-        patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=exception_raising_objective),
+        patch.object(scoring_optimizer, "objective", side_effect=exception_raising_objective),
         pytest.raises(InterruptAfterNCallsError),
     ):
         pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
@@ -78,7 +92,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     assert optuna_storage_dir.exists(), "Optuna storage directory not created in first run"
 
     db_files_first_run = list(optuna_storage_dir.glob("*.db"))
-    trials_after_first_run = {}
+    trials_after_first_run: dict[str, int] = {}
     for db_file in db_files_first_run:
         trials_after_first_run[db_file.name] = count_trials_in_database(db_file)
 
@@ -89,10 +103,11 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
     pipeline_optimizer.set_config(HPOConfig(sampler="random"))
 
     # Add tracking for second run to see which trials are executed
-    second_run_trials = set()
-    original_objective2 = pipeline_optimizer.nodes[NodeType.scoring].objective
+    second_run_trials: set[int] = set()
+    scoring_optimizer2 = cast("NodeOptimizer", pipeline_optimizer.nodes[NodeType.scoring])
+    original_objective2 = scoring_optimizer2.objective
 
-    def tracking_objective2(trial, *args, **kwargs):
+    def tracking_objective2(trial: Trial, *args: Any, **kwargs: Any) -> Any:
         msg = f"Second run: Processing trial #{trial.number}"
         logger.info(msg)
         second_run_trials.add(trial.number)
@@ -100,7 +115,7 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
 
     pipeline_optimizer.set_config(logging_config)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
-    with patch.object(pipeline_optimizer.nodes[NodeType.scoring], "objective", side_effect=tracking_objective2):
+    with patch.object(scoring_optimizer2, "objective", side_effect=tracking_objective2):
         # This run should complete without exceptions
         pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
@@ -124,7 +139,9 @@ def test_pipeline_with_exception_resume(dataset_no_oos, tmp_path):
             )
 
 
-def test_resuming_with_memory_storage_warning(dataset_no_oos, tmp_path, caplog):
+def test_resuming_with_memory_storage_warning(
+    dataset_no_oos: Dataset, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     """Test that a warning is issued when trying to resume with memory storage."""
     project_dir = tmp_path
     search_space = get_search_space("optuna")

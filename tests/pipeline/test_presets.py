@@ -1,8 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
+
 import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from tests.conftest import apply_test_models, setup_environment
+
+if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.configs import SentenceTransformerEmbeddingConfig
+    from autointent.generation import Generator
+    from autointent.nodes import NodeOptimizer
 
 
 @pytest.mark.parametrize(
@@ -20,10 +30,10 @@ from tests.conftest import apply_test_models, setup_environment
         "zero-shot-encoders",
     ],
 )
-def test_presets(dataset, preset, patch_llm_scorer_generator):
+def test_presets(dataset: Dataset, preset: str, patch_llm_scorer_generator: Generator) -> None:
     project_dir = setup_environment()
 
-    pipeline_optimizer = Pipeline.from_preset(preset)
+    pipeline_optimizer = Pipeline.from_preset(preset)  # type: ignore[arg-type]  # reason: parametrize values are runtime strings; mypy can't narrow to the SearchSpacePreset Literal
     apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
@@ -33,7 +43,7 @@ def test_presets(dataset, preset, patch_llm_scorer_generator):
     pipeline_optimizer.fit(dataset, refit_after=False)
 
 
-def test_apply_test_models_retargets_pipeline_slots():
+def test_apply_test_models_retargets_pipeline_slots() -> None:
     from autointent import Pipeline
     from tests.conftest import (
         TINY_BERT,
@@ -47,12 +57,17 @@ def test_apply_test_models_retargets_pipeline_slots():
     # cross-encoder=bge-reranker-v2-m3.
     apply_test_models(pipeline)
 
-    assert pipeline.embedder_config.model_name == TINY_SENTENCE_TRANSFORMER
+    # apply_test_models() installs a SentenceTransformerEmbeddingConfig (see
+    # tests.conftest.tiny_sentence_transformer_config); narrow the EmbedderConfig
+    # union to that concrete subclass to access model_name (BaseEmbedderConfig
+    # has no model_name).
+    embedder_config = cast("SentenceTransformerEmbeddingConfig", pipeline.embedder_config)
+    assert embedder_config.model_name == TINY_SENTENCE_TRANSFORMER
     assert pipeline.cross_encoder_config.model_name == TINY_CROSS_ENCODER
     assert pipeline.transformer_config.model_name == TINY_BERT
 
 
-def test_apply_test_models_rewrites_search_space_bert_entries():
+def test_apply_test_models_rewrites_search_space_bert_entries() -> None:
     from autointent import Pipeline
     from tests.conftest import TINY_BERT, apply_test_models
 
@@ -61,10 +76,13 @@ def test_apply_test_models_rewrites_search_space_bert_entries():
     # classification_model_config: [{model_name: 'microsoft/deberta-v3-large'}]
     apply_test_models(pipeline)
 
+    # Pipeline.from_preset() returns an optimization-mode Pipeline whose nodes
+    # are NodeOptimizer; the typed union with InferenceNode does not expose
+    # modules_search_spaces. Cast each node down to NodeOptimizer to access it.
     bert_entries = [
         entry
         for node in pipeline.nodes.values()
-        for entry in node.modules_search_spaces
+        for entry in cast("NodeOptimizer", node).modules_search_spaces
         if entry.get("module_name") == "bert"
     ]
     assert bert_entries, "transformers-heavy preset must have a bert module entry"
@@ -81,7 +99,7 @@ def test_apply_test_models_rewrites_search_space_bert_entries():
             )
 
 
-def test_apply_test_models_drops_stale_revision_in_search_space():
+def test_apply_test_models_drops_stale_revision_in_search_space() -> None:
     """When a search-space entry pins model_name AND revision (e.g. catboost
     in tests/assets/configs/multiclass.yaml), the walker rewrites the
     model_name but must also drop the now-wrong revision so the
@@ -94,7 +112,9 @@ def test_apply_test_models_drops_stale_revision_in_search_space():
     apply_test_models(pipeline)
 
     for node in pipeline.nodes.values():
-        for entry in node.modules_search_spaces:
+        # Pipeline.from_search_space() returns an optimization-mode Pipeline
+        # whose nodes are NodeOptimizer (see test_apply_test_models_rewrites_…).
+        for entry in cast("NodeOptimizer", node).modules_search_spaces:
             for field in ("classification_model_config", "embedder_config", "cross_encoder_config"):
                 value = entry.get(field)
                 if isinstance(value, list):
