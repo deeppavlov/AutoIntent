@@ -291,6 +291,17 @@ Expected: clean working tree; 5 commits since branching from `dev` (spec, plan, 
 
 If `Step 1` fails: stop, do not proceed to Phase B. Investigate and re-do whichever A-task introduced the regression.
 
+- [ ] **Step 4: Push `b/mypy-on-tests` to origin so Phase B PRs have a target**
+
+```bash
+git push -u origin b/mypy-on-tests
+git push origin phase-A-shared-surface  # tag, optional but useful as a sanity anchor
+```
+
+Phase B subagents open PRs targeting this branch on GitHub so the `ci.yaml` and `typing.yml` workflows run pytest + mypy on each subagent's diff. **Without this push, the subagent PRs would have nowhere to target, and verification would have to fall back to local pytest — which is exactly what caused the previous OOM** when 10 parallel subagents each loaded the full ML stack (torch / transformers / sentence-transformers) into memory at once.
+
+Note: the on-branch CI runs are bounded by the `Typing` workflow already having `continue-on-error: true` from Commit 3, so a mid-flight push won't paint the branch red on the typing check.
+
 ---
 
 # Phase B — Subagent fan-out, parallel
@@ -320,17 +331,26 @@ YOUR WORK:
 1. Confirm baseline: `uv run --group typing mypy tests/<SUBDIR> 2>&1 | tail -3` shows ~<N> errors.
 2. Fix every error per the policy. Touch ONLY files inside `tests/<SUBDIR>` (and your subdir's own `conftest.py` if present).
 3. Verify mypy: `uv run --group typing mypy tests/<SUBDIR>` exits with zero errors.
-4. Verify imports: `uv run pytest --collect-only tests/<SUBDIR> 2>&1 | tail -10`. Any collection error is a regression to fix.
-5. Commit with message:
+4. Commit with message:
    `test(types): annotate tests/<SUBDIR> (<N>→0 mypy errors)\n\nCo-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>`
-6. Report (final message to main thread):
+5. Push your worktree's branch to origin: `git push -u origin <your-branch-name>`.
+6. Open a PR against `b/mypy-on-tests` (the parent integration branch, already pushed by Phase A Task A5):
+   ```bash
+   gh pr create --base b/mypy-on-tests --head <your-branch-name> \
+     --title "test(types): annotate tests/<SUBDIR> (<N>→0 mypy errors)" \
+     --body "Subagent diff for the strict-mypy-on-tests effort. See docs/superpowers/specs/2026-06-07-mypy-on-tests-design.md. CI on this PR is the verification surface — pytest + typing run on GitHub Actions, not locally."
+   ```
+   This triggers `ci.yaml` (full pytest matrix on the diff) and `typing.yml`.
+7. Report (final message to main thread):
    - Mypy exit status (must be 0).
-   - Pytest collect-only exit status (must be 0).
+   - PR URL.
    - Number of `# type: ignore` added; list each with file:line, code, reason.
    - Any frozen-surface change request (file you couldn't fix without modifying frozen code).
    - Any suspected real `src/` type bug discovered (with file:line and call site).
+   - Do NOT wait for CI to finish before reporting. The main thread polls `gh pr checks` and gates the merge on CI green.
 
 HARD LIMITS:
+- **DO NOT run pytest locally** — not even `pytest --collect-only`. Earlier concurrent local pytest invocations across 10 parallel subagents OOM'd the host because each one loaded the full ML stack (torch, transformers, sentence-transformers) into memory. Verification happens on GitHub Actions via your PR. Mypy alone is fine to run locally (lightweight).
 - Do not modify: `src/`, root `tests/conftest.py`, `tests/_fixtures/`, `tests/_helpers/`, `tests/_transformers/`, `pyproject.toml`, `.github/`, `docs/`. Your subdir's own `conftest.py` is in-scope.
 - Do not add dependencies.
 - Do not refactor for non-typing reasons.
@@ -366,26 +386,35 @@ Agent({
 })
 ```
 
-- [ ] **Step 2: Review subagent report**
+- [ ] **Step 2: Review subagent report + wait for the PR's CI**
 
-Verify:
+Verify from the report:
 - Mypy exit 0 on `tests/modules/scoring` ✓
-- Pytest --collect-only exit 0 ✓
+- A PR URL targeting `b/mypy-on-tests` was provided ✓
 - All `# type: ignore` have codes + reasons ✓
 - No frozen-surface modifications ✓
 
-- [ ] **Step 3: Merge subagent branch into `b/mypy-on-tests`**
+Then poll CI on the subagent's PR:
+```bash
+gh pr checks <PR-URL>
+```
+- `ci.yaml` (full pytest matrix on the diff): **must pass before merging** — this is the real verification that replaces what used to be local `pytest --collect-only`.
+- `typing.yml`: informational on this branch (still warn-only via Phase A Commit 3); merge is not gated on it. Phase C flips it to enforced after all subagents land.
+
+If `ci.yaml` fails, do NOT merge. Send the subagent back with the failing test output (pasted from `gh pr view <PR-URL> --json statusCheckRollup`). If CI is still running, you can review other subagents' reports in parallel — their PRs run independently on GitHub.
+
+- [ ] **Step 3: Merge subagent branch into `b/mypy-on-tests` + push to auto-close the PR**
 
 ```bash
 cd /Users/voorhs/repos/lab/AutoIntent/.claude/worktrees/mypy-on-tests
-git fetch <subagent-worktree-path>  # or use git merge if local
-git merge --no-ff <subagent-branch>
+git fetch origin <subagent-branch>
+git merge --no-ff origin/<subagent-branch>
+# Alternative if the subagent's worktree is locally accessible (cherry-pick form):
+# git -C <subagent-worktree> format-patch -1 --stdout | git am
+git push origin b/mypy-on-tests
 ```
 
-Or apply as a patch:
-```bash
-git -C <subagent-worktree> format-patch -1 --stdout | git am
-```
+The final `git push` lands the subagent's commit on the remote target branch, which auto-closes the subagent's PR (GitHub detects the commits are now in the target).
 
 - [ ] **Step 4: Verify the merged state**
 
@@ -523,6 +552,8 @@ Agent({
 B1–B10 are independent and can be launched in a single message with 10 parallel `Agent` calls. The two-stage reviews (Step 2 of each task) happen as subagent reports come back. The branch merges (Step 3 of each task) MUST be serialized — only one merge into `b/mypy-on-tests` at a time. Cherry-picking the patches in any order is fine because their file sets are disjoint, so no merge conflicts are expected.
 
 If two subagents both report a request to widen the same frozen helper (e.g., both want `Dataset` widened to `Dataset | None`), Phase C decides; do not block the merges on this — accept their local `cast()` workarounds and revisit centrally.
+
+**Host-OOM safety (why subagents push + open PRs instead of running pytest locally)**: an earlier execution attempt of this plan froze the user's laptop because 10 parallel subagents simultaneously invoked `pytest --collect-only`, each loading the full ML import surface (torch / transformers / sentence-transformers) into memory. The verification step has been moved to GitHub Actions: each subagent pushes its branch and opens a PR against `b/mypy-on-tests`, and `ci.yaml` runs the real pytest matrix on GitHub. Subagents run only mypy locally, which is light enough that 10 parallel processes are not a memory concern. Trade-off: 10 simultaneous CI runs cost some GitHub Actions minutes but cost zero host RAM, which is the right side of the trade to be on.
 
 ---
 
@@ -732,7 +763,7 @@ Do **not** merge the PR. The user reviews and merges manually.
 | Phase C: review ignores | C2 |
 | Phase C: src/ bug escalation | C3 |
 | Done criteria — mypy clean | C1, C3 Step 3 |
-| Done criteria — pytest green | Phase B subagents (collect-only) + final PR CI |
+| Done criteria — pytest green | Phase B subagent PRs' `ci.yaml` runs + final PR CI |
 | Done criteria — gate enforced | C4 |
 | Done criteria — no new deps | A1 verification |
 | Done criteria — every ignore has code+reason | C2 |
