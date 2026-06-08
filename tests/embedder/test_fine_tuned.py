@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
+
 import numpy as np
 import pytest
 
@@ -6,8 +10,12 @@ from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
 from tests.conftest import tiny_sentence_transformer_config
 
+if TYPE_CHECKING:
+    from autointent import Dataset
+    from autointent.custom_types import ListOfLabels
 
-def test_model_updates_after_training(dataset):
+
+def test_model_updates_after_training(dataset: Dataset) -> None:
     """Test that model weights actually change after training"""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -35,9 +43,11 @@ def test_model_updates_after_training(dataset):
         param.data.detach().cpu().numpy().copy() for param in backend._model.parameters() if param.requires_grad
     ]
 
+    # data_handler.train_labels returns ListOfGenericLabels (may contain None for OOS);
+    # the test dataset has no OOS, so cast to the strict ListOfLabels for the typed API.
     backend.train(
         utterances=data_handler.train_utterances(0)[:1000],
-        labels=data_handler.train_labels(0)[:1000],
+        labels=cast("ListOfLabels", data_handler.train_labels(0)[:1000]),
         config=train_config,
     )
 

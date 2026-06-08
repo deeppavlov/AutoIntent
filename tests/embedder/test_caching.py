@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class TestEmbedderCaching:
     """Test caching functionality for different embedder backends."""
 
-    def test_caching_consistency(self, embedder_config: EmbedderConfig):
+    def test_caching_consistency(self, embedder_config: EmbedderConfig) -> None:
         """Test that caching produces consistent results when enabled."""
         # Create config with caching enabled
         if hasattr(embedder_config, "model_copy"):
@@ -40,7 +40,7 @@ class TestEmbedderCaching:
         # Verify results are identical
         np.testing.assert_allclose(embeddings1, embeddings2, rtol=1e-5)
 
-    def test_caching_disabled_consistency(self, embedder_config: EmbedderConfig):
+    def test_caching_disabled_consistency(self, embedder_config: EmbedderConfig) -> None:
         """Test behavior when caching is disabled."""
         # Ensure caching is disabled
         if hasattr(embedder_config, "model_copy"):
@@ -63,7 +63,7 @@ class TestEmbedderCaching:
 class TestSentenceTransformerCachingSpecific:
     """Test caching functionality specific to SentenceTransformer backend."""
 
-    def test_caching_performance_improvement(self):
+    def test_caching_performance_improvement(self) -> None:
         """Test that caching provides performance improvement."""
         config = create_sentence_transformer_config(use_cache=True)
         embedder = Embedder(config)
@@ -83,7 +83,7 @@ class TestSentenceTransformerCachingSpecific:
         # but we can at least verify the caching mechanism works
         assert embeddings1.shape == embeddings2.shape
 
-    def test_different_inputs_no_cache_collision(self):
+    def test_different_inputs_no_cache_collision(self) -> None:
         """Test that different inputs don't collide in cache."""
         config = create_sentence_transformer_config(use_cache=True)
         embedder = Embedder(config)
@@ -94,7 +94,7 @@ class TestSentenceTransformerCachingSpecific:
         # Different inputs should produce different embeddings
         assert not np.allclose(embeddings1, embeddings2, rtol=1e-3)
 
-    def test_cache_with_different_prompts(self):
+    def test_cache_with_different_prompts(self) -> None:
         """Test that prompts are considered in caching."""
         config = create_sentence_transformer_config(
             use_cache=True,

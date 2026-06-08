@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 import pytest
@@ -11,6 +11,7 @@ from autointent.configs import SentenceTransformerEmbeddingConfig
 from .conftest import backend_configs
 
 if TYPE_CHECKING:
+    from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
     from autointent.configs import EmbedderConfig
 
 
@@ -23,24 +24,24 @@ class TestEmbedderMemory:
         """Create an Embedder instance for testing."""
         return Embedder(embedder_config)
 
-    def test_clear_ram(self, embedder: Embedder):
+    def test_clear_ram(self, embedder: Embedder) -> None:
         """Test RAM clearing functionality."""
         # Load the model by doing an embedding
         embedder.embed(["test"])
 
         # Check that backend model is loaded for SentenceTransformers
         if isinstance(embedder.config, SentenceTransformerEmbeddingConfig):
-            assert embedder._backend._model is not None
+            assert cast("SentenceTransformerEmbeddingBackend", embedder._backend)._model is not None
 
         # Clear RAM
         embedder.clear_ram()
 
         # For SentenceTransformers, model should be cleared
         if isinstance(embedder.config, SentenceTransformerEmbeddingConfig):
-            assert embedder._backend._model is None
+            assert cast("SentenceTransformerEmbeddingBackend", embedder._backend)._model is None
         # For OpenAI, clear_ram is a no-op (no model stored in RAM)
 
-    def test_memory_efficiency_multiple_calls(self, embedder: Embedder):
+    def test_memory_efficiency_multiple_calls(self, embedder: Embedder) -> None:
         """Test that multiple embed calls don't cause memory leaks."""
         test_utterances = ["First test", "Second test", "Third test"]
 
@@ -51,15 +52,15 @@ class TestEmbedderMemory:
 
         # For SentenceTransformers, model should still be loaded once
         if isinstance(embedder.config, SentenceTransformerEmbeddingConfig):
-            assert embedder._backend._model is not None
+            assert cast("SentenceTransformerEmbeddingBackend", embedder._backend)._model is not None
 
         # Clear RAM should work after multiple calls
         embedder.clear_ram()
 
         if isinstance(embedder.config, SentenceTransformerEmbeddingConfig):
-            assert embedder._backend._model is None
+            assert cast("SentenceTransformerEmbeddingBackend", embedder._backend)._model is None
 
-    def test_model_reloading_after_clear(self, embedder: Embedder):
+    def test_model_reloading_after_clear(self, embedder: Embedder) -> None:
         """Test that model can be reloaded after clearing RAM."""
         # First embedding
         embeddings1 = embedder.embed(["test"])
