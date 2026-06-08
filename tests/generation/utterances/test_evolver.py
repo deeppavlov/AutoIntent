@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -5,14 +8,17 @@ import pytest
 from autointent.generation.chat_templates import AbstractEvolution
 from autointent.generation.utterances import UtteranceEvolver
 
+if TYPE_CHECKING:
+    from autointent import Dataset
 
-def test_default_chat_template(dataset):
+
+def test_default_chat_template(dataset: Dataset) -> None:
     template = AbstractEvolution()
     prompt = template("some utterance", dataset.intents[0])
     assert "some utterance" in prompt[-1]["content"]
 
 
-def test_on_dataset(dataset):
+def test_on_dataset(dataset: Dataset) -> None:
     mock_llm = Mock()
     mock_llm.get_chat_completion.return_value = "LLM answer"
 
@@ -46,7 +52,7 @@ def test_on_dataset(dataset):
     assert set(new_samples.column_names) == set(dataset[split_name].column_names)
 
 
-def test_on_dataset_evolver_async(dataset):
+def test_on_dataset_evolver_async(dataset: Dataset) -> None:
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "LLM answer"
 
@@ -77,7 +83,7 @@ def test_on_dataset_evolver_async(dataset):
         )
 
 
-def test_on_dataset_evolver_async_with_batch_size(dataset):
+def test_on_dataset_evolver_async_with_batch_size(dataset: Dataset) -> None:
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "LLM answer"
 

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from collections import defaultdict
+from typing import TYPE_CHECKING, cast
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -13,46 +16,49 @@ from autointent.generation.intents._description_generation import (
 )
 from autointent.schemas import Intent, Sample
 
+if TYPE_CHECKING:
+    from autointent.generation import Generator
 
-def test_get_utterances_by_id_empty_input():
-    utterances = []
+
+def test_get_utterances_by_id_empty_input() -> None:
+    utterances: list[Sample] = []
     result = group_utterances_by_label(utterances)
     assert result == {}
 
 
-def test_get_utterances_by_id_single_multiclass_utterance():
+def test_get_utterances_by_id_single_multiclass_utterance() -> None:
     samples = [Sample(utterance="Hello", label=1)]
     result = group_utterances_by_label(samples)
     assert result == {1: ["Hello"]}
 
 
-def test_get_utterances_by_id_multiple_multiclass_same_label():
+def test_get_utterances_by_id_multiple_multiclass_same_label() -> None:
     samples = [Sample(utterance="Hello", label=1), Sample(utterance="Hi", label=1)]
     result = group_utterances_by_label(samples)
     assert result == {1: ["Hello", "Hi"]}
 
 
-def test_get_utterances_by_id_single_multilabel_utterance():
+def test_get_utterances_by_id_single_multilabel_utterance() -> None:
     samples = [Sample(utterance="Good morning", label=[0, 1, 1, 0])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning"], 2: ["Good morning"]}
     assert result == expected_result
 
 
-def test_get_utterances_by_id_multiple_multilabel_utterances():
+def test_get_utterances_by_id_multiple_multilabel_utterances() -> None:
     samples = [Sample(utterance="Good morning", label=[0, 1, 1, 0]), Sample(utterance="Good night", label=[0, 1, 0, 1])]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Good morning", "Good night"], 2: ["Good morning"], 3: ["Good night"]}
     assert result == expected_result
 
 
-def test_get_utterances_by_id_oos_utterances():
+def test_get_utterances_by_id_oos_utterances() -> None:
     samples = [Sample(utterance="Unknown command", label=None), Sample(utterance="Hello", label=[0, 0, 1])]
     result = group_utterances_by_label(samples)
     assert result == {2: ["Hello"]}
 
 
-def test_get_utterances_by_id_mixed_types():
+def test_get_utterances_by_id_mixed_types() -> None:
     samples = [
         Sample(utterance="Hello", label=1),
         Sample(utterance="Good morning", label=[0, 1, 0, 1]),
@@ -64,7 +70,7 @@ def test_get_utterances_by_id_mixed_types():
     assert result == expected_result
 
 
-def test_get_utterances_by_id_duplicate_texts_different_labels():
+def test_get_utterances_by_id_duplicate_texts_different_labels() -> None:
     samples = [Sample(utterance="Duplicate", label=1), Sample(utterance="Duplicate", label=2)]
     result = group_utterances_by_label(samples)
     expected_result = {1: ["Duplicate"], 2: ["Duplicate"]}
@@ -72,7 +78,7 @@ def test_get_utterances_by_id_duplicate_texts_different_labels():
 
 
 @pytest.mark.asyncio
-async def test_create_intent_description_basic():
+async def test_create_intent_description_basic() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
@@ -83,7 +89,7 @@ async def test_create_intent_description_basic():
     )
 
     description = await create_intent_description(
-        client=client,
+        client=cast("Generator", client),
         intent_name="Greeting",
         utterances=utterances,
         prompt=prompt,
@@ -94,7 +100,7 @@ async def test_create_intent_description_basic():
 
 
 @pytest.mark.asyncio
-async def test_create_intent_description_empty_intent_name():
+async def test_create_intent_description_empty_intent_name() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
@@ -105,7 +111,7 @@ async def test_create_intent_description_empty_intent_name():
     )
 
     description = await create_intent_description(
-        client=client,
+        client=cast("Generator", client),
         intent_name=None,
         utterances=utterances,
         prompt=prompt,
@@ -116,18 +122,18 @@ async def test_create_intent_description_empty_intent_name():
 
 
 @pytest.mark.asyncio
-async def test_create_intent_description_empty_utterances_patterns():
+async def test_create_intent_description_empty_utterances_patterns() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
 
-    utterances = []
+    utterances: list[str] = []
     prompt = PromptDescription(
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
 
     description = await create_intent_description(
-        client=client,
+        client=cast("Generator", client),
         intent_name="Greeting",
         utterances=utterances,
         prompt=prompt,
@@ -138,7 +144,7 @@ async def test_create_intent_description_empty_utterances_patterns():
 
 
 @pytest.mark.asyncio
-async def test_create_intent_description_large_utterances_patterns():
+async def test_create_intent_description_large_utterances_patterns() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
@@ -150,7 +156,7 @@ async def test_create_intent_description_large_utterances_patterns():
 
     with patch("random.sample", side_effect=lambda x, k: x[:k]) as mock_sample:
         description = await create_intent_description(
-            client=client,
+            client=cast("Generator", client),
             intent_name="Greeting",
             utterances=utterances,
             prompt=prompt,
@@ -162,7 +168,7 @@ async def test_create_intent_description_large_utterances_patterns():
 
 
 @pytest.mark.asyncio
-async def test_generate_intent_descriptions_basic():
+async def test_generate_intent_descriptions_basic() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
@@ -176,7 +182,7 @@ async def test_generate_intent_descriptions_basic():
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=client,
+        client=cast("Generator", client),
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -187,7 +193,7 @@ async def test_generate_intent_descriptions_basic():
 
 
 @pytest.mark.asyncio
-async def test_generate_intent_descriptions_skip_existing_descriptions():
+async def test_generate_intent_descriptions_skip_existing_descriptions() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
@@ -207,7 +213,7 @@ async def test_generate_intent_descriptions_skip_existing_descriptions():
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=client,
+        client=cast("Generator", client),
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -219,12 +225,12 @@ async def test_generate_intent_descriptions_skip_existing_descriptions():
 
 
 @pytest.mark.asyncio
-async def test_generate_intent_descriptions_empty_utterances_patterns():
+async def test_generate_intent_descriptions_empty_utterances_patterns() -> None:
     client = AsyncMock()
     mock_create = client.get_chat_completion_async
     mock_create.return_value = "Generated description"
 
-    intent_utterances = {}  # No utterances for any intent
+    intent_utterances: dict[int, list[str]] = {}  # No utterances for any intent
     intents = [
         Intent(id=1, name="Greeting", description=None, regex_full_match=[], regex_partial_match=[]),
     ]
@@ -232,7 +238,7 @@ async def test_generate_intent_descriptions_empty_utterances_patterns():
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=client,
+        client=cast("Generator", client),
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -254,7 +260,7 @@ async def test_generate_intent_descriptions_empty_utterances_patterns():
     )
 
 
-def test_enhance_dataset_with_descriptions_basic():
+def test_enhance_dataset_with_descriptions_basic() -> None:
     client = AsyncMock()
     with patch(
         "autointent.generation.intents._description_generation.generate_intent_descriptions",
@@ -282,7 +288,7 @@ def test_enhance_dataset_with_descriptions_basic():
         )
         enhanced_dataset = generate_descriptions(
             dataset=dataset,
-            client=client,
+            client=cast("Generator", client),
             prompt=prompt,
         )
         expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
@@ -300,7 +306,7 @@ def test_enhance_dataset_with_descriptions_basic():
         )
 
 
-def test_enhance_dataset_with_existing_descriptions():
+def test_enhance_dataset_with_existing_descriptions() -> None:
     client = AsyncMock()
     with patch(
         "autointent.generation.intents._description_generation.generate_intent_descriptions",
@@ -328,7 +334,7 @@ def test_enhance_dataset_with_existing_descriptions():
         )
         enhanced_dataset = generate_descriptions(
             dataset=dataset,
-            client=client,
+            client=cast("Generator", client),
             prompt=prompt,
         )
         expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
