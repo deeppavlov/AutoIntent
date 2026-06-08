@@ -12,11 +12,11 @@ if TYPE_CHECKING:
     from datasets import Dataset as HFDataset
 
 
-def count_oos(split: HFDataset):
+def count_oos(split: HFDataset) -> int:
     return len(split.filter(lambda sample: sample["label"] is None))
 
 
-def create_clinc150_subset():
+def create_clinc150_subset() -> Dataset:
     snapshot_path = ires.files("tests.assets.data").joinpath("clinc150_oos_input.json")
     clinc = Dataset.from_json(str(snapshot_path))
 
@@ -49,7 +49,7 @@ def create_clinc150_subset():
     )
 
 
-def test():
+def test() -> None:
     dataset = create_clinc150_subset()
 
     desired_specs = {
