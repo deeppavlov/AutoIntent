@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 import pytest
 import respx
-from respx.router import MockRouter
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from respx.router import MockRouter
 
 
 @pytest.fixture

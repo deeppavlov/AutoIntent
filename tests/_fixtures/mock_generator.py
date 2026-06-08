@@ -33,7 +33,7 @@ def mock_generator() -> Generator:
     gen = Mock(spec=Generator)
     gen.get_structured_output_sync.side_effect = lambda **kwargs: _make_categorization()
     gen.get_chat_completion.return_value = "mocked response"
-    return cast(Generator, gen)
+    return cast("Generator", gen)
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def mock_async_generator() -> Generator:
     gen = Mock(spec=Generator)
     gen.get_structured_output_async = AsyncMock(side_effect=lambda **kwargs: _make_categorization())
     gen.get_chat_completion_async = AsyncMock(return_value="mocked response")
-    return cast(Generator, gen)
+    return cast("Generator", gen)
 
 
 @pytest.fixture
@@ -65,4 +65,4 @@ def patch_llm_scorer_generator(monkeypatch: pytest.MonkeyPatch) -> Generator:
         return combined
 
     monkeypatch.setattr(llm_encoder, "Generator", _patched_constructor)
-    return cast(Generator, combined)
+    return cast("Generator", combined)
