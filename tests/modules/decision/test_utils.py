@@ -1,11 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 import pytest
 
 from autointent.modules.decision._utils import apply_tags
 from autointent.schemas import Tag
 
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
-def sample_data():
+
+SampleTuple = tuple["npt.NDArray[Any]", "npt.NDArray[Any]", list[Tag], "npt.NDArray[Any]"]
+
+
+def sample_data() -> SampleTuple:
     labels = np.array([[1, 1, 0], [0, 1, 1]])
     scores = np.array([[0.9, 0.8, 0.1], [0.1, 0.8, 0.7]])
     tags = [Tag(name="mutual_exclusive", intent_ids=[0, 1])]
@@ -13,7 +23,7 @@ def sample_data():
     return labels, scores, tags, expected_labels
 
 
-def no_conflict_data():
+def no_conflict_data() -> SampleTuple:
     labels = np.array([[1, 0, 0], [0, 1, 0]])
     scores = np.array([[0.9, 0.2, 0.1], [0.1, 0.8, 0.3]])
     tags = [Tag(name="mutual_exclusive", intent_ids=[0, 1])]
@@ -21,7 +31,7 @@ def no_conflict_data():
     return labels, scores, tags, expected_labels
 
 
-def multiple_tags_data():
+def multiple_tags_data() -> SampleTuple:
     labels = np.array([[1, 1, 1, 0], [1, 0, 1, 1]])
     scores = np.array([[0.9, 0.8, 0.7, 0.6], [0.95, 0.85, 0.9, 0.8]])
     tags = [Tag(name="tag1", intent_ids=[0, 1]), Tag(name="tag2", intent_ids=[2, 3])]
@@ -83,6 +93,11 @@ def multiple_tags_data():
         ),
     ],
 )
-def test_apply_tags(labels, scores, tags, expected_labels):
+def test_apply_tags(
+    labels: npt.NDArray[Any],
+    scores: npt.NDArray[Any],
+    tags: list[Tag],
+    expected_labels: npt.NDArray[Any],
+) -> None:
     adjusted_labels = apply_tags(labels, scores, tags)
     np.testing.assert_array_equal(adjusted_labels, expected_labels)

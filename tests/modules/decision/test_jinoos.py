@@ -6,14 +6,16 @@ import numpy as np
 import pytest
 
 from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
-from autointent.modules import JinoosDecision
+from autointent.modules.decision import JinoosDecision
 from tests.conftest import setup_environment
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
+    from tests.modules.decision.conftest import FitData
 
-def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float):
+
+def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float) -> npt.NDArray[Any]:
     """
     `labels`: labels without oos detection
     """
@@ -23,7 +25,7 @@ def detect_oos(scores: npt.NDArray[Any], labels: npt.NDArray[Any], thresh: float
     return labels
 
 
-def test_predict_returns_correct_indices(multiclass_fit_data, scores):
+def test_predict_returns_correct_indices(multiclass_fit_data: FitData, scores: npt.NDArray[Any]) -> None:
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)
     # inference
@@ -33,7 +35,7 @@ def test_predict_returns_correct_indices(multiclass_fit_data, scores):
     np.testing.assert_array_equal(predictions, desired)
 
 
-def test_fails_on_wrong_n_classes(multiclass_fit_data):
+def test_fails_on_wrong_n_classes(multiclass_fit_data: FitData) -> None:
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
@@ -41,22 +43,22 @@ def test_fails_on_wrong_n_classes(multiclass_fit_data):
         predictor.predict(scores)
 
 
-def test_fails_on_wrong_clf_problem(multilabel_fit_data):
+def test_fails_on_wrong_clf_problem(multilabel_fit_data: FitData) -> None:
     predictor = JinoosDecision()
     with pytest.raises(WrongClassificationError):
         predictor.fit(*multilabel_fit_data)
 
 
-def test_dump_load(multiclass_fit_data):
+def test_dump_load(multiclass_fit_data: FitData) -> None:
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)
     predictions = predictor.predict(multiclass_fit_data[0])
 
     path = setup_environment() / "jinoos_module"
-    predictor.dump(path)
+    predictor.dump(str(path))
     del predictor
 
-    predictor = JinoosDecision.load(path)
+    predictor = JinoosDecision.load(str(path))
 
     assert hasattr(predictor, "_thresh")
     assert predictor._thresh is not None
