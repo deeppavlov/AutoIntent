@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from copy import deepcopy
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -8,12 +10,15 @@ from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import DataConfig, FaissConfig, HPOConfig, LoggingConfig
 from tests.conftest import setup_environment
 
+if TYPE_CHECKING:
+    from autointent import Dataset
+
 
 class DummyCallback(OptimizerCallback):
     name = "dummy"
 
     def __init__(self) -> None:
-        self.history = []
+        self.history: list[tuple[str, Any]] = []
 
     def start_run(self, **kwargs: dict[str, Any]) -> None:
         self.history.append(("start_run", kwargs))
@@ -51,10 +56,10 @@ class DummyCallback(OptimizerCallback):
         return metrics
 
 
-def test_pipeline_callbacks(dataset):
+def test_pipeline_callbacks(dataset: Dataset) -> None:
     project_dir = setup_environment()
 
-    search_space = [
+    search_space: list[dict[str, Any]] = [
         {
             "node_type": "embedding",
             "target_metric": "retrieval_hit_rate",
@@ -104,7 +109,7 @@ def test_pipeline_callbacks(dataset):
 
     pipeline_optimizer._fit(context)
 
-    dummy_callback = context.callback_handler.callbacks[0]
+    dummy_callback = cast("DummyCallback", context.callback_handler.callbacks[0])
 
     assert len(dummy_callback.history) == 30
     assert dummy_callback.history[0][0] == "start_run"

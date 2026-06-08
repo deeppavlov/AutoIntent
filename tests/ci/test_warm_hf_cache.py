@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 import warm_hf_cache as wc
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 
 class TestResolveEntry:
-    def test_known_repo_resolves_to_pinned_sha(self):
+    def test_known_repo_resolves_to_pinned_sha(self) -> None:
         entry = wc._resolve_entry("prajjwal1/bert-tiny", "model")
         assert entry.repo_id == "prajjwal1/bert-tiny"
         assert entry.repo_type == "model"
@@ -14,19 +19,19 @@ class TestResolveEntry:
         from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
         assert entry.revision == DEFAULT_REVISIONS["prajjwal1/bert-tiny"]
 
-    def test_unknown_repo_raises(self):
+    def test_unknown_repo_raises(self) -> None:
         with pytest.raises(wc.ConfigError, match="not in DEFAULT_REVISIONS"):
             wc._resolve_entry("not-a-real/repo", "model")
 
 
 class TestLoadConfig:
-    def test_empty_file(self, tmp_path):
+    def test_empty_file(self, tmp_path: Path) -> None:
         cfg = tmp_path / "empty.yaml"
         cfg.write_text("models: []\ndatasets: []\n")
         entries = wc._load_config(cfg)
         assert entries == []
 
-    def test_models_resolved_via_default_revisions(self, tmp_path):
+    def test_models_resolved_via_default_revisions(self, tmp_path: Path) -> None:
         from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
         cfg = tmp_path / "cfg.yaml"
@@ -44,19 +49,19 @@ class TestLoadConfig:
             ),
         ]
 
-    def test_unknown_top_level_key_raises(self, tmp_path):
+    def test_unknown_top_level_key_raises(self, tmp_path: Path) -> None:
         cfg = tmp_path / "cfg.yaml"
         cfg.write_text("models: []\nfoo: []\n")
         with pytest.raises(wc.ConfigError, match="Unknown top-level"):
             wc._load_config(cfg)
 
-    def test_unpinned_model_raises(self, tmp_path):
+    def test_unpinned_model_raises(self, tmp_path: Path) -> None:
         cfg = tmp_path / "cfg.yaml"
         cfg.write_text("models:\n  - not-a-real/repo\n")
         with pytest.raises(wc.ConfigError, match="not in DEFAULT_REVISIONS"):
             wc._load_config(cfg)
 
-    def test_dataset_entry_raises(self, tmp_path):
+    def test_dataset_entry_raises(self, tmp_path: Path) -> None:
         # DEFAULT_REVISIONS covers models only today. If we ever need to
         # warm a dataset, _resolve_entry must be extended; the parser
         # raises until then so a dataset in the YAML can't silently
@@ -78,7 +83,7 @@ class TestPrewarmConfigsAreSubsetOfDefaultRevisions:
     misconfigured YAML never reaches the warm-cache job."""
 
     @pytest.mark.parametrize("yaml_path", [".ci/hf-prewarm.yaml"])
-    def test_every_model_is_pinned_in_default_revisions(self, yaml_path):
+    def test_every_model_is_pinned_in_default_revisions(self, yaml_path: str) -> None:
         from pathlib import Path
 
         import yaml as pyyaml
@@ -95,7 +100,7 @@ class TestPrewarmConfigsAreSubsetOfDefaultRevisions:
         )
 
     @pytest.mark.parametrize("yaml_path", [".ci/hf-prewarm.yaml"])
-    def test_no_sha_suffix_in_repo_ids(self, yaml_path):
+    def test_no_sha_suffix_in_repo_ids(self, yaml_path: str) -> None:
         """The new YAML format is bare repo IDs. A '@' in an entry means
         someone added an entry in the old 'repo@sha' format — likely
         because they copy-pasted from git history. Catch it explicitly so
