@@ -1,4 +1,4 @@
-from typing import get_args
+from typing import Any, get_args
 
 import pytest
 
@@ -7,7 +7,7 @@ from tests.conftest import TaskType, get_search_space
 
 
 @pytest.fixture
-def valid_optimizer_config():
+def valid_optimizer_config() -> list[dict[str, Any]]:
     """Fixture for a valid OptimizerConfig."""
     return [
         {
@@ -41,7 +41,7 @@ def valid_optimizer_config():
     ]
 
 
-def test_valid_optimizer_config(valid_optimizer_config):
+def test_valid_optimizer_config(valid_optimizer_config: list[dict[str, Any]]) -> None:
     """Test that a valid optimizer config passes validation."""
     for node_dict_config in valid_optimizer_config:
         NodeOptimizer(**node_dict_config)
@@ -51,14 +51,14 @@ def test_valid_optimizer_config(valid_optimizer_config):
     "task_type",
     get_args(TaskType),
 )
-def test_optimizer_config(task_type):
+def test_optimizer_config(task_type: TaskType) -> None:
     for node_dict_config in get_search_space(task_type):
         NodeOptimizer(**node_dict_config)
 
 
-def test_invalid_optimizer_config_missing_field():
+def test_invalid_optimizer_config_missing_field() -> None:
     """Test that a missing required field raises ValidationError."""
-    invalid_config = [
+    invalid_config: list[dict[str, Any]] = [
         {
             "node_type": "scoring",
             # Missing "target_metric"
@@ -69,10 +69,13 @@ def test_invalid_optimizer_config_missing_field():
     ]
 
     with pytest.raises(TypeError):
-        NodeOptimizer(**invalid_config)
+        # reason: test asserts TypeError; double-star spread of a list is invalid at
+        # runtime (raises TypeError), which is the exact failure mode under test. mypy
+        # correctly flags the kwarg mismatch, so suppress with code here.
+        NodeOptimizer(**invalid_config)  # type: ignore[arg-type]
 
 
-def test_deberta_v3_large_is_pinned():
+def test_deberta_v3_large_is_pinned() -> None:
     from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-large")
@@ -81,7 +84,7 @@ def test_deberta_v3_large_is_pinned():
     assert all(c in "0123456789abcdef" for c in sha), f"SHA must be hex; got {sha!r}"
 
 
-def test_canonical_test_models_have_pinned_revisions():
+def test_canonical_test_models_have_pinned_revisions() -> None:
     from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
     from tests.conftest import (
         TINY_BERT,
@@ -103,7 +106,7 @@ def test_canonical_test_models_have_pinned_revisions():
     assert tiny_sentence_transformer_config().model_name == TINY_SENTENCE_TRANSFORMER
 
 
-def test_bert_tiny_config_in_scoring_tests_gets_pinned_revision():
+def test_bert_tiny_config_in_scoring_tests_gets_pinned_revision() -> None:
     """test_bert/lora/ptuning.py rely on _apply_default_revision to fill
     revision when they omit it. Lock that contract in here so a future
     change to the validator doesn't silently make the scoring tests
@@ -115,7 +118,7 @@ def test_bert_tiny_config_in_scoring_tests_gets_pinned_revision():
     assert cfg.revision == DEFAULT_REVISIONS["prajjwal1/bert-tiny"]
 
 
-def test_hf_guard_blocks_unpinned_revision():
+def test_hf_guard_blocks_unpinned_revision() -> None:
     from tests.conftest import _make_hf_guard
 
     sentinel = object()
@@ -128,7 +131,7 @@ def test_hf_guard_blocks_unpinned_revision():
             guard("repo/id", "file.bin", revision=bad)
 
 
-def test_hf_guard_allows_sha_pinned_revision():
+def test_hf_guard_allows_sha_pinned_revision() -> None:
     from tests.conftest import _make_hf_guard
 
     sentinel = object()
@@ -141,7 +144,7 @@ def test_hf_guard_allows_sha_pinned_revision():
     assert guard("repo/id", "file.bin", revision=sha2) is sentinel
 
 
-def test_deberta_v3_small_is_pinned():
+def test_deberta_v3_small_is_pinned() -> None:
     from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
     sha = DEFAULT_REVISIONS.get("microsoft/deberta-v3-small")
@@ -152,9 +155,9 @@ def test_deberta_v3_small_is_pinned():
     assert all(c in "0123456789abcdef" for c in sha), f"SHA must be lowercase hex; got {sha!r}"
 
 
-def test_invalid_optimizer_config_wrong_type():
+def test_invalid_optimizer_config_wrong_type() -> None:
     """Test that an invalid field type raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",
         "search_space": [
@@ -171,7 +174,7 @@ def test_invalid_optimizer_config_wrong_type():
         NodeOptimizer(**invalid_config)
 
 
-def test_pinned_revisions_module_has_no_runtime_imports():
+def test_pinned_revisions_module_has_no_runtime_imports() -> None:
     """The leaf module must stay minimal — no imports beyond __future__.
 
     .ci/warm_hf_cache.py loads it via importlib.util.spec_from_file_location,
@@ -206,7 +209,7 @@ def test_pinned_revisions_module_has_no_runtime_imports():
             )
 
 
-def test_leaf_module_loadable_without_autointent_package():
+def test_leaf_module_loadable_without_autointent_package() -> None:
     """The warm-cache CI job loads _pinned_revisions.py via
     importlib.util.spec_from_file_location in an environment where the
     autointent package is NOT installed. Run that exact load mechanism

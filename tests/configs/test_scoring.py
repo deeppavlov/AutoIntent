@@ -1,10 +1,12 @@
+from typing import Any
+
 import pytest
 
 from autointent.nodes import NodeOptimizer
 
 
 @pytest.fixture
-def valid_scoring_config():
+def valid_scoring_config() -> dict[str, Any]:
     """Fixture for a valid ScoringNode configuration."""
     return {
         "node_type": "scoring",
@@ -56,7 +58,7 @@ def valid_scoring_config():
     }
 
 
-def test_valid_scoring_config(valid_scoring_config):
+def test_valid_scoring_config(valid_scoring_config: dict[str, Any]) -> None:
     """Test that a valid scoring config passes validation."""
     node = NodeOptimizer(**valid_scoring_config)
     assert node.node_type == "scoring"
@@ -65,9 +67,9 @@ def test_valid_scoring_config(valid_scoring_config):
     assert node.modules_search_spaces[0]["module_name"] == "dnnc"
 
 
-def test_invalid_scoring_config_missing_field():
+def test_invalid_scoring_config_missing_field() -> None:
     """Test that a missing required field raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "scoring",
         # Missing "target_metric"
         "search_space": [
@@ -76,12 +78,15 @@ def test_invalid_scoring_config_missing_field():
     }
 
     with pytest.raises(TypeError):
-        NodeOptimizer(*invalid_config)
+        # reason: test asserts TypeError; single-star spread of a dict yields its keys
+        # as positional args, which is the exact failure mode under test. mypy correctly
+        # flags the mismatched arg types, so suppress with codes here.
+        NodeOptimizer(*invalid_config)  # type: ignore[arg-type]
 
 
-def test_invalid_scoring_config_wrong_type():
+def test_invalid_scoring_config_wrong_type() -> None:
     """Test that an invalid field type raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",
         "search_space": [
