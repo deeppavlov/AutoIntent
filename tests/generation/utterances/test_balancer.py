@@ -61,4 +61,3 @@ def test_balancer(unbalanced_dataset: Dataset, mock_generator: Mock, mock_prompt
     original_utterances = {s["utterance"] for s in unbalanced_dataset[Split.TRAIN]}
     balanced_utterances = {s["utterance"] for s in balanced[Split.TRAIN]}
     assert original_utterances.issubset(balanced_utterances)
-

@@ -32,9 +32,7 @@ def _docker_available() -> bool:
     if shutil.which("docker") is None:
         return False
     try:
-        result = subprocess.run(
-            ["docker", "info"], capture_output=True, timeout=5, check=False
-        )
+        result = subprocess.run(["docker", "info"], capture_output=True, timeout=5, check=False)
     except (OSError, subprocess.TimeoutExpired):
         return False
     return result.returncode == 0
@@ -145,9 +143,7 @@ class TestVectorIndex:
         embeddings = vector_index.get_all_embeddings()
         assert embeddings.shape[0] == 4
 
-    def test_query_by_text(
-        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
-    ) -> None:
+    def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test querying the index with text."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -213,9 +209,7 @@ class TestVectorIndex:
             assert len(distances[0]) <= 1
             assert len(documents[0]) <= 1
 
-    def test_clear_ram(
-        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
-    ) -> None:
+    def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test clearing the index from RAM."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -231,9 +225,7 @@ class TestVectorIndex:
             embeddings = vector_index.get_all_embeddings()
             assert embeddings.shape[0] == 0
 
-    def test_dump_and_load(
-        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
-    ) -> None:
+    def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test dumping and loading the vector index."""
         vector_index.add(sample_texts, sample_labels)
 

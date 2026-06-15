@@ -198,15 +198,11 @@ def test_pinned_revisions_module_has_no_runtime_imports() -> None:
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom):
             assert node.module == "__future__", (
-                f"_pinned_revisions.py must not import {node.module!r} "
-                f"(only `from __future__ import ...` is allowed)"
+                f"_pinned_revisions.py must not import {node.module!r} (only `from __future__ import ...` is allowed)"
             )
         elif isinstance(node, ast.Import):
             modules = [alias.name for alias in node.names]
-            assert not modules, (
-                f"_pinned_revisions.py must not contain `import` statements; "
-                f"found: {modules}"
-            )
+            assert not modules, f"_pinned_revisions.py must not contain `import` statements; found: {modules}"
 
 
 def test_leaf_module_loadable_without_autointent_package() -> None:
@@ -248,6 +244,4 @@ def test_leaf_module_loadable_without_autointent_package() -> None:
         text=True,
         check=False,
     )
-    assert result.returncode == 0, (
-        f"Hermetic load failed:\nstdout={result.stdout}\nstderr={result.stderr}"
-    )
+    assert result.returncode == 0, f"Hermetic load failed:\nstdout={result.stdout}\nstderr={result.stderr}"
