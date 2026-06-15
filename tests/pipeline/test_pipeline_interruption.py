@@ -10,6 +10,7 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
 from autointent.custom_types import NodeType
+from autointent.nodes import NodeOptimizer
 from tests.conftest import get_search_space
 
 if TYPE_CHECKING:
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
     from optuna.trial import Trial
 
     from autointent import Dataset
-    from autointent.nodes import NodeOptimizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ def count_trials_in_database(db_path: Path) -> int:
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM trials")
+        # reason: sqlite Row indexer returns Any by API design
         return cast("int", cursor.fetchone()[0])
 
 
@@ -44,7 +45,7 @@ def get_completed_trial_numbers(db_path: Path) -> set[int]:
         return {row[0] for row in cursor.fetchall()}
 
 
-def test_pipeline_with_exception_resume(dataset_no_oos: Dataset, tmp_path: Path) -> None:
+def test_pipeline_with_exception_resume(dataset_no_oos: Dataset, tmp_path: Path) -> None:  # noqa: PLR0915
     """Test that pipeline can resume after an exception and continues from where it left off."""
     project_dir = tmp_path
     search_space = get_search_space("optuna")
@@ -61,8 +62,9 @@ def test_pipeline_with_exception_resume(dataset_no_oos: Dataset, tmp_path: Path)
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
     pipeline_optimizer.set_config(HPOConfig(sampler="random"))
     # Pipeline.from_search_space() builds NodeOptimizer instances; the union
-    # with InferenceNode does not expose `objective`. Cast each accessed node.
-    scoring_optimizer = cast("NodeOptimizer", pipeline_optimizer.nodes[NodeType.scoring])
+    # with InferenceNode does not expose `objective`. Assert each accessed node.
+    scoring_optimizer = pipeline_optimizer.nodes[NodeType.scoring]
+    assert isinstance(scoring_optimizer, NodeOptimizer)
     original_objective = scoring_optimizer.objective
 
     def exception_raising_objective(trial: Trial, *args: Any, **kwargs: Any) -> Any:
@@ -104,7 +106,8 @@ def test_pipeline_with_exception_resume(dataset_no_oos: Dataset, tmp_path: Path)
 
     # Add tracking for second run to see which trials are executed
     second_run_trials: set[int] = set()
-    scoring_optimizer2 = cast("NodeOptimizer", pipeline_optimizer.nodes[NodeType.scoring])
+    scoring_optimizer2 = pipeline_optimizer.nodes[NodeType.scoring]
+    assert isinstance(scoring_optimizer2, NodeOptimizer)
     original_objective2 = scoring_optimizer2.objective
 
     def tracking_objective2(trial: Trial, *args: Any, **kwargs: Any) -> Any:

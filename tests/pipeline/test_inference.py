@@ -152,6 +152,7 @@ def test_load_with_overrided_params(dataset: Dataset) -> None:
     # The scoring module is concretely a LinearScorer (or sibling) here with a
     # private _embedder attribute; reach through Any since BaseModule does not
     # declare this internal field.
+    # reason: deliberate escape for private state access
     inference_scoring_module: Any = cast("Any", inference_pipeline.nodes[NodeType.scoring]).module
     assert inference_scoring_module._embedder.config.tokenizer_config.max_length == 8
     del inference_pipeline
@@ -166,6 +167,7 @@ def test_load_with_overrided_params(dataset: Dataset) -> None:
     )
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
+    # reason: deliberate escape for private state access
     loaded_scoring_module: Any = cast("Any", loaded_pipe.nodes[NodeType.scoring]).module
     assert loaded_scoring_module._embedder.config.tokenizer_config.max_length == 8
 

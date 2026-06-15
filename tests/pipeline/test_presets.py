@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
 from autointent import Pipeline
-from autointent.configs import DataConfig, HPOConfig, LoggingConfig
+from autointent.configs import DataConfig, HPOConfig, LoggingConfig, SentenceTransformerEmbeddingConfig
+from autointent.nodes import NodeOptimizer
 from tests.conftest import apply_test_models, setup_environment
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.configs import SentenceTransformerEmbeddingConfig
     from autointent.generation import Generator
-    from autointent.nodes import NodeOptimizer
 
 
 @pytest.mark.parametrize(
@@ -61,8 +60,8 @@ def test_apply_test_models_retargets_pipeline_slots() -> None:
     # tests.conftest.tiny_sentence_transformer_config); narrow the EmbedderConfig
     # union to that concrete subclass to access model_name (BaseEmbedderConfig
     # has no model_name).
-    embedder_config = cast("SentenceTransformerEmbeddingConfig", pipeline.embedder_config)
-    assert embedder_config.model_name == TINY_SENTENCE_TRANSFORMER
+    assert isinstance(pipeline.embedder_config, SentenceTransformerEmbeddingConfig)
+    assert pipeline.embedder_config.model_name == TINY_SENTENCE_TRANSFORMER
     assert pipeline.cross_encoder_config.model_name == TINY_CROSS_ENCODER
     assert pipeline.transformer_config.model_name == TINY_BERT
 
@@ -78,13 +77,11 @@ def test_apply_test_models_rewrites_search_space_bert_entries() -> None:
 
     # Pipeline.from_preset() returns an optimization-mode Pipeline whose nodes
     # are NodeOptimizer; the typed union with InferenceNode does not expose
-    # modules_search_spaces. Cast each node down to NodeOptimizer to access it.
-    bert_entries = [
-        entry
-        for node in pipeline.nodes.values()
-        for entry in cast("NodeOptimizer", node).modules_search_spaces
-        if entry.get("module_name") == "bert"
-    ]
+    # modules_search_spaces. Assert each node is a NodeOptimizer to access it.
+    bert_entries: list[dict[str, Any]] = []
+    for node in pipeline.nodes.values():
+        assert isinstance(node, NodeOptimizer)
+        bert_entries.extend(entry for entry in node.modules_search_spaces if entry.get("module_name") == "bert")
     assert bert_entries, "transformers-heavy preset must have a bert module entry"
 
     for entry in bert_entries:
@@ -114,7 +111,8 @@ def test_apply_test_models_drops_stale_revision_in_search_space() -> None:
     for node in pipeline.nodes.values():
         # Pipeline.from_search_space() returns an optimization-mode Pipeline
         # whose nodes are NodeOptimizer (see test_apply_test_models_rewrites_…).
-        for entry in cast("NodeOptimizer", node).modules_search_spaces:
+        assert isinstance(node, NodeOptimizer)
+        for entry in node.modules_search_spaces:
             for field in ("classification_model_config", "embedder_config", "cross_encoder_config"):
                 value = entry.get(field)
                 if isinstance(value, list):

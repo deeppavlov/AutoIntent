@@ -61,6 +61,7 @@ def test_full_config(dataset_no_oos: Dataset) -> None:
     # tests.assets.configs is a regular package, so importlib.resources.files
     # returns a concrete Path; cast asserts that to mypy without changing
     # behavior (matches the pattern used in tests/conftest.py).
+    # reason: importlib.resources.files() returns Traversable typed as Any
     config_path = cast("Path", ires.files("tests.assets.configs").joinpath("full_training.yaml"))
     pipeline_optimizer = Pipeline.from_optimization_config(config_path)
     apply_test_models(pipeline_optimizer)
