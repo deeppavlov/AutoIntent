@@ -1,17 +1,24 @@
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import DNNCScorer
+from autointent.modules.scoring import DNNCScorer
+from tests._helpers import is_strict_labels
+
+if TYPE_CHECKING:
+    from autointent import Dataset
 
 pytest.importorskip("sentence_transformers")
 
 
 @pytest.mark.parametrize(("train_head", "pred_score"), [(True, 1)])
-def test_base_dnnc(dataset, train_head, pred_score):
+def test_base_dnnc(dataset: Dataset, train_head: bool, pred_score: int) -> None:
     data_handler = DataHandler(dataset)
 
     scorer = DNNCScorer(
@@ -20,7 +27,10 @@ def test_base_dnnc(dataset, train_head, pred_score):
         k=3,
     )
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -29,10 +39,15 @@ def test_base_dnnc(dataset, train_head, pred_score):
         "can you tell me why is my bank account frozen",
     ]
     predictions = scorer.predict(test_data)
-    np.testing.assert_almost_equal(np.array([[0.0, pred_score, 0.0, 0.0]] * len(test_data)), predictions, decimal=0.5)
+    np.testing.assert_almost_equal(
+        np.array([[0.0, pred_score, 0.0, 0.0]] * len(test_data)),
+        predictions,
+        decimal=0.5,  # type: ignore[arg-type]  # reason: numpy stubs require int but assert_almost_equal rounds float decimal; preserves pre-typing behavior
+    )
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)
+    assert metadata is not None
     assert "neighbors" in metadata[0]
     assert "scores" in metadata[0]
 
@@ -44,7 +59,7 @@ def test_base_dnnc(dataset, train_head, pred_score):
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
 
-def test_dnnc_in_pipeline(dataset):
+def test_dnnc_in_pipeline(dataset: Dataset) -> None:
     """Test DNNCScorer as part of an AutoML pipeline."""
     search_space = [
         {

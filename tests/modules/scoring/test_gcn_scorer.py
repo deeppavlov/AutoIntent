@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
+
 import numpy as np
 import pytest
 import torch
@@ -6,11 +10,14 @@ from autointent import Dataset, Pipeline
 from autointent.modules.scoring import GCNScorer
 from tests.conftest import get_test_embedder_config
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 _embedder_config = get_test_embedder_config()
 
 
 @pytest.fixture
-def multilabel_dataset():
+def multilabel_dataset() -> Dataset:
     data = {
         "train": [
             {"utterance": "utterance 1", "label": [1, 0, 0]},
@@ -28,7 +35,7 @@ def multilabel_dataset():
 
 
 @pytest.fixture
-def multiclass_dataset():
+def multiclass_dataset() -> Dataset:
     data = {
         "train": [
             {"utterance": "utterance 1", "label": 0},
@@ -45,7 +52,7 @@ def multiclass_dataset():
     return Dataset.from_dict(data)
 
 
-def test_gcn_scorer_multilabel(multilabel_dataset):
+def test_gcn_scorer_multilabel(multilabel_dataset: Dataset) -> None:
     torch.manual_seed(42)
     scorer = GCNScorer(
         embedder_config=_embedder_config,
@@ -56,7 +63,11 @@ def test_gcn_scorer_multilabel(multilabel_dataset):
     )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
-    descriptions = [intent.name for intent in multilabel_dataset.intents]
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multilabel_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
 
     scorer.fit(train_utterances, train_labels, descriptions)
     test_utterances = ["test 1", "test 2"]
@@ -66,7 +77,7 @@ def test_gcn_scorer_multilabel(multilabel_dataset):
     np.testing.assert_allclose(predictions, expected_predictions, atol=1e-2)
 
 
-def test_gcn_scorer_multiclass(multiclass_dataset):
+def test_gcn_scorer_multiclass(multiclass_dataset: Dataset) -> None:
     torch.manual_seed(42)
     scorer = GCNScorer(
         embedder_config=_embedder_config,
@@ -77,7 +88,11 @@ def test_gcn_scorer_multiclass(multiclass_dataset):
     )
     train_utterances = multiclass_dataset["train"]["utterance"]
     train_labels = multiclass_dataset["train"]["label"]
-    descriptions = [intent.name for intent in multiclass_dataset.intents]
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multiclass_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
 
     scorer.fit(train_utterances, train_labels, descriptions)
     test_utterances = ["test 1", "test 2"]
@@ -88,7 +103,7 @@ def test_gcn_scorer_multiclass(multiclass_dataset):
     np.testing.assert_allclose(predictions.sum(axis=1), 1.0, atol=1e-6)
 
 
-def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
+def test_gcn_scorer_dump_load(tmp_path: Path, multilabel_dataset: Dataset) -> None:
     torch.manual_seed(42)
     scorer = GCNScorer(
         embedder_config=_embedder_config,
@@ -99,7 +114,11 @@ def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
     )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
-    descriptions = [intent.name for intent in multilabel_dataset.intents]
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multilabel_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
     scorer.fit(train_utterances, train_labels, descriptions)
 
     test_utterances = ["test utterance 1"]
@@ -113,7 +132,7 @@ def test_gcn_scorer_dump_load(tmp_path, multilabel_dataset):
     np.testing.assert_allclose(original_predictions, loaded_predictions, atol=1e-6)
 
 
-def test_gcn_in_pipeline(dataset):
+def test_gcn_in_pipeline(dataset: Dataset) -> None:
     """Test GCNScorer as part of an AutoML pipeline."""
     search_space = [
         {

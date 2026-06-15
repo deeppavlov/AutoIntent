@@ -1,14 +1,23 @@
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import SklearnScorer
+from autointent.modules.scoring import SklearnScorer
+from tests._helpers import is_strict_labels
 from tests.conftest import get_test_embedder_config
 
+if TYPE_CHECKING:
+    import numpy.typing as npt
 
-def test_base_sklearn(dataset):
+    from autointent import Dataset
+
+
+def test_base_sklearn(dataset: Dataset) -> None:
     data_handler = DataHandler(dataset)
 
     scorer = SklearnScorer(
@@ -19,7 +28,10 @@ def test_base_sklearn(dataset):
         l1_ratio=0.5,
     )
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",
@@ -43,7 +55,10 @@ def test_base_sklearn(dataset):
         decimal=2,
     )
 
-    predictions, metadata = scorer.predict_with_metadata(test_data)
+    # cast: base predict_with_metadata signature is wider than scoring subclasses actually return.
+    predictions, metadata = cast(
+        "tuple[npt.NDArray[Any], list[dict[str, Any]] | None]", scorer.predict_with_metadata(test_data)
+    )
     assert len(predictions) == len(test_data)
     assert metadata is None
 
@@ -55,7 +70,7 @@ def test_base_sklearn(dataset):
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
 
-def test_sklearn_in_pipeline(dataset):
+def test_sklearn_in_pipeline(dataset: Dataset) -> None:
     """Test SklearnScorer as part of an AutoML pipeline."""
     search_space = [
         {

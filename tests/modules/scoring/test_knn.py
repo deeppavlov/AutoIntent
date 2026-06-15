@@ -1,14 +1,21 @@
+from __future__ import annotations
+
 import tempfile
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules import KNNScorer
+from autointent.modules.scoring import KNNScorer
+from tests._helpers import is_strict_labels
 from tests.conftest import get_test_embedder_config
 
+if TYPE_CHECKING:
+    from autointent import Dataset
 
-def test_base_knn(dataset):
+
+def test_base_knn(dataset: Dataset) -> None:
     data_handler = DataHandler(dataset)
 
     scorer = KNNScorer(k=3, weights="distance", embedder_config=get_test_embedder_config())
@@ -21,7 +28,10 @@ def test_base_knn(dataset):
         "can you tell me why is my bank account frozen",
     ]
 
-    scorer.fit(data_handler.train_utterances(0), data_handler.train_labels(0))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
     predictions = scorer.predict(test_data)
     assert (
         predictions
@@ -38,6 +48,7 @@ def test_base_knn(dataset):
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)
+    assert metadata is not None
     assert "neighbors" in metadata[0]
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -48,7 +59,7 @@ def test_base_knn(dataset):
         assert np.allclose(predictions, new_predictions)
 
 
-def test_knn_in_pipeline(dataset):
+def test_knn_in_pipeline(dataset: Dataset) -> None:
     """Test KNNScorer as part of an AutoML pipeline."""
     search_space = [
         {
