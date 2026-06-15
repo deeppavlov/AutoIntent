@@ -1,13 +1,14 @@
 from autointent._wrappers.embedder import Embedder
 from autointent.configs import SentenceTransformerEmbeddingConfig as EmbedderConfig
+from autointent.configs import TokenizerConfig
 
 
-def test_max_length_configuration():
+def test_max_length_configuration() -> None:
     """Test max_length configuration affects tokenization."""
     max_length = 10
     config = EmbedderConfig(
         model_name="sergeyzh/rubert-tiny-turbo",
-        tokenizer_config={"max_length": max_length},
+        tokenizer_config=TokenizerConfig(max_length=max_length),
         use_cache=False,
     )
     embedder = Embedder(config)

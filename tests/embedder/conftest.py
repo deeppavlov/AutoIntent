@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import importlib.util
 import platform
+from typing import Any
 
 import pytest
 import torch
@@ -77,9 +80,9 @@ trainable_backend_configs = [
 ]
 
 
-def create_sentence_transformer_config(**kwargs) -> SentenceTransformerEmbeddingConfig:
+def create_sentence_transformer_config(**kwargs: Any) -> SentenceTransformerEmbeddingConfig:
     """Helper function to create SentenceTransformer config with defaults."""
-    defaults = {
+    defaults: dict[str, Any] = {
         "model_name": "sergeyzh/rubert-tiny-turbo",
         "batch_size": 4,
         "device": "cpu",
@@ -90,9 +93,9 @@ def create_sentence_transformer_config(**kwargs) -> SentenceTransformerEmbedding
     return SentenceTransformerEmbeddingConfig(**defaults)
 
 
-def create_openai_config(**kwargs) -> OpenaiEmbeddingConfig:
+def create_openai_config(**kwargs: Any) -> OpenaiEmbeddingConfig:
     """Helper function to create OpenAI config with defaults."""
-    defaults = {
+    defaults: dict[str, Any] = {
         "model_name": "text-embedding-3-small",
         "batch_size": 2,
         "use_cache": False,
@@ -103,9 +106,9 @@ def create_openai_config(**kwargs) -> OpenaiEmbeddingConfig:
     return OpenaiEmbeddingConfig(**defaults)
 
 
-def create_vllm_config(**kwargs) -> VllmEmbeddingConfig:
+def create_vllm_config(**kwargs: Any) -> VllmEmbeddingConfig:
     """Helper function to create VllmEmbeddingConfig with test-friendly defaults."""
-    defaults = {
+    defaults: dict[str, Any] = {
         "model_name": "BAAI/bge-base-en-v1.5",
         "batch_size": 4,
         "use_cache": False,
@@ -117,5 +120,5 @@ def create_vllm_config(**kwargs) -> VllmEmbeddingConfig:
 
 
 @pytest.fixture(autouse=True)
-def _autouse_fake_openai_embedding(patch_openai_embedding_backend):
+def _autouse_fake_openai_embedding(patch_openai_embedding_backend: None) -> None:
     """Within tests/embedder/, every OpenaiEmbeddingConfig resolves to FakeOpenaiEmbeddingBackend."""
