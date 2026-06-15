@@ -21,5 +21,4 @@ jobs:
           uv sync --group typing --group test --extra catboost --extra peft --extra transformers --extra sentence-transformers --extra openai
 
       - name: Run mypy
-        continue-on-error: true
         run: uv run mypy src/autointent tests
