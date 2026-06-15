@@ -128,7 +128,7 @@ class Generator:
         model_name: str | None = None,
         use_cache: bool = True,
         client_params: dict[str, Any] | None = None,
-        **generation_params: dict[str, Any],
+        **generation_params: Any,  # noqa: ANN401
     ) -> None:
         """Initialize the Generator with API configuration.
 
@@ -165,11 +165,11 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = self.client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,  # type: ignore[arg-type]  # reason: list[Message] (TypedDict) structurally matches openai ChatCompletionMessageParam union but mypy can't verify
             model=self.model_name,
             **self.generation_params,
         )
-        return response.choices[0].message.content  # type: ignore[no-any-return]
+        return response.choices[0].message.content  # type: ignore[return-value]  # reason: openai stub types content as str | None; we accept the runtime contract that content is set for non-streaming completions
 
     async def get_chat_completion_async(self, messages: list[Message]) -> str:
         """Prompt LLM and return its answer asynchronously.
@@ -178,7 +178,7 @@ class Generator:
             messages: List of messages to send to the model.
         """
         response = await self.async_client.chat.completions.create(
-            messages=messages,  # type: ignore[call-overload]
+            messages=messages,  # type: ignore[arg-type]  # reason: list[Message] (TypedDict) structurally matches openai ChatCompletionMessageParam union but mypy can't verify
             model=self.model_name,
             **self.generation_params,
         )
@@ -186,7 +186,7 @@ class Generator:
         if response is None or not response.choices:
             msg = "No response received from the model."
             raise RuntimeError(msg)
-        return response.choices[0].message.content  # type: ignore[no-any-return]
+        return response.choices[0].message.content  # type: ignore[return-value]  # reason: openai stub types content as str | None; we accept the runtime contract that content is set for non-streaming completions
 
     def _create_retry_messages(self, error_message: str, raw: str | None) -> list[Message]:
         """Create a follow-up message for retry with error details and schema."""
@@ -230,9 +230,9 @@ class Generator:
         try:
             response = await self.async_client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,  # type: ignore[arg-type]  # reason: list[Message] (TypedDict) structurally matches openai ChatCompletionMessageParam union
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
@@ -317,9 +317,9 @@ class Generator:
         try:
             response = self.client.beta.chat.completions.parse(
                 model=self.model_name,
-                messages=messages,  # type: ignore[arg-type]
+                messages=messages,  # type: ignore[arg-type]  # reason: list[Message] (TypedDict) structurally matches openai ChatCompletionMessageParam union
                 response_format=output_model,
-                **self.generation_params,  # type: ignore[arg-type]
+                **self.generation_params,
             )
             raw = response.choices[0].message.content
             res = response.choices[0].message.parsed
