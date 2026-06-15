@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, cast
+
 import pytest
 
 from autointent import Pipeline
@@ -5,9 +9,16 @@ from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embed
 from autointent.custom_types import NodeType
 from tests.conftest import apply_test_models, get_search_space, setup_environment
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from autointent import Dataset
+    from autointent.generation import Generator
+    from tests.conftest import TaskType
+
 
 @pytest.fixture
-def project_dir(task_type):
+def project_dir(task_type: TaskType) -> Path:
     return setup_environment() / "test_inference" / task_type
 
 
@@ -21,7 +32,12 @@ def project_dir(task_type):
         "description_with_llm",
     ],
 )
-def test_inference_from_config(dataset, task_type, project_dir, patch_llm_scorer_generator):
+def test_inference_from_config(
+    dataset: Dataset,
+    task_type: TaskType,
+    project_dir: Path,
+    patch_llm_scorer_generator: Generator,
+) -> None:
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -69,7 +85,12 @@ def test_inference_from_config(dataset, task_type, project_dir, patch_llm_scorer
         "description_with_llm",
     ],
 )
-def test_inference_on_the_fly(dataset, task_type, project_dir, patch_llm_scorer_generator):
+def test_inference_on_the_fly(
+    dataset: Dataset,
+    task_type: TaskType,
+    project_dir: Path,
+    patch_llm_scorer_generator: Generator,
+) -> None:
     search_space = get_search_space(task_type)
 
     pipeline = Pipeline.from_search_space(search_space)
@@ -103,7 +124,7 @@ def test_inference_on_the_fly(dataset, task_type, project_dir, patch_llm_scorer_
     assert prediction == prediction_v2
 
 
-def test_load_with_overrided_params(dataset):
+def test_load_with_overrided_params(dataset: Dataset) -> None:
     project_dir = setup_environment() / "test_inference" / "override"
     search_space = get_search_space("light")
 
@@ -128,7 +149,12 @@ def test_load_with_overrided_params(dataset):
     # case 2: rich inference from file system
     rich_outputs = inference_pipeline.predict_with_metadata(utterances)
     assert len(rich_outputs.predictions) == len(utterances)
-    assert inference_pipeline.nodes[NodeType.scoring].module._embedder.config.tokenizer_config.max_length == 8
+    # The scoring module is concretely a LinearScorer (or sibling) here with a
+    # private _embedder attribute; reach through Any since BaseModule does not
+    # declare this internal field.
+    # reason: deliberate escape for private state access
+    inference_scoring_module: Any = cast("Any", inference_pipeline.nodes[NodeType.scoring]).module
+    assert inference_scoring_module._embedder.config.tokenizer_config.max_length == 8
     del inference_pipeline
 
     # case 3: dump and then load pipeline
@@ -141,10 +167,12 @@ def test_load_with_overrided_params(dataset):
     )
     prediction_v2 = loaded_pipe.predict(utterances)
     assert prediction == prediction_v2
-    assert loaded_pipe.nodes[NodeType.scoring].module._embedder.config.tokenizer_config.max_length == 8
+    # reason: deliberate escape for private state access
+    loaded_scoring_module: Any = cast("Any", loaded_pipe.nodes[NodeType.scoring]).module
+    assert loaded_scoring_module._embedder.config.tokenizer_config.max_length == 8
 
 
-def test_no_saving(dataset):
+def test_no_saving(dataset: Dataset) -> None:
     project_dir = setup_environment() / "test_inference" / "no_saving"
     search_space = get_search_space("light")
 
