@@ -17,6 +17,7 @@ class TestResolveEntry:
         # The SHA must match DEFAULT_REVISIONS — we look it up here rather
         # than hardcoding to keep this test honest if the pin moves.
         from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
+
         assert entry.revision == DEFAULT_REVISIONS["prajjwal1/bert-tiny"]
 
     def test_unknown_repo_raises(self) -> None:
@@ -35,11 +36,7 @@ class TestLoadConfig:
         from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
         cfg = tmp_path / "cfg.yaml"
-        cfg.write_text(
-            "models:\n"
-            "  - prajjwal1/bert-tiny\n"
-            "datasets: []\n"
-        )
+        cfg.write_text("models:\n  - prajjwal1/bert-tiny\ndatasets: []\n")
         entries = wc._load_config(cfg)
         assert entries == [
             wc.Entry(
@@ -67,11 +64,7 @@ class TestLoadConfig:
         # raises until then so a dataset in the YAML can't silently
         # regress to an unpinned download.
         cfg = tmp_path / "cfg.yaml"
-        cfg.write_text(
-            "models: []\n"
-            "datasets:\n"
-            "  - DeepPavlov/clinc150\n"
-        )
+        cfg.write_text("models: []\ndatasets:\n  - DeepPavlov/clinc150\n")
         with pytest.raises(wc.ConfigError, match="not in DEFAULT_REVISIONS"):
             wc._load_config(cfg)
 

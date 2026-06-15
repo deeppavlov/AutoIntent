@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -109,7 +109,8 @@ def test_pipeline_callbacks(dataset: Dataset) -> None:
 
     pipeline_optimizer._fit(context)
 
-    dummy_callback = cast("DummyCallback", context.callback_handler.callbacks[0])
+    dummy_callback = context.callback_handler.callbacks[0]
+    assert isinstance(dummy_callback, DummyCallback)
 
     assert len(dummy_callback.history) == 30
     assert dummy_callback.history[0][0] == "start_run"
