@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -8,11 +8,11 @@ import pytest
 from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
 from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
+from tests._helpers import is_strict_labels
 from tests.conftest import tiny_sentence_transformer_config
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 
 def test_model_updates_after_training(dataset: Dataset) -> None:
@@ -44,10 +44,12 @@ def test_model_updates_after_training(dataset: Dataset) -> None:
     ]
 
     # data_handler.train_labels returns ListOfGenericLabels (may contain None for OOS);
-    # the test dataset has no OOS, so cast to the strict ListOfLabels for the typed API.
+    # the test dataset has no OOS, so narrow to strict ListOfLabels for the typed API.
+    labels = data_handler.train_labels(0)[:1000]
+    assert is_strict_labels(labels)
     backend.train(
         utterances=data_handler.train_utterances(0)[:1000],
-        labels=cast("ListOfLabels", data_handler.train_labels(0)[:1000]),
+        labels=labels,
         config=train_config,
     )
 
