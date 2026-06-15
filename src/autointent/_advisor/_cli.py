@@ -20,10 +20,13 @@ from typing import Any
 
 import yaml
 
+from autointent import Dataset
+from autointent.utils import load_preset
+
 from ._estimates import run_preflight
 from ._hardware import detect_hardware
 from ._render import render_json, render_recommendation, render_text
-from ._report import DatasetStats, PreflightReport
+from ._report import DatasetStats, PreflightReport, Severity
 
 logger = logging.getLogger("autointent.advisor")
 
@@ -62,8 +65,6 @@ def _load_config(target: str) -> tuple[dict[str, Any], str]:
         with path.open(encoding="utf-8") as f:
             return yaml.safe_load(f), path.stem
     # treat as a bundled preset name
-    from autointent.utils import load_preset
-
     return load_preset(target), target  # type: ignore[arg-type]
 
 
@@ -81,14 +82,8 @@ def _stats_from_args(args: argparse.Namespace) -> DatasetStats:
 def _stats_from_dataset(path: str, *, multilabel: bool) -> DatasetStats:
     """Best-effort: load a dataset from disk via the existing Dataset constructor."""
     try:
-        from autointent import Dataset
-    except ImportError:
-        logger.warning("autointent.Dataset unavailable; falling back to placeholders.")
-        return DatasetStats.placeholder(multilabel=multilabel)
-
-    try:
         ds = Dataset.from_json(path) if path.endswith(".json") else Dataset.from_hub(path)
-    except Exception as e:  # noqa: BLE001
+    except (OSError, ValueError) as e:
         logger.warning("Failed to load dataset %s: %s", path, e)
         return DatasetStats.placeholder(multilabel=multilabel)
 
@@ -147,27 +142,24 @@ def cmd_recommend(args: argparse.Namespace) -> int:
     stats = _stats_from_args(args)
 
     results: list[tuple[str, PreflightReport]] = []
-    from autointent.utils import load_preset
 
     for preset in BUNDLED_PRESETS:
         try:
             cfg = load_preset(preset)  # type: ignore[arg-type]
-        except Exception as e:  # noqa: BLE001
+        except (OSError, ValueError, KeyError) as e:
             logger.debug("Skipping preset %s: %s", preset, e)
             continue
         report = run_preflight(cfg, stats, hardware, preset_name=preset)
         if args.budget_time_h is not None and report.resource.time_hours > args.budget_time_h:
             report.add(
                 "resource",
-                report.worst_severity if report.worst_severity.value == "red" else report.worst_severity,  # noqa: PLW0125 - explicit
+                Severity.RED,
                 f"Estimated time {report.resource.time_hours:.1f} h exceeds budget {args.budget_time_h} h.",
             )
         results.append((preset, report))
 
     feasible = [(name, r) for name, r in results if r.is_feasible]
-    feasible.sort(
-        key=lambda pair: (-_QUALITY_TIER.get(pair[0], 0), pair[1].resource.time_hours, pair[0])
-    )
+    feasible.sort(key=lambda pair: (-_QUALITY_TIER.get(pair[0], 0), pair[1].resource.time_hours, pair[0]))
     chosen = feasible[0][0] if feasible else None
 
     if args.json:
@@ -175,9 +167,7 @@ def cmd_recommend(args: argparse.Namespace) -> int:
 
         out = {
             "chosen": chosen,
-            "results": [
-                {"preset": name, "report": r.to_dict()} for name, r in results
-            ],
+            "results": [{"preset": name, "report": r.to_dict()} for name, r in results],
         }
         sys.stdout.write(json.dumps(out, indent=2, default=str))
         sys.stdout.write("\n")
@@ -206,9 +196,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_inspect.add_argument("target", help="Preset name (e.g. transformers-light) or path to a YAML config.")
     p_inspect.add_argument("--json", action="store_true", help="Emit a structured JSON report.")
-    p_inspect.add_argument(
-        "--budget-vram-gb", type=float, default=None, help="Override detected VRAM budget."
-    )
+    p_inspect.add_argument("--budget-vram-gb", type=float, default=None, help="Override detected VRAM budget.")
     _add_common_dataset_args(p_inspect)
     p_inspect.set_defaults(func=cmd_inspect)
 
@@ -217,12 +205,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Detect hardware and recommend the best-fitting bundled preset.",
     )
     p_rec.add_argument("--json", action="store_true", help="Emit a structured JSON report.")
-    p_rec.add_argument(
-        "--budget-vram-gb", type=float, default=None, help="Override detected VRAM budget."
-    )
-    p_rec.add_argument(
-        "--budget-time-h", type=float, default=None, help="Optional wall-time ceiling in hours."
-    )
+    p_rec.add_argument("--budget-vram-gb", type=float, default=None, help="Override detected VRAM budget.")
+    p_rec.add_argument("--budget-time-h", type=float, default=None, help="Optional wall-time ceiling in hours.")
     _add_common_dataset_args(p_rec)
     p_rec.set_defaults(func=cmd_recommend)
 

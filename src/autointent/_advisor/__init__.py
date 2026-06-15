@@ -7,9 +7,9 @@ at the repo root for the design document.
 
 from __future__ import annotations
 
+from ._estimates import run_preflight
 from ._hardware import HardwareProfile, detect_hardware
 from ._report import DatasetStats, Finding, PreflightReport, ResourceEstimate, Severity
-from ._estimates import run_preflight
 
 __all__ = [
     "DatasetStats",

@@ -67,7 +67,7 @@ class DatasetStats:
         n_classes: int = 10,
         avg_tokens: int = 32,
         multilabel: bool = False,
-    ) -> "DatasetStats":
+    ) -> DatasetStats:
         return cls(
             n_samples=n_samples,
             n_classes=n_classes,
@@ -105,9 +105,7 @@ class PreflightReport:
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
-        d["findings"] = [
-            {**asdict(f), "severity": f.severity.value} for f in self.findings
-        ]
+        d["findings"] = [{**asdict(f), "severity": f.severity.value} for f in self.findings]
         d["worst_severity"] = self.worst_severity.value
         d["is_feasible"] = self.is_feasible
         return d

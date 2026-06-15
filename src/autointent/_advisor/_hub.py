@@ -14,6 +14,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Any
 
+from huggingface_hub import HfApi, scan_cache_dir, try_to_load_from_cache
+
 logger = logging.getLogger(__name__)
 
 # Coarse heuristic estimates keyed on name fragments. Used only when HF Hub
@@ -55,17 +57,11 @@ class ModelMeta:
 def hub_reachable(timeout_s: float = 2.0) -> bool:
     """Single up-front probe. Memoized per process."""
     try:
-        from huggingface_hub import HfApi
-
         HfApi().list_models(limit=1)
-    except ImportError:
-        logger.debug("huggingface_hub not installed; assuming offline")
-        return False
     except Exception as e:  # noqa: BLE001
         logger.debug("HF Hub probe failed: %s", e)
         return False
-    else:
-        return True
+    return True
 
 
 def _heuristic_params_millions(model_name: str) -> float:
@@ -77,11 +73,6 @@ def _heuristic_params_millions(model_name: str) -> float:
 
 def _is_warm_cached(model_name: str) -> bool:
     """True when the weight shard is present in the local HF cache."""
-    try:
-        from huggingface_hub import scan_cache_dir, try_to_load_from_cache
-    except ImportError:
-        return False
-
     weight_files = ["model.safetensors", "pytorch_model.bin", "model.safetensors.index.json"]
     for fname in weight_files:
         path = try_to_load_from_cache(model_name, fname)
@@ -98,11 +89,6 @@ def _is_warm_cached(model_name: str) -> bool:
 
 
 def _hub_metadata(model_name: str) -> ModelMeta | None:
-    try:
-        from huggingface_hub import HfApi
-    except ImportError:
-        return None
-
     try:
         info = HfApi().model_info(model_name, files_metadata=True)
     except Exception as e:  # noqa: BLE001

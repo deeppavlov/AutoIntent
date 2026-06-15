@@ -162,9 +162,7 @@ def test_partial_descriptions_with_description_scorer_flags_red() -> None:
         has_descriptions=False,
     )
     report = run_preflight(cfg, stats, _profile(vram_gb=16.0))
-    assert any(
-        f.phase == "data" and "description" in f.message.lower() for f in report.findings
-    )
+    assert any(f.phase == "data" and "description" in f.message.lower() for f in report.findings)
 
 
 def test_long_dataset_triggers_truncation_warning() -> None:
@@ -175,9 +173,7 @@ def test_long_dataset_triggers_truncation_warning() -> None:
                 "search_space": [
                     {
                         "module_name": "bert",
-                        "classification_model_config": [
-                            {"model_name": "microsoft/deberta-v3-small"}
-                        ],
+                        "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
                         "max_length": [128],
                     }
                 ],
@@ -192,6 +188,41 @@ def test_long_dataset_triggers_truncation_warning() -> None:
     )
     report = run_preflight(cfg, stats, _profile(vram_gb=16.0))
     assert any("truncation" in f.message.lower() for f in report.findings)
+
+
+def test_cli_recommend_budget_time_flags_red_for_overbudget_presets(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Tight time budget must flag every preset that exceeds it with RED severity.
+
+    Previously the budget path used a tautological severity expression and the
+    breach never escalated the finding — covers the regression."""
+    main(
+        [
+            "recommend",
+            "--n-samples",
+            "1000",
+            "--n-classes",
+            "10",
+            "--avg-tokens",
+            "20",
+            "--budget-vram-gb",
+            "48",
+            "--budget-time-h",
+            "0.0001",
+            "--json",
+        ]
+    )
+    payload = json.loads(capsys.readouterr().out)
+    flagged = [
+        r
+        for r in payload["results"]
+        if any(f["severity"] == "red" and "exceeds budget" in f["message"] for f in r["report"]["findings"])
+    ]
+    assert flagged, "budget-time-h breach should produce RED severity findings"
+    # Any preset above the budget must be marked infeasible.
+    for r in flagged:
+        assert r["report"]["is_feasible"] is False
 
 
 if __name__ == "__main__":

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from autointent._advisor._render import render_json, render_recommendation, render_text
 from autointent._advisor._report import (
     DatasetStats,
@@ -140,12 +138,14 @@ class TestRenderRecommendation:
 
 def test_dataset_stats_in_text_block() -> None:
     stats = DatasetStats.placeholder(n_samples=777, n_classes=4)
-    r = PreflightReport(dataset={
-        "n_samples": stats.n_samples,
-        "n_classes": stats.n_classes,
-        "avg_tokens": stats.avg_tokens,
-        "source": stats.source,
-    })
+    r = PreflightReport(
+        dataset={
+            "n_samples": stats.n_samples,
+            "n_classes": stats.n_classes,
+            "avg_tokens": stats.avg_tokens,
+            "source": stats.source,
+        }
+    )
     out = render_text(r)
     assert "777" in out
     assert "n_classes=4" in out

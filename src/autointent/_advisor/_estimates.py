@@ -9,7 +9,8 @@ treat them as ballparks, not budgets.
 from __future__ import annotations
 
 import logging
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from ._hardware import HardwareProfile
 from ._hub import ModelMeta, hub_reachable, resolve_model
@@ -31,6 +32,16 @@ _PER_STEP_BASELINE_S = {
 }
 
 TRANSFORMER_SCORER_MODULES = {"bert", "lora", "ptuning", "dnnc"}
+
+# Coefficients for the linear / catboost time formulas (proposal §"Algorithm").
+_LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-8
+_CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
+_CATBOOST_GPU_SPEEDUP = 10.0
+# LogisticRegressionCV defaults: Cs=10, cv=3 → 31 inner fits + 1 final refit.
+_LOGREG_CV_MULTIPLIER = 31
+_CATBOOST_DEFAULT_BINS = 254
+# Bytes per histogram bucket / tree node — order-of-magnitude constants.
+_CATBOOST_BYTES_PER_TREE_NODE = 32
 
 
 def _extract_model_names(module_entry: dict[str, Any]) -> list[str]:
@@ -74,11 +85,22 @@ def _walk_modules(search_space: list[dict[str, Any]]) -> Iterable[tuple[str, dic
             yield node_type, entry
 
 
+def _walk_modules_indexed(
+    search_space: list[dict[str, Any]],
+) -> Iterable[tuple[int, str, dict[str, Any]]]:
+    """Yield (node_index, node_type, module_entry) — index lets us bound per-node max cost."""
+    for node_idx, node in enumerate(search_space or []):
+        node_type = node.get("node_type", "?")
+        for entry in node.get("search_space", []) or []:
+            yield node_idx, node_type, entry
+
+
 def _vram_for_transformer(meta: ModelMeta, mode: str, mixed_precision: bool) -> float:
     """VRAM in GB for one trial of a transformer-based module.
 
-    Conservative AMP accounting (the proposal flags the prior naive halving
-    as too generous; keep optimizer state at fp32 even in AMP).
+    Full fine-tune fp32: weights + grads + Adam (m, v) = 4W.
+    Full fine-tune AMP: fp16 weights + fp16 grads + fp32 master copy + fp32 Adam = 3W.
+    (Activations are not modeled separately.)
     """
     weights_gb = meta.weights_gb
     if mode == "inference":
@@ -87,16 +109,90 @@ def _vram_for_transformer(meta: ModelMeta, mode: str, mixed_precision: bool) -> 
         return weights_gb * 1.3 + 0.5
     if mode == "reranker":
         return weights_gb * 1.5
-    # full fine-tune (bert, ptuning, gcn-with-backbone)
     if mixed_precision:
-        # fp16 weights+grads + fp32 master+adam moments
-        return (weights_gb * 0.5) * 2 + weights_gb * 1 + weights_gb * 2
-    return weights_gb * (1 + 1 + 2)
+        return weights_gb * 3.0
+    return weights_gb * 4.0
 
 
 def _ram_for_module(meta: ModelMeta, stats: DatasetStats) -> float:
     """RAM in GB. Loose upper bound."""
     return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / (1024**3)
+
+
+def _embedder_dim(meta: ModelMeta | None) -> int:
+    """Coarse hidden-size guess from parameter count.
+
+    Concrete points: MiniLM (33M) ~384, BERT-base (110M) ~768, BERT-large (350M) ~1024.
+    """
+    if meta is None:
+        return 768
+    params = meta.params_millions
+    if params >= 300:
+        return 1024
+    if params >= 100:
+        return 768
+    if params >= 50:
+        return 512
+    return 384
+
+
+def _largest_embedder(seen_models: dict[str, ModelMeta]) -> ModelMeta | None:
+    if not seen_models:
+        return None
+    return max(seen_models.values(), key=lambda m: m.params_millions)
+
+
+def _ram_for_linear(*, stats: DatasetStats, embedder_dim: int) -> float:
+    """Float64 design matrix dominates; coefficients and L-BFGS history are small."""
+    data_bytes = 8.0 * stats.n_samples * embedder_dim
+    coef_bytes = 8.0 * max(1, stats.n_classes) * embedder_dim
+    lbfgs_bytes = 10.0 * 8.0 * embedder_dim
+    return (data_bytes + coef_bytes + lbfgs_bytes) / (1024**3)
+
+
+def _time_for_linear(
+    *,
+    n_trials: int,
+    n_samples: int,
+    embedder_dim: int,
+    max_iter: int,
+    cv_multiplier: int,
+    class_multiplier: int,
+) -> float:
+    seconds = (
+        n_trials
+        * _LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER
+        * n_samples
+        * embedder_dim
+        * max_iter
+        * cv_multiplier
+        * class_multiplier
+    )
+    return seconds / 3600.0
+
+
+def _ram_for_catboost(*, stats: DatasetStats, n_features: int, iterations: int, depth: int) -> float:
+    data_bytes = 4.0 * stats.n_samples * n_features
+    histograms_bytes = 4.0 * n_features * _CATBOOST_DEFAULT_BINS
+    trees_bytes = iterations * (2**depth) * _CATBOOST_BYTES_PER_TREE_NODE
+    return (data_bytes + histograms_bytes + trees_bytes) / (1024**3)
+
+
+def _time_for_catboost(
+    *,
+    n_trials: int,
+    n_samples: int,
+    n_features: int,
+    iterations: int,
+    depth: int,
+    class_multiplier: int,
+    on_gpu: bool,
+) -> float:
+    coeff = _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER
+    if on_gpu:
+        coeff /= _CATBOOST_GPU_SPEEDUP
+    seconds = n_trials * iterations * coeff * n_samples * n_features * depth * class_multiplier
+    return seconds / 3600.0
 
 
 def _time_for_transformer(
@@ -148,10 +244,24 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
     if global_embedder:
         seen_models[global_embedder] = resolve_model(global_embedder)
 
-    for node_type, entry in _walk_modules(config.get("search_space") or []):
+    # First pass: walk transformer-bearing modules (collects seen_models for embedder_dim lookup).
+    transformer_entries: list[tuple[int, str, dict[str, Any]]] = []
+    classic_entries: list[tuple[int, str, dict[str, Any]]] = []
+    for node_idx, node_type, entry in _walk_modules_indexed(config.get("search_space") or []):
+        module = entry.get("module_name", "?")
+        if module in {"linear", "catboost"}:
+            classic_entries.append((node_idx, node_type, entry))
+        else:
+            transformer_entries.append((node_idx, node_type, entry))
+
+    # Track the heaviest module per node so dump_modules accounting is bounded by
+    # "one selected variant per node × n_trials", not "sum of every candidate".
+    node_max_weights: dict[int, float] = {}
+
+    for node_idx, node_type, entry in transformer_entries:
         module = entry.get("module_name", "?")
         model_names = _extract_model_names(entry)
-        if not model_names and global_embedder and module in {"linear", "catboost", "knn", "mlknn"}:
+        if not model_names and global_embedder and module in {"knn", "mlknn"}:
             model_names = [global_embedder]
 
         for name in model_names:
@@ -191,6 +301,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             estimate.vram_gb = max(estimate.vram_gb, vram)
             estimate.ram_gb = max(estimate.ram_gb, ram)
             estimate.time_hours += time_h
+            node_max_weights[node_idx] = max(node_max_weights.get(node_idx, 0.0), meta.weights_gb)
             estimate.drivers.append(
                 {
                     "node_type": node_type,
@@ -204,6 +315,76 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
                 }
             )
 
+    # Second pass: linear / catboost — cost depends on embedder_dim, not a checkpoint.
+    embedder_meta = _largest_embedder(seen_models)
+    embedder_dim = _embedder_dim(embedder_meta)
+    class_multiplier_classic = max(1, stats.n_classes) if stats.multilabel else 1
+    for _node_idx, node_type, entry in classic_entries:
+        module = entry.get("module_name", "?")
+        if module == "linear":
+            max_iter = _max_int(entry.get("max_iter"), 100)
+            cv_multiplier = 1 if stats.multilabel else _LOGREG_CV_MULTIPLIER
+            ram = _ram_for_linear(stats=stats, embedder_dim=embedder_dim)
+            time_h = _time_for_linear(
+                n_trials=n_trials,
+                n_samples=stats.n_samples,
+                embedder_dim=embedder_dim,
+                max_iter=max_iter,
+                cv_multiplier=cv_multiplier,
+                class_multiplier=class_multiplier_classic,
+            )
+            if refit_after:
+                time_h *= 1 + 1.0 / max(1, n_trials)
+            vram = 0.0
+            mode = "linear-cv" if cv_multiplier > 1 else "linear"
+            confidence = embedder_meta.confidence if embedder_meta else "heuristic"
+        elif module == "catboost":
+            iterations = _max_int(entry.get("iterations"), 1000)
+            depth = _max_int(entry.get("depth"), 6)
+            on_gpu = entry.get("task_type") == "GPU" and hardware.accelerator == "cuda"
+            # CatBoost's multiclass MultiClass loss already grows per-class trees.
+            cb_class_mult = max(1, stats.n_classes)
+            ram = _ram_for_catboost(
+                stats=stats,
+                n_features=embedder_dim,
+                iterations=iterations,
+                depth=depth,
+            )
+            time_h = _time_for_catboost(
+                n_trials=n_trials,
+                n_samples=stats.n_samples,
+                n_features=embedder_dim,
+                iterations=iterations,
+                depth=depth,
+                class_multiplier=cb_class_mult,
+                on_gpu=on_gpu,
+            )
+            if refit_after:
+                time_h *= 1 + 1.0 / max(1, n_trials)
+            vram = ram if on_gpu else 0.0
+            if on_gpu:
+                ram = 0.0
+            mode = "catboost-gpu" if on_gpu else "catboost"
+            confidence = embedder_meta.confidence if embedder_meta else "heuristic"
+        else:
+            continue
+
+        estimate.vram_gb = max(estimate.vram_gb, vram)
+        estimate.ram_gb = max(estimate.ram_gb, ram)
+        estimate.time_hours += time_h
+        estimate.drivers.append(
+            {
+                "node_type": node_type,
+                "module": module,
+                "model": embedder_meta.name if embedder_meta else "(no embedder)",
+                "mode": mode,
+                "vram_gb": round(vram, 2),
+                "ram_gb": round(ram, 2),
+                "time_hours": round(time_h, 2),
+                "confidence": confidence,
+            }
+        )
+
     for meta in seen_models.values():
         if meta.cached_locally:
             estimate.disk_cached_gb += meta.disk_gb
@@ -211,8 +392,10 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             estimate.disk_download_gb += meta.disk_gb
 
     if dump_modules:
-        weights_total = sum(m.weights_gb for m in seen_models.values())
-        estimate.disk_dump_gb = weights_total * n_trials
+        # Each trial selects one variant per node, so per-trial dumped weights
+        # are bounded by the heaviest module in each node, summed across nodes.
+        per_trial_dump_gb = sum(node_max_weights.values())
+        estimate.disk_dump_gb = per_trial_dump_gb * n_trials
 
     if n_jobs > 1 and hardware.accelerator in {"cuda", "mps"}:
         effective_vram = estimate.vram_gb * n_jobs
@@ -309,23 +492,17 @@ def _data_phase(
             )
 
     # rare class × linear-CV
-    has_linear = any(
-        e.get("module_name") == "linear" for _, e in _walk_modules(config.get("search_space") or [])
-    )
+    has_linear = any(e.get("module_name") == "linear" for _, e in _walk_modules(config.get("search_space") or []))
     if has_linear and stats.rare_classes:
         report.add(
             "data",
             Severity.RED,
-            (
-                "LogisticRegressionCV (cv=3) will fail: classes "
-                f"{stats.rare_classes[:5]} have <3 samples."
-            ),
+            (f"LogisticRegressionCV (cv=3) will fail: classes {stats.rare_classes[:5]} have <3 samples."),
         )
 
     # partial descriptions × description scorer
     has_description = any(
-        e.get("module_name") == "description"
-        for _, e in _walk_modules(config.get("search_space") or [])
+        e.get("module_name") == "description" for _, e in _walk_modules(config.get("search_space") or [])
     )
     if has_description and stats.has_descriptions is False:
         report.add(

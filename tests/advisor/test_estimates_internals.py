@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 from autointent._advisor import _estimates, _hub
@@ -109,22 +111,19 @@ class TestVramForTransformer:
             confidence="hub",
         )
 
-    def test_full_finetune_is_larger_than_lora_is_larger_than_inference(
-        self, meta: ModelMeta
-    ) -> None:
+    def test_full_finetune_is_larger_than_lora_is_larger_than_inference(self, meta: ModelMeta) -> None:
         inference = _vram_for_transformer(meta, "inference", mixed_precision=False)
         lora = _vram_for_transformer(meta, "lora", mixed_precision=False)
         full = _vram_for_transformer(meta, "full-finetune", mixed_precision=False)
         assert inference < lora < full
 
-    def test_amp_does_not_naively_halve(self, meta: ModelMeta) -> None:
-        """The proposal calls out that AMP doesn't halve total VRAM — fp32 master
-        weights and Adam moments don't shrink. Weight-side accounting comes out
-        equal to fp32; the only savings (activations) aren't modeled by us."""
+    def test_amp_partially_reduces_full_finetune_vram(self, meta: ModelMeta) -> None:
+        """AMP saves on fp16 weights+grads (W down from 2W); Adam state stays
+        fp32 (2W). Total 3W vs fp32's 4W — real but not a full halving."""
         full_fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False)
         full_amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True)
-        assert full_amp / full_fp32 == pytest.approx(1.0)
-        assert full_amp / full_fp32 > 0.5  # explicit check vs the naive-halving formula
+        assert full_amp < full_fp32
+        assert full_amp / full_fp32 == pytest.approx(0.75)
 
     def test_reranker_uses_inference_class(self, meta: ModelMeta) -> None:
         inference = _vram_for_transformer(meta, "inference", mixed_precision=False)
@@ -155,9 +154,7 @@ class TestRunPreflightFeatures:
                     "search_space": [
                         {
                             "module_name": "bert",
-                            "classification_model_config": [
-                                {"model_name": "microsoft/deberta-v3-small"}
-                            ],
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
                             "num_train_epochs": [3],
                             "batch_size": [16],
                         }
@@ -179,9 +176,7 @@ class TestRunPreflightFeatures:
                     "search_space": [
                         {
                             "module_name": "bert",
-                            "classification_model_config": [
-                                {"model_name": "microsoft/deberta-v3-small"}
-                            ],
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
                             "num_train_epochs": [3],
                             "batch_size": [16],
                         }
@@ -207,9 +202,7 @@ class TestRunPreflightFeatures:
             ],
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile(accelerator="cpu"))
-        assert any(
-            f.phase == "config" and "CatBoost" in f.message for f in report.findings
-        )
+        assert any(f.phase == "config" and "CatBoost" in f.message for f in report.findings)
 
     def test_catboost_gpu_with_cuda_is_silent(self) -> None:
         cfg = {
@@ -223,9 +216,7 @@ class TestRunPreflightFeatures:
             ],
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile(accelerator="cuda"))
-        assert not any(
-            f.phase == "config" and "CatBoost" in f.message for f in report.findings
-        )
+        assert not any(f.phase == "config" and "CatBoost" in f.message for f in report.findings)
 
     def test_offline_flips_low_confidence(self) -> None:
         cfg = {
@@ -277,9 +268,7 @@ class TestRunPreflightFeatures:
                         {
                             "module_name": "bert",
                             "max_length": [128],
-                            "classification_model_config": [
-                                {"model_name": "some/model"}
-                            ],
+                            "classification_model_config": [{"model_name": "some/model"}],
                         }
                     ],
                 }
@@ -299,9 +288,7 @@ class TestRunPreflightFeatures:
                         {
                             "module_name": "bert",
                             "max_length": [128],
-                            "classification_model_config": [
-                                {"model_name": "some/model"}
-                            ],
+                            "classification_model_config": [{"model_name": "some/model"}],
                         }
                     ],
                 }
@@ -312,8 +299,203 @@ class TestRunPreflightFeatures:
         yellows = [
             f
             for f in report.findings
-            if f.phase == "data"
-            and f.severity == Severity.YELLOW
-            and "truncation" in f.message.lower()
+            if f.phase == "data" and f.severity == Severity.YELLOW and "truncation" in f.message.lower()
         ]
         assert yellows
+
+
+class TestLinearCatboostFormulas:
+    """Cost surfaces for the classic (sklearn / catboost) scorers."""
+
+    def _embedder_node(self) -> dict[str, Any]:
+        return {
+            "node_type": "embedder",
+            "search_space": [
+                {
+                    "module_name": "sentence_transformer",
+                    "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
+                }
+            ],
+        }
+
+    def test_linear_contributes_ram_and_time(self) -> None:
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear", "max_iter": [200]}],
+                },
+            ],
+            "hpo_config": {"n_trials": 5},
+        }
+        stats = DatasetStats.placeholder(n_samples=100_000, n_classes=10, avg_tokens=24)
+        report = run_preflight(cfg, stats, _profile())
+        linear_drivers = [d for d in report.resource.drivers if d["module"] == "linear"]
+        assert len(linear_drivers) == 1
+        assert report.resource.ram_gb > 0
+        assert report.resource.time_hours > 0
+        assert linear_drivers[0]["vram_gb"] == 0  # sklearn is CPU-only
+
+    def test_logreg_cv_multiplier_dominates_multiclass_time(self) -> None:
+        """Multiclass linear uses LogisticRegressionCV (Cs*cv+1 ≈ 31 inner fits);
+        multilabel uses one LogReg per class (cv_multiplier=1). At equal n_classes,
+        multiclass must be much slower than the per-class multilabel path."""
+        base = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear", "max_iter": [1000]}],
+                },
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+        multiclass = run_preflight(
+            base,
+            DatasetStats.placeholder(n_samples=100_000, n_classes=10, multilabel=False),
+            _profile(),
+        )
+        multilabel = run_preflight(
+            base,
+            DatasetStats.placeholder(n_samples=100_000, n_classes=10, multilabel=True),
+            _profile(),
+        )
+        # multiclass: 31 inner fits x 1 model; multilabel: 1 fit x n_classes=10 models.
+        # 31 > 10 => multiclass is the slower path.
+        assert multiclass.resource.time_hours > multilabel.resource.time_hours
+
+    def test_catboost_contributes_ram_and_time_on_cpu(self) -> None:
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "catboost",
+                            "iterations": [1000],
+                            "depth": [6],
+                        }
+                    ],
+                },
+            ],
+            "hpo_config": {"n_trials": 3},
+        }
+        stats = DatasetStats.placeholder(n_samples=100_000, n_classes=8, avg_tokens=24)
+        report = run_preflight(cfg, stats, _profile(accelerator="cpu"))
+        cb = next(d for d in report.resource.drivers if d["module"] == "catboost")
+        assert report.resource.ram_gb > 0
+        assert report.resource.time_hours > 0
+        assert cb["vram_gb"] == 0
+        assert cb["mode"] == "catboost"
+
+    def test_catboost_gpu_moves_cost_to_vram(self) -> None:
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "catboost",
+                            "iterations": [1000],
+                            "depth": [6],
+                            "task_type": "GPU",
+                        }
+                    ],
+                },
+            ],
+            "hpo_config": {"n_trials": 2},
+        }
+        stats = DatasetStats.placeholder(n_samples=100_000, n_classes=8, avg_tokens=24)
+        report = run_preflight(cfg, stats, _profile(accelerator="cuda"))
+        cb = next(d for d in report.resource.drivers if d["module"] == "catboost")
+        assert report.resource.vram_gb > 0
+        assert cb["ram_gb"] == 0
+        assert cb["mode"] == "catboost-gpu"
+
+    def test_linear_scales_with_n_samples(self) -> None:
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear"}],
+                },
+            ],
+        }
+        small = run_preflight(cfg, DatasetStats.placeholder(n_samples=500), _profile())
+        big = run_preflight(cfg, DatasetStats.placeholder(n_samples=500_000), _profile())
+        assert big.resource.time_hours > small.resource.time_hours
+        assert big.resource.ram_gb > small.resource.ram_gb
+
+
+class TestDumpModulesBounding:
+    """`dump_modules=True` writes one selected variant per node per trial — not
+    every candidate. The estimate must be bounded by sum-of-max-per-node x n_trials."""
+
+    def test_dump_disk_is_bounded_by_per_node_max_not_sum_of_all_variants(self) -> None:
+        # Two BERT candidates in the same node: only one is selected per trial.
+        cfg = {
+            "search_space": [
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [
+                                {"model_name": "microsoft/deberta-v3-small"},
+                                {"model_name": "microsoft/deberta-v3-large"},
+                            ],
+                            "num_train_epochs": [3],
+                            "batch_size": [16],
+                        }
+                    ],
+                }
+            ],
+            "hpo_config": {"n_trials": 4},
+            "dump_modules": True,
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        # Per-node max ~ deberta-v3-large weights (~350M x 4 ~ 1.3 GB). Two-candidate
+        # sum would be roughly doubled. Verify we used the per-node-max bound.
+        small_meta = _hub.resolve_model("microsoft/deberta-v3-small")
+        large_meta = _hub.resolve_model("microsoft/deberta-v3-large")
+        expected = large_meta.weights_gb * 4
+        naive_sum = (small_meta.weights_gb + large_meta.weights_gb) * 4
+        assert report.resource.disk_dump_gb == pytest.approx(expected, rel=0.01)
+        assert report.resource.disk_dump_gb < naive_sum
+
+    def test_dump_disk_sums_across_nodes(self) -> None:
+        cfg = {
+            "search_space": [
+                {
+                    "node_type": "embedder",
+                    "search_space": [
+                        {
+                            "module_name": "sentence_transformer",
+                            "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
+                        }
+                    ],
+                },
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                            "num_train_epochs": [3],
+                            "batch_size": [16],
+                        }
+                    ],
+                },
+            ],
+            "hpo_config": {"n_trials": 2},
+            "dump_modules": True,
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        embedder = _hub.resolve_model("sentence-transformers/all-MiniLM-L6-v2")
+        bert = _hub.resolve_model("microsoft/deberta-v3-small")
+        expected = (embedder.weights_gb + bert.weights_gb) * 2
+        assert report.resource.disk_dump_gb == pytest.approx(expected, rel=0.01)

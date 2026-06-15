@@ -14,6 +14,9 @@ import shutil
 from dataclasses import dataclass, field
 from typing import Literal
 
+import psutil
+import torch
+
 logger = logging.getLogger(__name__)
 
 Accelerator = Literal["cuda", "mps", "cpu"]
@@ -46,13 +49,7 @@ class HardwareProfile:
 
 
 def _detect_ram_gb() -> float:
-    try:
-        import psutil
-
-        return psutil.virtual_memory().total / (1024**3)
-    except ImportError:
-        logger.debug("psutil unavailable; RAM unknown")
-        return 0.0
+    return psutil.virtual_memory().total / (1024**3)
 
 
 def _detect_free_disk_gb(path: str | None = None) -> float:
@@ -67,40 +64,24 @@ def _detect_free_disk_gb(path: str | None = None) -> float:
 
 
 def _detect_cuda() -> tuple[float, str] | None:
+    if not torch.cuda.is_available():
+        return None
+    idx = 0
     try:
-        import torch
-
-        if not torch.cuda.is_available():
-            return None
-        idx = 0
-        try:
-            free, total = torch.cuda.mem_get_info(idx)
-            vram_gb = total / (1024**3)
-        except (RuntimeError, AttributeError) as e:
-            logger.debug("torch.cuda.mem_get_info failed: %s", e)
-            return None
-        name = torch.cuda.get_device_name(idx)
-        return vram_gb, name
-    except ImportError:
+        _free, total = torch.cuda.mem_get_info(idx)
+        vram_gb = total / (1024**3)
+    except (RuntimeError, AttributeError) as e:
+        logger.debug("torch.cuda.mem_get_info failed: %s", e)
         return None
-    except Exception as e:  # noqa: BLE001 - protect the advisor from torch quirks
-        logger.debug("CUDA detection raised: %s", e)
-        return None
+    name = torch.cuda.get_device_name(idx)
+    return vram_gb, name
 
 
 def _detect_mps(ram_gb: float, budget_ratio: float = MPS_DEFAULT_BUDGET_RATIO) -> tuple[float, str] | None:
-    try:
-        import torch
-
-        if not (hasattr(torch.backends, "mps") and torch.backends.mps.is_available()):
-            return None
-        # apple silicon: unified memory; budget is fraction of total RAM
-        return ram_gb * budget_ratio, f"Apple Silicon ({platform.machine()})"
-    except ImportError:
+    if not (hasattr(torch.backends, "mps") and torch.backends.mps.is_available()):
         return None
-    except Exception as e:  # noqa: BLE001
-        logger.debug("MPS detection raised: %s", e)
-        return None
+    # apple silicon: unified memory; budget is fraction of total RAM
+    return ram_gb * budget_ratio, f"Apple Silicon ({platform.machine()})"
 
 
 def detect_hardware(
@@ -133,9 +114,7 @@ def detect_hardware(
         if mps is not None:
             vram_gb, device_name = mps
             accel = "mps"
-            notes.append(
-                f"MPS unified memory: VRAM budget = {mps_budget_ratio:.0%} of RAM."
-            )
+            notes.append(f"MPS unified memory: VRAM budget = {mps_budget_ratio:.0%} of RAM.")
         else:
             vram_gb = 0.0
             device_name = platform.processor() or "cpu"
@@ -143,9 +122,7 @@ def detect_hardware(
 
     if vram_budget_gb is not None:
         if vram_gb and vram_budget_gb > vram_gb:
-            notes.append(
-                f"Manual --budget-vram-gb={vram_budget_gb} exceeds detected {vram_gb:.1f} GB; using override."
-            )
+            notes.append(f"Manual --budget-vram-gb={vram_budget_gb} exceeds detected {vram_gb:.1f} GB; using override.")
         notes.append(f"Using manual VRAM budget: {vram_budget_gb} GB.")
         vram_gb = vram_budget_gb
 

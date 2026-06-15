@@ -18,7 +18,7 @@ _PHASE_ORDER = ("resource", "data", "config")
 _PHASE_LABEL = {"resource": "Resource", "data": "Data", "config": "Config"}
 
 
-def render_text(report: "PreflightReport") -> str:
+def render_text(report: PreflightReport) -> str:
     lines: list[str] = []
     title = "Compute feasibility check"
     if report.preset_name:
@@ -76,12 +76,12 @@ def render_text(report: "PreflightReport") -> str:
     return "\n".join(lines)
 
 
-def render_json(report: "PreflightReport") -> str:
+def render_json(report: PreflightReport) -> str:
     return json.dumps(report.to_dict(), indent=2, default=str)
 
 
 def render_recommendation(
-    results: list[tuple[str, "PreflightReport"]],
+    results: list[tuple[str, PreflightReport]],
     chosen: str | None,
 ) -> str:
     """Compact table for the ``recommend`` subcommand."""

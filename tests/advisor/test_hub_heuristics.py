@@ -32,9 +32,7 @@ def _offline(monkeypatch: pytest.MonkeyPatch) -> None:
         ("bert-base-uncased", 70, 200),
     ],
 )
-def test_name_heuristic_picks_reasonable_bucket(
-    name: str, expected_min_m: int, expected_max_m: int
-) -> None:
+def test_name_heuristic_picks_reasonable_bucket(name: str, expected_min_m: int, expected_max_m: int) -> None:
     meta = _hub.resolve_model(name)
     assert meta.confidence == "heuristic"
     assert expected_min_m <= meta.params_millions <= expected_max_m, (
