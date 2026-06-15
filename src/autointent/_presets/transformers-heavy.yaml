@@ -5,12 +5,19 @@ search_space:
       - module_name: bert
         classification_model_config:
           - model_name: microsoft/deberta-v3-large
+          - model_name: intfloat/multilingual-e5-large-instruct
+          - model_name: microsoft/harrier-oss-v1-27b
         num_train_epochs: [30]
         batch_size: [32, 64]
         learning_rate:
           low: 1.0e-5
           high: 1.0e-4
           log: True
+      - module_name: description_bi
+        embedder_config:
+          - model_name: microsoft/deberta-v3-large
+          - model_name: intfloat/multilingual-e5-large-instruct
+          - model_name: microsoft/harrier-oss-v1-27b
   - node_type: decision
     target_metric: decision_accuracy
     search_space:

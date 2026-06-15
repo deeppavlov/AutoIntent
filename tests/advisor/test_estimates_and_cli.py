@@ -98,7 +98,7 @@ def test_cli_inspect_json_is_parseable(capsys: pytest.CaptureFixture[str]) -> No
     payload = json.loads(captured.out)
     assert payload["preset_name"] == "transformers-light"
     assert "findings" in payload
-    assert payload["worst_severity"] in {"green", "yellow", "red"}
+    assert payload["headroom"] in {"ample", "tight", "over"}
     # rc is 0 on feasible, 1 otherwise
     assert rc in (0, 1)
 
@@ -217,9 +217,9 @@ def test_cli_recommend_budget_time_flags_red_for_overbudget_presets(
     flagged = [
         r
         for r in payload["results"]
-        if any(f["severity"] == "red" and "exceeds budget" in f["message"] for f in r["report"]["findings"])
+        if any(f["severity"] == "over" and "exceeds budget" in f["message"] for f in r["report"]["findings"])
     ]
-    assert flagged, "budget-time-h breach should produce RED severity findings"
+    assert flagged, "budget-time-h breach should produce OVER severity findings"
     # Any preset above the budget must be marked infeasible.
     for r in flagged:
         assert r["report"]["is_feasible"] is False

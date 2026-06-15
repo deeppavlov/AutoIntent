@@ -14,22 +14,22 @@ from autointent._advisor._report import (
 
 
 class TestSeverityOrdering:
-    def test_worst_severity_on_empty_report_is_green(self) -> None:
-        assert PreflightReport().worst_severity == Severity.GREEN
+    def test_headroom_on_empty_report_is_green(self) -> None:
+        assert PreflightReport().headroom == Severity.AMPLE
 
     def test_red_beats_yellow_beats_green(self) -> None:
         r = PreflightReport()
-        r.add("resource", Severity.GREEN, "ok")
-        r.add("data", Severity.YELLOW, "warn")
-        assert r.worst_severity == Severity.YELLOW
-        r.add("config", Severity.RED, "fail")
-        assert r.worst_severity == Severity.RED
+        r.add("resource", Severity.AMPLE, "ok")
+        r.add("data", Severity.TIGHT, "warn")
+        assert r.headroom == Severity.TIGHT
+        r.add("config", Severity.OVER, "fail")
+        assert r.headroom == Severity.OVER
 
     def test_is_feasible_flips_on_any_red(self) -> None:
         r = PreflightReport()
-        r.add("resource", Severity.YELLOW, "warn")
+        r.add("resource", Severity.TIGHT, "warn")
         assert r.is_feasible is True
-        r.add("data", Severity.RED, "fail")
+        r.add("data", Severity.OVER, "fail")
         assert r.is_feasible is False
 
 
@@ -62,12 +62,12 @@ class TestResourceEstimate:
 class TestToDictSerialization:
     def test_findings_round_trip_severity_as_string(self) -> None:
         r = PreflightReport()
-        r.add("resource", Severity.RED, "boom")
+        r.add("resource", Severity.OVER, "boom")
         d = r.to_dict()
-        assert d["worst_severity"] == "red"
+        assert d["headroom"] == "over"
         assert d["is_feasible"] is False
         assert d["findings"] == [
-            {"phase": "resource", "severity": "red", "message": "boom", "metric": None},
+            {"phase": "resource", "severity": "over", "message": "boom", "metric": None},
         ]
 
     def test_hardware_and_dataset_pass_through(self) -> None:
@@ -80,6 +80,6 @@ class TestToDictSerialization:
         assert d["dataset"]["n_samples"] == 100
 
     def test_finding_is_frozen(self) -> None:
-        f = Finding(phase="resource", severity=Severity.GREEN, message="ok")
+        f = Finding(phase="resource", severity=Severity.AMPLE, message="ok")
         with pytest.raises(Exception):  # noqa: PT011 - dataclass.FrozenInstanceError varies
             f.message = "changed"  # type: ignore[misc]

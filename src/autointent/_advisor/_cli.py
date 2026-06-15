@@ -153,7 +153,7 @@ def cmd_recommend(args: argparse.Namespace) -> int:
         if args.budget_time_h is not None and report.resource.time_hours > args.budget_time_h:
             report.add(
                 "resource",
-                Severity.RED,
+                Severity.OVER,
                 f"Estimated time {report.resource.time_hours:.1f} h exceeds budget {args.budget_time_h} h.",
             )
         results.append((preset, report))

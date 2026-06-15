@@ -13,9 +13,67 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ._report import PreflightReport
 
-_SEVERITY_TAG = {"green": "✓", "yellow": "⚠", "red": "✗"}
+_SEVERITY_TAG = {"ample": "✓", "tight": "⚠", "over": "✗"}
 _PHASE_ORDER = ("resource", "data", "config")
 _PHASE_LABEL = {"resource": "Resource", "data": "Data", "config": "Config"}
+
+
+def _batch_hint(driver: dict) -> str:
+    """Per-driver batch annotation: '64 → 32', '64', '64 (no fit)', or ''."""
+    bs = driver.get("batch_size")
+    if bs is None:
+        return ""
+    mx = driver.get("max_batch_size")
+    if mx is None:
+        return str(bs)
+    if mx == 0:
+        return f"{bs} (no fit)"
+    if mx == bs:
+        return str(bs)
+    return f"{bs} → {mx}"
+
+
+_DRIVERS_LIMIT = 8
+_DRIVERS_HEADERS = ("Node", "Model", "Mode", "VRAM", "Time", "Batch", "Source")
+
+
+def _render_drivers_table(drivers: list[dict]) -> list[str]:
+    """Format the Drivers of cost section as an aligned table."""
+    visible = drivers[:_DRIVERS_LIMIT]
+    rows: list[tuple[str, ...]] = []
+    for d in visible:
+        rows.append((
+            f"{d['node_type']}.{d['module']}",
+            str(d["model"]),
+            str(d["mode"]),
+            f"{d['vram_gb']:.2f} GB",
+            f"{d['time_hours']:.2f} h",
+            _batch_hint(d),
+            f"[{d['confidence']}]",
+        ))
+
+    widths = [len(h) for h in _DRIVERS_HEADERS]
+    for row in rows:
+        for i, cell in enumerate(row):
+            widths[i] = max(widths[i], len(cell))
+
+    # Right-align numeric columns (VRAM @ idx 3, Time @ idx 4); left-align the rest.
+    right_align = {3, 4}
+
+    def fmt(row: tuple[str, ...]) -> str:
+        cells = []
+        for i, cell in enumerate(row):
+            if i in right_align:
+                cells.append(cell.rjust(widths[i]))
+            else:
+                cells.append(cell.ljust(widths[i]))
+        return "  " + "  ".join(cells).rstrip()
+
+    lines = ["Drivers of cost:", fmt(_DRIVERS_HEADERS), "  " + "  ".join("─" * w for w in widths)]
+    lines.extend(fmt(r) for r in rows)
+    if len(drivers) > _DRIVERS_LIMIT:
+        lines.append(f"  … and {len(drivers) - _DRIVERS_LIMIT} more")
+    return lines
 
 
 def render_text(report: PreflightReport) -> str:
@@ -50,15 +108,7 @@ def render_text(report: PreflightReport) -> str:
         lines.append("")
 
     if report.resource.drivers:
-        lines.append("Drivers of cost:")
-        for d in report.resource.drivers[:8]:
-            lines.append(
-                f"  {d['node_type']}.{d['module']:<10} {d['model']:<48}"
-                f"  {d['mode']:<14}  VRAM ~{d['vram_gb']} GB, time ~{d['time_hours']} h"
-                f"  [{d['confidence']}]"
-            )
-        if len(report.resource.drivers) > 8:
-            lines.append(f"  … and {len(report.resource.drivers) - 8} more")
+        lines.extend(_render_drivers_table(report.resource.drivers))
         lines.append("")
 
     if report.notes:
@@ -68,7 +118,7 @@ def render_text(report: PreflightReport) -> str:
         lines.append("")
 
     summary = f"Verdict: {'feasible' if report.is_feasible else 'INFEASIBLE'} "
-    summary += f"(worst severity: {report.worst_severity.value})"
+    summary += f"(headroom: {report.headroom.value})"
     if report.low_confidence:
         summary += " — low-confidence (heuristic fallback in use)"
     lines.append(summary)
@@ -91,7 +141,7 @@ def render_recommendation(
     else:
         lines.append("  → none of the bundled presets fit your hardware as-is.")
     lines.append("")
-    lines.append(f"{'Preset':<24} {'Status':<14} {'VRAM':<10} {'Time':<10} {'Worst':<8}")
+    lines.append(f"{'Preset':<24} {'Status':<14} {'VRAM':<10} {'Time':<10} {'Headroom':<10}")
     lines.append("-" * 68)
     for name, report in results:
         verdict = "feasible" if report.is_feasible else "infeasible"
@@ -99,6 +149,6 @@ def render_recommendation(
             f"{name:<24} {verdict:<14} "
             f"{report.resource.vram_gb:>4.1f} GB   "
             f"{report.resource.time_hours:>4.1f} h    "
-            f"{report.worst_severity.value:<8}"
+            f"{report.headroom.value:<8}"
         )
     return "\n".join(lines)

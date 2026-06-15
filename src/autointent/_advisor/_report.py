@@ -8,9 +8,9 @@ from typing import Any, Literal
 
 
 class Severity(str, Enum):
-    GREEN = "green"
-    YELLOW = "yellow"
-    RED = "red"
+    AMPLE = "ample"
+    TIGHT = "tight"
+    OVER = "over"
 
 
 Phase = Literal["resource", "data", "config"]
@@ -93,19 +93,20 @@ class PreflightReport:
         self.findings.append(Finding(phase=phase, severity=severity, message=message, metric=metric))
 
     @property
-    def worst_severity(self) -> Severity:
-        order = {Severity.GREEN: 0, Severity.YELLOW: 1, Severity.RED: 2}
+    def headroom(self) -> Severity:
+        """Worst headroom level across all findings — the column shown in CLI reports."""
+        order = {Severity.AMPLE: 0, Severity.TIGHT: 1, Severity.OVER: 2}
         if not self.findings:
-            return Severity.GREEN
+            return Severity.AMPLE
         return max((f.severity for f in self.findings), key=lambda s: order[s])
 
     @property
     def is_feasible(self) -> bool:
-        return self.worst_severity != Severity.RED
+        return self.headroom != Severity.OVER
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d["findings"] = [{**asdict(f), "severity": f.severity.value} for f in self.findings]
-        d["worst_severity"] = self.worst_severity.value
+        d["headroom"] = self.headroom.value
         d["is_feasible"] = self.is_feasible
         return d

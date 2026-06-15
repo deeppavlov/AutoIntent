@@ -86,17 +86,17 @@ class TestExtractModelNames:
 
 class TestClassifySeverity:
     def test_below_yellow_is_green(self) -> None:
-        assert _classify_severity(estimate=1.0, budget=10.0) == Severity.GREEN
+        assert _classify_severity(estimate=1.0, budget=10.0) == Severity.AMPLE
 
     def test_above_yellow_threshold(self) -> None:
-        assert _classify_severity(estimate=8.0, budget=10.0) == Severity.YELLOW
+        assert _classify_severity(estimate=8.0, budget=10.0) == Severity.TIGHT
 
     def test_at_or_above_red_threshold(self) -> None:
-        assert _classify_severity(estimate=10.0, budget=10.0) == Severity.RED
-        assert _classify_severity(estimate=12.0, budget=10.0) == Severity.RED
+        assert _classify_severity(estimate=10.0, budget=10.0) == Severity.OVER
+        assert _classify_severity(estimate=12.0, budget=10.0) == Severity.OVER
 
     def test_zero_budget_returns_yellow(self) -> None:
-        assert _classify_severity(estimate=1.0, budget=0.0) == Severity.YELLOW
+        assert _classify_severity(estimate=1.0, budget=0.0) == Severity.TIGHT
 
 
 class TestVramForTransformer:
@@ -117,13 +117,34 @@ class TestVramForTransformer:
         full = _vram_for_transformer(meta, "full-finetune", mixed_precision=False)
         assert inference < lora < full
 
-    def test_amp_partially_reduces_full_finetune_vram(self, meta: ModelMeta) -> None:
-        """AMP saves on fp16 weights+grads (W down from 2W); Adam state stays
-        fp32 (2W). Total 3W vs fp32's 4W — real but not a full halving."""
-        full_fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False)
-        full_amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True)
-        assert full_amp < full_fp32
-        assert full_amp / full_fp32 == pytest.approx(0.75)
+    def test_inference_activations_are_smaller_than_training(self, meta: ModelMeta) -> None:
+        """Inference doesn't store per-layer outputs for backward — activation memory
+        should be many times smaller than training at the same batch_size."""
+        train_total = _vram_for_transformer(meta, "full-finetune", False, batch_size=64, seq_len=128)
+        train_weights = _vram_for_transformer(meta, "full-finetune", False, batch_size=0)
+        inf_total = _vram_for_transformer(meta, "inference", False, batch_size=64, seq_len=128)
+        inf_weights = _vram_for_transformer(meta, "inference", False, batch_size=0)
+        train_acts = train_total - train_weights
+        inf_acts = inf_total - inf_weights
+        assert inf_acts > 0
+        assert train_acts > inf_acts
+        # 12-layer model: training activations should be at least ~5× inference.
+        assert train_acts / inf_acts > 5
+
+    def test_amp_does_not_reduce_weight_side_vram(self, meta: ModelMeta) -> None:
+        """Weight-side AMP accounting: fp16 weights+grads (W) + fp32 master copy (W)
+        + fp32 Adam moments (2W) = 4W, identical to pure fp32. AMP's savings live
+        in activations, not the optimizer."""
+        full_fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False, batch_size=0)
+        full_amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True, batch_size=0)
+        assert full_amp == pytest.approx(full_fp32)
+
+    def test_amp_does_reduce_activation_side_vram(self, meta: ModelMeta) -> None:
+        """When a batch is configured, AMP halves activation bytes — total VRAM
+        with batch should be strictly smaller under AMP than fp32."""
+        fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False, batch_size=64, seq_len=128)
+        amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True, batch_size=64, seq_len=128)
+        assert amp < fp32
 
     def test_reranker_uses_inference_class(self, meta: ModelMeta) -> None:
         inference = _vram_for_transformer(meta, "inference", mixed_precision=False)
@@ -255,7 +276,7 @@ class TestRunPreflightFeatures:
         )
         report = run_preflight(cfg, stats, _profile())
         assert any(
-            f.phase == "data" and "LogisticRegressionCV" in f.message and f.severity == Severity.RED
+            f.phase == "data" and "LogisticRegressionCV" in f.message and f.severity == Severity.OVER
             for f in report.findings
         )
 
@@ -276,7 +297,7 @@ class TestRunPreflightFeatures:
         }
         stats = DatasetStats(n_samples=500, n_classes=5, avg_tokens=50, p95_tokens=400)
         report = run_preflight(cfg, stats, _profile())
-        red = [f for f in report.findings if f.phase == "data" and f.severity == Severity.RED]
+        red = [f for f in report.findings if f.phase == "data" and f.severity == Severity.OVER]
         assert red, "p95=400 > 1.5 * max_length=128 should be red"
 
     def test_truncation_yellow_when_p95_only_slightly_exceeds(self) -> None:
@@ -299,7 +320,7 @@ class TestRunPreflightFeatures:
         yellows = [
             f
             for f in report.findings
-            if f.phase == "data" and f.severity == Severity.YELLOW and "truncation" in f.message.lower()
+            if f.phase == "data" and f.severity == Severity.TIGHT and "truncation" in f.message.lower()
         ]
         assert yellows
 
@@ -429,6 +450,86 @@ class TestLinearCatboostFormulas:
         big = run_preflight(cfg, DatasetStats.placeholder(n_samples=500_000), _profile())
         assert big.resource.time_hours > small.resource.time_hours
         assert big.resource.ram_gb > small.resource.ram_gb
+
+
+class TestPerDriverBatchHint:
+    """Each transformer driver carries its own (batch_size, max_batch_size) for rendering."""
+
+    def _bert_cfg(self, model_name: str, batch_size: int) -> dict[str, Any]:
+        return {
+            "search_space": [
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": model_name}],
+                            "num_train_epochs": [3],
+                            "batch_size": [batch_size],
+                        }
+                    ],
+                }
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+
+    def test_driver_records_current_and_max_batch(self) -> None:
+        report = run_preflight(
+            self._bert_cfg("microsoft/deberta-v3-large", batch_size=64),
+            DatasetStats.placeholder(),
+            _profile(vram_gb=10.0),
+        )
+        drivers = [d for d in report.resource.drivers if d["module"] == "bert"]
+        assert drivers
+        d = drivers[0]
+        assert d["batch_size"] == 64
+        # vram_gb=10 + 5 GB weights → some room for activations, max < 64.
+        assert d["max_batch_size"] is not None
+        assert 0 < d["max_batch_size"] < 64
+
+    def test_max_batch_zero_when_weights_alone_overflow(self) -> None:
+        report = run_preflight(
+            self._bert_cfg("microsoft/deberta-v3-large", batch_size=64),
+            DatasetStats.placeholder(),
+            _profile(vram_gb=2.0),
+        )
+        d = next(d for d in report.resource.drivers if d["module"] == "bert")
+        assert d["max_batch_size"] == 0
+
+    def test_max_batch_can_be_larger_than_current(self) -> None:
+        report = run_preflight(
+            self._bert_cfg("microsoft/deberta-v3-large", batch_size=32),
+            DatasetStats.placeholder(),
+            _profile(vram_gb=64.0),
+        )
+        d = next(d for d in report.resource.drivers if d["module"] == "bert")
+        assert d["max_batch_size"] is not None and d["max_batch_size"] > 32
+
+    def test_multiple_drivers_carry_independent_max_batch(self) -> None:
+        cfg = {
+            "search_space": [
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [
+                                {"model_name": "microsoft/deberta-v3-small"},
+                                {"model_name": "microsoft/deberta-v3-large"},
+                            ],
+                            "num_train_epochs": [3],
+                            "batch_size": [64],
+                        }
+                    ],
+                }
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile(vram_gb=10.0))
+        small = next(d for d in report.resource.drivers if "small" in d["model"])
+        large = next(d for d in report.resource.drivers if "large" in d["model"])
+        # The smaller model has more headroom → larger max batch (or equal-cap when both saturate).
+        assert small["max_batch_size"] >= large["max_batch_size"]
 
 
 class TestDumpModulesBounding:

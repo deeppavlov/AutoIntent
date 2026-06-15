@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from autointent._advisor._render import render_json, render_recommendation, render_text
+from autointent._advisor._render import _batch_hint, render_json, render_recommendation, render_text
 from autointent._advisor._report import (
     DatasetStats,
     PreflightReport,
@@ -46,8 +46,8 @@ def _populated_report() -> PreflightReport:
         ),
         notes=["MPS unified memory note"],
     )
-    r.add("resource", Severity.YELLOW, "VRAM ~6 GB vs available 8 GB")
-    r.add("data", Severity.RED, "rare classes blocked")
+    r.add("resource", Severity.TIGHT, "VRAM ~6 GB vs available 8 GB")
+    r.add("data", Severity.OVER, "rare classes blocked")
     return r
 
 
@@ -64,10 +64,10 @@ class TestRenderText:
         assert "Drivers of cost:" in out
         assert "x/y" in out
 
-    def test_verdict_reflects_worst_severity(self) -> None:
+    def test_verdict_reflects_headroom(self) -> None:
         out = render_text(_populated_report())
         assert "Verdict: INFEASIBLE" in out
-        assert "worst severity: red" in out
+        assert "headroom: over" in out
 
     def test_disclaimer_always_present(self) -> None:
         out = render_text(_populated_report())
@@ -96,25 +96,25 @@ class TestRenderJson:
     def test_findings_have_string_severity(self) -> None:
         d = json.loads(render_json(_populated_report()))
         for f in d["findings"]:
-            assert f["severity"] in {"green", "yellow", "red"}
+            assert f["severity"] in {"ample", "tight", "over"}
 
-    def test_worst_severity_and_feasibility_serialized(self) -> None:
+    def test_headroom_and_feasibility_serialized(self) -> None:
         d = json.loads(render_json(_populated_report()))
-        assert d["worst_severity"] == "red"
+        assert d["headroom"] == "over"
         assert d["is_feasible"] is False
 
     def test_empty_report_serializes(self) -> None:
         d = json.loads(render_json(PreflightReport()))
-        assert d["worst_severity"] == "green"
+        assert d["headroom"] == "ample"
         assert d["is_feasible"] is True
 
 
 class TestRenderRecommendation:
     def _two_reports(self) -> list[tuple[str, PreflightReport]]:
         a = PreflightReport(preset_name="a", resource=ResourceEstimate(vram_gb=2.0, time_hours=0.5))
-        a.add("resource", Severity.GREEN, "ok")
+        a.add("resource", Severity.AMPLE, "ok")
         b = PreflightReport(preset_name="b", resource=ResourceEstimate(vram_gb=8.0, time_hours=4.0))
-        b.add("resource", Severity.RED, "too big")
+        b.add("resource", Severity.OVER, "too big")
         return [("a", a), ("b", b)]
 
     def test_lists_chosen_preset_when_present(self) -> None:
@@ -134,6 +134,25 @@ class TestRenderRecommendation:
         out = render_recommendation(self._two_reports(), chosen="a")
         assert "feasible" in out
         assert "infeasible" in out
+
+
+class TestBatchHint:
+    """Per-driver batch cell rendered in the Drivers-of-cost table."""
+
+    def test_arrow_when_max_differs(self) -> None:
+        assert _batch_hint({"batch_size": 64, "max_batch_size": 32}) == "64 → 32"
+
+    def test_plain_when_max_equals_current(self) -> None:
+        assert _batch_hint({"batch_size": 64, "max_batch_size": 64}) == "64"
+
+    def test_no_fit_label_when_max_zero(self) -> None:
+        assert _batch_hint({"batch_size": 64, "max_batch_size": 0}) == "64 (no fit)"
+
+    def test_empty_when_no_batch(self) -> None:
+        assert _batch_hint({"batch_size": None, "max_batch_size": None}) == ""
+
+    def test_increase_arrow(self) -> None:
+        assert _batch_hint({"batch_size": 32, "max_batch_size": 128}) == "32 → 128"
 
 
 def test_dataset_stats_in_text_block() -> None:

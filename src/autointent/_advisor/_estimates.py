@@ -33,6 +33,10 @@ _PER_STEP_BASELINE_S = {
 
 TRANSFORMER_SCORER_MODULES = {"bert", "lora", "ptuning", "dnnc"}
 
+# Fallback max_length when the search-space entry doesn't pin it. Used both as
+# the default in _vram_for_transformer and in the entry-walk seq_len resolution.
+_DEFAULT_SEQ_LEN = 128
+
 # Coefficients for the linear / catboost time formulas (proposal §"Algorithm").
 _LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-8
 _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
@@ -95,12 +99,12 @@ def _walk_modules_indexed(
             yield node_idx, node_type, entry
 
 
-def _vram_for_transformer(meta: ModelMeta, mode: str, mixed_precision: bool) -> float:
-    """VRAM in GB for one trial of a transformer-based module.
+def _weights_vram_for_transformer(meta: ModelMeta, mode: str) -> float:
+    """Weight-side VRAM in GB — weights + grads + Adam optimizer state. Excludes activations.
 
-    Full fine-tune fp32: weights + grads + Adam (m, v) = 4W.
-    Full fine-tune AMP: fp16 weights + fp16 grads + fp32 master copy + fp32 Adam = 3W.
-    (Activations are not modeled separately.)
+    Full fine-tune fp32: W + W + 2W (Adam m, v) = 4W.
+    Full fine-tune AMP: 0.5W (fp16 weights) + 0.5W (fp16 grads) + W (fp32 master) + 2W (fp32 Adam) = 4W.
+    AMP's savings live in activations, not the optimizer — the weight side is identical.
     """
     weights_gb = meta.weights_gb
     if mode == "inference":
@@ -109,14 +113,109 @@ def _vram_for_transformer(meta: ModelMeta, mode: str, mixed_precision: bool) -> 
         return weights_gb * 1.3 + 0.5
     if mode == "reranker":
         return weights_gb * 1.5
-    if mixed_precision:
-        return weights_gb * 3.0
     return weights_gb * 4.0
+
+
+def _vram_for_transformer(
+    meta: ModelMeta,
+    mode: str,
+    mixed_precision: bool,
+    *,
+    batch_size: int = 0,
+    seq_len: int = _DEFAULT_SEQ_LEN,
+) -> float:
+    """Total VRAM in GB: weights + grads + optimizer state + activations × batch.
+
+    Activation accounting differs by mode — training keeps per-layer outputs for
+    backward; inference only needs one or two layers in flight.
+    """
+    base = _weights_vram_for_transformer(meta, mode)
+    if batch_size <= 0:
+        return base
+    per_sample = _activations_gb_per_sample(
+        meta, seq_len, mixed_precision=mixed_precision, is_training=mode != "inference"
+    )
+    return base + per_sample * batch_size
 
 
 def _ram_for_module(meta: ModelMeta, stats: DatasetStats) -> float:
     """RAM in GB. Loose upper bound."""
     return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / (1024**3)
+
+
+def _floor_to_power_of_two(n: int) -> int:
+    """Largest power of two ≤ n; returns 0 when n < 1."""
+    if n < 1:
+        return 0
+    power = 1
+    while power * 2 <= n:
+        power *= 2
+    return power
+
+
+def _n_layers(meta: ModelMeta | None) -> int:
+    """Coarse layer-count guess from parameter count.
+
+    MiniLM (33M) ~6, BERT-base (110M) ~12, BERT-large (350M) ~24.
+    """
+    if meta is None:
+        return 12
+    params = meta.params_millions
+    if params >= 300:
+        return 24
+    if params >= 100:
+        return 12
+    if params >= 50:
+        return 8
+    return 6
+
+
+def _activations_gb_per_sample(
+    meta: ModelMeta | None,
+    seq_len: int,
+    *,
+    mixed_precision: bool,
+    is_training: bool,
+) -> float:
+    """Heuristic activation memory per sample.
+
+    Training: ``seq_len × hidden × layers × const`` — per-layer outputs are kept
+    for backward.
+    Inference: ``seq_len × hidden × const`` — only one or two layers' outputs in
+    flight at once.
+    Mixed precision halves activation bytes.
+    """
+    hidden = _embedder_dim(meta)
+    if is_training:
+        # Training keeps every layer's outputs for backward → scales × n_layers.
+        # The 16-byte/token/layer coefficient bundles fp32 activation + ~4× backward overhead.
+        bytes_per_sample = seq_len * hidden * _n_layers(meta) * 16
+    else:
+        # Inference only holds ~1-2 layers' outputs in flight at once.
+        bytes_per_sample = seq_len * hidden * 8
+    if mixed_precision:
+        bytes_per_sample //= 2
+    return bytes_per_sample / (1024**3)
+
+
+def _max_fitting_batch_size(
+    *,
+    weight_vram_gb: float,
+    vram_budget_gb: float,
+    per_sample_gb: float,
+) -> int:
+    """Largest batch that keeps total VRAM under the AMPLE/TIGHT threshold.
+
+    Returns 0 when even the weights blow the budget. Result is rounded down to
+    the nearest power of two.
+    """
+    if per_sample_gb <= 0:
+        return 0
+    target_vram = vram_budget_gb * _YELLOW
+    available_for_activations = target_vram - weight_vram_gb
+    if available_for_activations <= 0:
+        return 0
+    return _floor_to_power_of_two(int(available_for_activations / per_sample_gb))
 
 
 def _embedder_dim(meta: ModelMeta | None) -> int:
@@ -211,13 +310,13 @@ def _time_for_transformer(
 
 def _classify_severity(estimate: float, budget: float) -> Severity:
     if budget <= 0:
-        return Severity.YELLOW
+        return Severity.TIGHT
     ratio = estimate / budget
     if ratio >= _RED:
-        return Severity.RED
+        return Severity.OVER
     if ratio >= _YELLOW:
-        return Severity.YELLOW
-    return Severity.GREEN
+        return Severity.TIGHT
+    return Severity.AMPLE
 
 
 def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
@@ -281,20 +380,31 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
 
             batch_size = _max_int(entry.get("batch_size"), 32)
             epochs = _max_int(entry.get("num_train_epochs"), 1 if mode == "inference" else 10)
+            seq_len = _max_int(entry.get("max_length"), _DEFAULT_SEQ_LEN)
 
-            vram = _vram_for_transformer(meta, mode, mixed_precision)
+            vram = _vram_for_transformer(meta, mode, mixed_precision, batch_size=batch_size, seq_len=seq_len)
             ram = _ram_for_module(meta, stats)
 
-            time_h = 0.0
-            if mode != "inference":
-                time_h = _time_for_transformer(
-                    meta=meta,
-                    n_trials=n_trials,
-                    epochs=epochs,
-                    batch_size=batch_size,
-                    n_samples=stats.n_samples,
-                    device_class=hardware.device_class,
+            driver_max_batch: int | None = None
+            if hardware.vram_gb > 0:
+                weights_vram = _weights_vram_for_transformer(meta, mode)
+                per_sample_gb = _activations_gb_per_sample(
+                    meta, seq_len, mixed_precision=mixed_precision, is_training=mode != "inference"
                 )
+                driver_max_batch = _max_fitting_batch_size(
+                    weight_vram_gb=weights_vram,
+                    vram_budget_gb=hardware.vram_gb,
+                    per_sample_gb=per_sample_gb,
+                )
+
+            time_h = _time_for_transformer(
+                meta=meta,
+                n_trials=n_trials,
+                epochs=epochs,
+                batch_size=batch_size,
+                n_samples=stats.n_samples,
+                device_class=hardware.device_class,
+            )
             if refit_after and mode != "inference":
                 time_h *= 1 + 1.0 / max(1, n_trials)
 
@@ -311,6 +421,8 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
                     "vram_gb": round(vram, 2),
                     "ram_gb": round(ram, 2),
                     "time_hours": round(time_h, 2),
+                    "batch_size": batch_size,
+                    "max_batch_size": driver_max_batch,
                     "confidence": meta.confidence,
                 }
             )
@@ -381,6 +493,8 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
                 "vram_gb": round(vram, 2),
                 "ram_gb": round(ram, 2),
                 "time_hours": round(time_h, 2),
+                "batch_size": None,
+                "max_batch_size": None,
                 "confidence": confidence,
             }
         )
@@ -409,7 +523,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
     if hardware.accelerator == "cpu" and effective_vram > 0:
         report.add(
             "resource",
-            Severity.YELLOW,
+            Severity.TIGHT,
             f"No GPU detected; transformer modules will be very slow (worst case ~{estimate.time_hours:.1f} h).",
             metric="vram",
         )
@@ -419,6 +533,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             msg += f" (= per-trial {estimate.vram_gb:.1f} GB × {n_jobs} parallel trials)"
         msg += f" vs available {hardware.vram_gb:.1f} GB"
         report.add("resource", vram_sev, msg, metric="vram")
+
 
     ram_sev = _classify_severity(estimate.ram_gb, hardware.ram_gb)
     report.add(
@@ -440,7 +555,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
 
     if estimate.time_hours > 0:
         time_msg = f"Time ~{estimate.time_hours:.1f} h (worst case, no HPO pruning)"
-        report.add("resource", Severity.GREEN, time_msg, metric="time")
+        report.add("resource", Severity.AMPLE, time_msg, metric="time")
 
 
 def _config_phase(
@@ -454,7 +569,7 @@ def _config_phase(
     if n_jobs > 1 and hardware.accelerator in {"cuda", "mps"}:
         report.add(
             "config",
-            Severity.YELLOW,
+            Severity.TIGHT,
             f"hpo_config.n_jobs={n_jobs} on a single GPU multiplies VRAM demand by {n_jobs}×.",
         )
 
@@ -466,7 +581,7 @@ def _config_phase(
     if uses_catboost_gpu and hardware.accelerator != "cuda":
         report.add(
             "config",
-            Severity.YELLOW,
+            Severity.TIGHT,
             "CatBoost task_type=GPU configured but no CUDA detected — will fall back to CPU.",
         )
 
@@ -484,7 +599,7 @@ def _data_phase(
             continue
         max_len = _max_int(max_len_value, 512)
         if p95 > max_len:
-            severity = Severity.RED if p95 > max_len * 1.5 else Severity.YELLOW
+            severity = Severity.OVER if p95 > max_len * 1.5 else Severity.TIGHT
             report.add(
                 "data",
                 severity,
@@ -496,7 +611,7 @@ def _data_phase(
     if has_linear and stats.rare_classes:
         report.add(
             "data",
-            Severity.RED,
+            Severity.OVER,
             (f"LogisticRegressionCV (cv=3) will fail: classes {stats.rare_classes[:5]} have <3 samples."),
         )
 
@@ -507,7 +622,7 @@ def _data_phase(
     if has_description and stats.has_descriptions is False:
         report.add(
             "data",
-            Severity.RED,
+            Severity.OVER,
             "description scorer present but intent descriptions are missing — fill them in or drop the scorer.",
         )
 
