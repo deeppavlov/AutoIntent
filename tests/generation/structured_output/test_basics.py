@@ -64,9 +64,7 @@ def _chat_completion_response(content: str) -> httpx.Response:
 @pytest.fixture
 def generator(respx_openai: MockRouter) -> Generator:
     """Create a generator instance for testing."""
-    # reason: Generator.__init__ types **generation_params as dict[str, Any] (src bug:
-    # should be Any). int kwargs are valid at runtime; flagged for Phase C.
-    return Generator(max_tokens=1000, use_cache=False)  # type: ignore[arg-type]
+    return Generator(max_tokens=1000, use_cache=False)
 
 
 class TestStructuredOutput:

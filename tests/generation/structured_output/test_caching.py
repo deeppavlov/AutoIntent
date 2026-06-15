@@ -48,15 +48,12 @@ def _resp(name: str, value: int) -> httpx.Response:
 
 @pytest.fixture
 def generator_with_cache(respx_openai: MockRouter) -> Generator:
-    # reason: Generator.__init__ types **generation_params as dict[str, Any] (src bug:
-    # should be Any). int kwargs are valid at runtime; flagged for Phase C.
-    return Generator(max_tokens=1000, use_cache=True, temperature=2)  # type: ignore[arg-type]
+    return Generator(max_tokens=1000, use_cache=True, temperature=2)
 
 
 @pytest.fixture
 def generator_without_cache(respx_openai: MockRouter) -> Generator:
-    # reason: same Generator src bug as above.
-    return Generator(max_tokens=1000, use_cache=False, temperature=2)  # type: ignore[arg-type]
+    return Generator(max_tokens=1000, use_cache=False, temperature=2)
 
 
 @pytest.mark.asyncio

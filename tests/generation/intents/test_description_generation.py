@@ -89,7 +89,7 @@ async def test_create_intent_description_basic() -> None:
     )
 
     description = await create_intent_description(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_name="Greeting",
         utterances=utterances,
         prompt=prompt,
@@ -111,7 +111,7 @@ async def test_create_intent_description_empty_intent_name() -> None:
     )
 
     description = await create_intent_description(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_name=None,
         utterances=utterances,
         prompt=prompt,
@@ -133,7 +133,7 @@ async def test_create_intent_description_empty_utterances_patterns() -> None:
     )
 
     description = await create_intent_description(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_name="Greeting",
         utterances=utterances,
         prompt=prompt,
@@ -156,7 +156,7 @@ async def test_create_intent_description_large_utterances_patterns() -> None:
 
     with patch("random.sample", side_effect=lambda x, k: x[:k]) as mock_sample:
         description = await create_intent_description(
-            client=cast("Generator", client),
+            client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
             intent_name="Greeting",
             utterances=utterances,
             prompt=prompt,
@@ -182,7 +182,7 @@ async def test_generate_intent_descriptions_basic() -> None:
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -213,7 +213,7 @@ async def test_generate_intent_descriptions_skip_existing_descriptions() -> None
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -238,7 +238,7 @@ async def test_generate_intent_descriptions_empty_utterances_patterns() -> None:
         user_text="Describe intent {intent_name} with examples: {user_utterances}",
     )
     updated_intents = await generate_intent_descriptions(
-        client=cast("Generator", client),
+        client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
         intent_utterances=intent_utterances,
         intents=intents,
         prompt=prompt,
@@ -288,7 +288,7 @@ def test_enhance_dataset_with_descriptions_basic() -> None:
         )
         enhanced_dataset = generate_descriptions(
             dataset=dataset,
-            client=cast("Generator", client),
+            client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
             prompt=prompt,
         )
         expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
@@ -334,7 +334,7 @@ def test_enhance_dataset_with_existing_descriptions() -> None:
         )
         enhanced_dataset = generate_descriptions(
             dataset=dataset,
-            client=cast("Generator", client),
+            client=cast("Generator", client),  # reason: AsyncMock substituted for Generator dependency
             prompt=prompt,
         )
         expected_intent_utterances = defaultdict(list, {0: ["Hello"], 1: ["Goodbye"]})
