@@ -6,21 +6,25 @@ import sys
 import tempfile
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import FaissConfig, OpenSearchConfig, TaskTypeEnum, VectorIndexConfig
+from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
+from autointent.configs import (
+    FaissConfig,
+    HashingVectorizerEmbeddingConfig,
+    OpenSearchConfig,
+    TaskTypeEnum,
+    VectorIndexConfig,
+)
 from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
     from types import ModuleType
-
-    from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
-    from autointent.configs import HashingVectorizerEmbeddingConfig
 
 
 def _docker_available() -> bool:
@@ -278,8 +282,8 @@ class TestVectorIndex:
 
             # Check that loaded index works with overridden config.
             # EmbedderConfig is a union; n_features is on HashingVectorizerEmbeddingConfig only.
-            loaded_cfg = cast("HashingVectorizerEmbeddingConfig", loaded_index.embedder.config)
-            assert loaded_cfg.n_features == 512
+            assert isinstance(loaded_index.embedder.config, HashingVectorizerEmbeddingConfig)
+            assert loaded_index.embedder.config.n_features == 512
 
     def test_error_handling_mismatched_lengths(self, vector_index: VectorIndex) -> None:
         """Test error handling when texts and labels have different lengths."""
@@ -307,8 +311,8 @@ class TestVectorIndex:
             # Index name should be auto-generated if not provided.
             # vector_index.index is typed as BaseIndexBackend, but OpenSearchConfig implies
             # the concrete OpenSearchBackend (which has the index_name property).
-            opensearch_index = cast("OpenSearchBackend", vector_index.index)
-            assert opensearch_index.index_name is not None
+            assert isinstance(vector_index.index, OpenSearchBackend)
+            assert vector_index.index.index_name is not None
 
 
 class TestVectorIndexEdgeCases:
