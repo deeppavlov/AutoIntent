@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import tempfile
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import KNNScorer
+from tests._helpers import is_strict_labels
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 
 def test_base_knn(dataset: Dataset) -> None:
@@ -28,8 +28,10 @@ def test_base_knn(dataset: Dataset) -> None:
         "can you tell me why is my bank account frozen",
     ]
 
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
     predictions = scorer.predict(test_data)
     assert (
         predictions

@@ -63,8 +63,11 @@ def test_gcn_scorer_multilabel(multilabel_dataset: Dataset) -> None:
     )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
-    # cast: test fixtures set intent.name explicitly, so the list never contains None.
-    descriptions = cast("list[str]", [intent.name for intent in multilabel_dataset.intents])
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multilabel_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
 
     scorer.fit(train_utterances, train_labels, descriptions)
     test_utterances = ["test 1", "test 2"]
@@ -85,8 +88,11 @@ def test_gcn_scorer_multiclass(multiclass_dataset: Dataset) -> None:
     )
     train_utterances = multiclass_dataset["train"]["utterance"]
     train_labels = multiclass_dataset["train"]["label"]
-    # cast: test fixtures set intent.name explicitly, so the list never contains None.
-    descriptions = cast("list[str]", [intent.name for intent in multiclass_dataset.intents])
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multiclass_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
 
     scorer.fit(train_utterances, train_labels, descriptions)
     test_utterances = ["test 1", "test 2"]
@@ -108,8 +114,11 @@ def test_gcn_scorer_dump_load(tmp_path: Path, multilabel_dataset: Dataset) -> No
     )
     train_utterances = multilabel_dataset["train"]["utterance"]
     train_labels = multilabel_dataset["train"]["label"]
-    # cast: test fixtures set intent.name explicitly, so the list never contains None.
-    descriptions = cast("list[str]", [intent.name for intent in multilabel_dataset.intents])
+    # test fixtures set intent.name explicitly, so the list never contains None.
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    raw_descriptions = [intent.name for intent in multilabel_dataset.intents]
+    assert all(d is not None for d in raw_descriptions)
+    descriptions = cast("list[str]", raw_descriptions)
     scorer.fit(train_utterances, train_labels, descriptions)
 
     test_utterances = ["test utterance 1"]

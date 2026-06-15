@@ -12,12 +12,12 @@ from autointent import Pipeline
 from autointent.configs import HFModelConfig
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import BERTLoRAScorer
+from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 pytest.importorskip("peft")
 
@@ -30,8 +30,10 @@ def test_lora_scorer_dump_load(dataset: Dataset) -> None:
 
     # Create and train scorer
     scorer_original = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer_original.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer_original.fit(data_handler.train_utterances(0), labels)
 
     # Test data
     test_data = [
@@ -75,8 +77,10 @@ def test_lora_prediction(dataset: Dataset) -> None:
 
     scorer = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
 
     test_data = [
         "why is there a hold on my american saving bank account",
@@ -116,8 +120,10 @@ def test_lora_cache_clearing(dataset: Dataset) -> None:
 
     scorer = BERTLoRAScorer(classification_model_config=_config, num_train_epochs=1, batch_size=8)
 
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
 
     test_data = ["test text"]
 

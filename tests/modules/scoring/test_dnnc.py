@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import tempfile
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -9,10 +9,10 @@ import pytest
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import DNNCScorer
+from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 pytest.importorskip("sentence_transformers")
 
@@ -27,8 +27,10 @@ def test_base_dnnc(dataset: Dataset, train_head: bool, pred_score: int) -> None:
         k=3,
     )
 
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
     test_data = [
         "why is there a hold on my american saving bank account",
         "i am nost sure why my account is blocked",

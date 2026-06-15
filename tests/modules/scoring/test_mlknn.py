@@ -1,26 +1,28 @@
 from __future__ import annotations
 
 import tempfile
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import MLKnnScorer
+from tests._helpers import is_strict_labels
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 
 def test_base_mlknn(dataset: Dataset) -> None:
     data_handler = DataHandler(dataset.to_multilabel())
 
     scorer = MLKnnScorer(embedder_config=get_test_embedder_config(), k=3)
-    # cast: tests use the non-OOS clinc_subset, so train_labels never returns None entries.
-    scorer.fit(data_handler.train_utterances(0), cast("ListOfLabels", data_handler.train_labels(0)))
+    # tests use the non-OOS clinc_subset, so train_labels never returns None entries.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels)
 
     test_data = [
         "why is there a hold on my american saving bank account",

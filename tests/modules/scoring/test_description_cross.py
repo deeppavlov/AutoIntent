@@ -9,12 +9,12 @@ import pytest
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import CrossEncoderDescriptionScorer
+from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
     import numpy.typing as npt
 
     from autointent import Dataset
-    from autointent.custom_types import ListOfLabels
 
 pytest.importorskip("sentence_transformers")
 
@@ -37,11 +37,16 @@ def test_description_scorer_cross_encoder(
         cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2", temperature=0.3, multilabel=multilabel
     )
 
-    # cast: clinc_subset has descriptions defined for every intent, and uses non-OOS labels.
+    # clinc_subset has descriptions defined for every intent, and uses non-OOS labels.
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    descriptions = data_handler.intent_descriptions
+    # Pattern C: mypy cannot narrow list[str | None] from `all(...)` alone; keep the cast.
+    assert all(d is not None for d in descriptions)
     scorer.fit(
         data_handler.train_utterances(0),
-        cast("ListOfLabels", data_handler.train_labels(0)),
-        cast("list[str]", data_handler.intent_descriptions),
+        labels,
+        cast("list[str]", descriptions),
     )
     assert scorer._description_texts is not None
     assert len(scorer._description_texts) == len(data_handler.intent_descriptions)
