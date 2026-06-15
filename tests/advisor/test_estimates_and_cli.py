@@ -150,7 +150,7 @@ def test_partial_descriptions_with_description_scorer_flags_red() -> None:
             {
                 "node_type": "scoring",
                 "search_space": [
-                    {"module_name": "description"},
+                    {"module_name": "description_bi"},
                 ],
             }
         ],

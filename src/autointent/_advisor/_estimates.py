@@ -12,15 +12,49 @@ import logging
 from collections.abc import Iterable
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from autointent.configs._optimization import HPOConfig
+
 from ._hardware import HardwareProfile
 from ._hub import ModelMeta, hub_reachable, resolve_model
 from ._report import DatasetStats, PreflightReport, ResourceEstimate, Severity
 
 logger = logging.getLogger(__name__)
 
-# yellow / red thresholds as fraction of available budget
-_YELLOW = 0.7
-_RED = 1.0
+
+class _AdvisorConfig(BaseModel):
+    """Validated view of the advisor's input config.
+
+    Wraps the four top-level keys the phase helpers read. Unknown top-level
+    keys are ignored (preset YAMLs carry extra metadata the advisor doesn't model).
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    hpo_config: HPOConfig = Field(default_factory=HPOConfig)
+    search_space: list[dict[str, Any]] = Field(default_factory=list)
+    refit_after: bool = False
+    dump_modules: bool = False
+    embedder_config: dict[str, Any] | None = None
+
+
+def _validated_config(config: dict[str, Any]) -> _AdvisorConfig:
+    """Validate ``config`` against ``_AdvisorConfig``; fall back to defaults on any error.
+
+    The advisor is best-effort: a malformed user config should still produce a
+    report (with placeholder costs) rather than crashing.
+    """
+    try:
+        return _AdvisorConfig.model_validate(config)
+    except ValidationError as e:
+        logger.warning("Advisor config failed validation; falling back to defaults: %s", e)
+        return _AdvisorConfig()
+
+# Severity thresholds as a fraction of available budget: at or above _TIGHT
+# downgrades to Severity.TIGHT; at or above _OVER downgrades to Severity.OVER.
+_TIGHT_RATIO = 0.7
+_OVER_RATIO = 1.0
 
 # rough per-step seconds, keyed on device class. Scaled by params_millions / 100.
 _PER_STEP_BASELINE_S = {
@@ -31,7 +65,14 @@ _PER_STEP_BASELINE_S = {
     "apple-silicon": 0.08,
 }
 
-TRANSFORMER_SCORER_MODULES = {"bert", "lora", "ptuning", "dnnc"}
+# Maps each fine-tunable transformer module to its training-mode label.
+# Modules not listed are treated as inference-only.
+_TRANSFORMER_TRAINING_MODE = {
+    "bert": "full-finetune",
+    "ptuning": "lora",
+    "lora": "lora",
+    "dnnc": "reranker",
+}
 
 # Fallback max_length when the search-space entry doesn't pin it. Used both as
 # the default in _vram_for_transformer and in the entry-walk seq_len resolution.
@@ -81,14 +122,6 @@ def _max_int(value: Any, default: int) -> int:
         return default
 
 
-def _walk_modules(search_space: list[dict[str, Any]]) -> Iterable[tuple[str, dict[str, Any]]]:
-    """Yield (node_type, module_entry) pairs."""
-    for node in search_space or []:
-        node_type = node.get("node_type", "?")
-        for entry in node.get("search_space", []) or []:
-            yield node_type, entry
-
-
 def _walk_modules_indexed(
     search_space: list[dict[str, Any]],
 ) -> Iterable[tuple[int, str, dict[str, Any]]]:
@@ -97,6 +130,12 @@ def _walk_modules_indexed(
         node_type = node.get("node_type", "?")
         for entry in node.get("search_space", []) or []:
             yield node_idx, node_type, entry
+
+
+def _walk_modules(search_space: list[dict[str, Any]]) -> Iterable[tuple[str, dict[str, Any]]]:
+    """Yield (node_type, module_entry) pairs — index-agnostic view over `_walk_modules_indexed`."""
+    for _, node_type, entry in _walk_modules_indexed(search_space):
+        yield node_type, entry
 
 
 def _weights_vram_for_transformer(meta: ModelMeta, mode: str) -> float:
@@ -211,7 +250,7 @@ def _max_fitting_batch_size(
     """
     if per_sample_gb <= 0:
         return 0
-    target_vram = vram_budget_gb * _YELLOW
+    target_vram = vram_budget_gb * _TIGHT_RATIO
     available_for_activations = target_vram - weight_vram_gb
     if available_for_activations <= 0:
         return 0
@@ -309,12 +348,14 @@ def _time_for_transformer(
 
 
 def _classify_severity(estimate: float, budget: float) -> Severity:
+    if estimate <= 0:
+        return Severity.AMPLE
     if budget <= 0:
         return Severity.TIGHT
     ratio = estimate / budget
-    if ratio >= _RED:
+    if ratio >= _OVER_RATIO:
         return Severity.OVER
-    if ratio >= _YELLOW:
+    if ratio >= _TIGHT_RATIO:
         return Severity.TIGHT
     return Severity.AMPLE
 
@@ -325,28 +366,27 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
     hardware: HardwareProfile,
     report: PreflightReport,
 ) -> None:
-    hpo = config.get("hpo_config") or {}
-    n_trials = int(hpo.get("n_trials", 1))
-    n_jobs = int(hpo.get("n_jobs", 1))
-    refit_after = bool(config.get("refit_after", False))
-    dump_modules = bool(config.get("dump_modules", False))
+    cfg = _validated_config(config)
+    n_trials = max(1, cfg.hpo_config.n_trials)
+    n_jobs = max(1, cfg.hpo_config.n_jobs)
+    refit_after = cfg.refit_after
+    dump_modules = cfg.dump_modules
 
     if not hub_reachable():
         report.low_confidence = True
         report.notes.append("HF Hub unreachable — all model sizes are name-pattern heuristics.")
 
     seen_models: dict[str, ModelMeta] = {}
-    estimate = ResourceEstimate(parallel_factor=max(1, n_jobs))
+    estimate = ResourceEstimate(parallel_factor=n_jobs)
 
-    embedder_cfg = config.get("embedder_config") or {}
-    global_embedder = embedder_cfg.get("model_name") if isinstance(embedder_cfg, dict) else None
+    global_embedder = (cfg.embedder_config or {}).get("model_name")
     if global_embedder:
         seen_models[global_embedder] = resolve_model(global_embedder)
 
     # First pass: walk transformer-bearing modules (collects seen_models for embedder_dim lookup).
     transformer_entries: list[tuple[int, str, dict[str, Any]]] = []
     classic_entries: list[tuple[int, str, dict[str, Any]]] = []
-    for node_idx, node_type, entry in _walk_modules_indexed(config.get("search_space") or []):
+    for node_idx, node_type, entry in _walk_modules_indexed(cfg.search_space):
         module = entry.get("module_name", "?")
         if module in {"linear", "catboost"}:
             classic_entries.append((node_idx, node_type, entry))
@@ -367,16 +407,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             meta = seen_models.setdefault(name, resolve_model(name))
 
             mixed_precision = entry.get("dtype") in {"fp16", "bf16"}
-            if module == "bert":
-                mode = "full-finetune"
-            elif module == "lora":
-                mode = "lora"
-            elif module == "dnnc":
-                mode = "reranker"
-            elif module == "ptuning":
-                mode = "full-finetune"
-            else:
-                mode = "inference"
+            mode = _TRANSFORMER_TRAINING_MODE.get(module, "inference")
 
             batch_size = _max_int(entry.get("batch_size"), 32)
             epochs = _max_int(entry.get("num_train_epochs"), 1 if mode == "inference" else 10)
@@ -430,7 +461,11 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
     # Second pass: linear / catboost — cost depends on embedder_dim, not a checkpoint.
     embedder_meta = _largest_embedder(seen_models)
     embedder_dim = _embedder_dim(embedder_meta)
-    class_multiplier_classic = max(1, stats.n_classes) if stats.multilabel else 1
+    # Both multinomial (multiclass) and one-vs-rest (multilabel) LR scale linearly in n_classes;
+    # the multiclass path additionally pays the LogisticRegressionCV inner-fit multiplier.
+    class_multiplier_classic = max(1, stats.n_classes)
+    confidence = embedder_meta.confidence if embedder_meta else "heuristic"
+    embedder_label = embedder_meta.name if embedder_meta else "(no embedder)"
     for _node_idx, node_type, entry in classic_entries:
         module = entry.get("module_name", "?")
         if module == "linear":
@@ -449,14 +484,14 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
                 time_h *= 1 + 1.0 / max(1, n_trials)
             vram = 0.0
             mode = "linear-cv" if cv_multiplier > 1 else "linear"
-            confidence = embedder_meta.confidence if embedder_meta else "heuristic"
         elif module == "catboost":
             iterations = _max_int(entry.get("iterations"), 1000)
             depth = _max_int(entry.get("depth"), 6)
             on_gpu = entry.get("task_type") == "GPU" and hardware.accelerator == "cuda"
-            # CatBoost's multiclass MultiClass loss already grows per-class trees.
-            cb_class_mult = max(1, stats.n_classes)
-            ram = _ram_for_catboost(
+            # CatBoost's MultiClass loss grows per-class trees only above binary;
+            # binary uses Logloss with one tree per iteration.
+            cb_class_mult = max(1, stats.n_classes) if stats.n_classes > 2 or stats.multilabel else 1
+            ram_total = _ram_for_catboost(
                 stats=stats,
                 n_features=embedder_dim,
                 iterations=iterations,
@@ -473,11 +508,8 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             )
             if refit_after:
                 time_h *= 1 + 1.0 / max(1, n_trials)
-            vram = ram if on_gpu else 0.0
-            if on_gpu:
-                ram = 0.0
+            vram, ram = (ram_total, 0.0) if on_gpu else (0.0, ram_total)
             mode = "catboost-gpu" if on_gpu else "catboost"
-            confidence = embedder_meta.confidence if embedder_meta else "heuristic"
         else:
             continue
 
@@ -488,7 +520,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             {
                 "node_type": node_type,
                 "module": module,
-                "model": embedder_meta.name if embedder_meta else "(no embedder)",
+                "model": embedder_label,
                 "mode": mode,
                 "vram_gb": round(vram, 2),
                 "ram_gb": round(ram, 2),
@@ -515,6 +547,9 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
         effective_vram = estimate.vram_gb * n_jobs
     else:
         effective_vram = estimate.vram_gb
+    # MPS shares one unified pool: parallel workers each allocate weights+activations
+    # in RAM, so peak RAM also scales with n_jobs on Apple Silicon.
+    effective_ram = estimate.ram_gb * n_jobs if n_jobs > 1 and hardware.accelerator == "mps" else estimate.ram_gb
 
     report.resource = estimate
 
@@ -535,11 +570,11 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
         report.add("resource", vram_sev, msg, metric="vram")
 
 
-    ram_sev = _classify_severity(estimate.ram_gb, hardware.ram_gb)
+    ram_sev = _classify_severity(effective_ram, hardware.ram_gb)
     report.add(
         "resource",
         ram_sev,
-        f"RAM ~{estimate.ram_gb:.1f} GB vs available {hardware.ram_gb:.1f} GB",
+        f"RAM ~{effective_ram:.1f} GB vs available {hardware.ram_gb:.1f} GB",
         metric="ram",
     )
 
@@ -606,9 +641,10 @@ def _data_phase(
                 f"Train tokens p95~{p95} exceeds {entry.get('module_name', '?')}.max_length={max_len}; expect silent truncation.",
             )
 
-    # rare class × linear-CV
+    # rare class × linear-CV (LogisticRegressionCV cv=3 needs ≥3 samples/class;
+    # multilabel path uses one-vs-rest without CV so the failure can't occur there)
     has_linear = any(e.get("module_name") == "linear" for _, e in _walk_modules(config.get("search_space") or []))
-    if has_linear and stats.rare_classes:
+    if has_linear and stats.rare_classes and not stats.multilabel:
         report.add(
             "data",
             Severity.OVER,
@@ -616,8 +652,9 @@ def _data_phase(
         )
 
     # partial descriptions × description scorer
+    description_modules = {"description_bi", "description_cross", "description_llm"}
     has_description = any(
-        e.get("module_name") == "description" for _, e in _walk_modules(config.get("search_space") or [])
+        e.get("module_name") in description_modules for _, e in _walk_modules(config.get("search_space") or [])
     )
     if has_description and stats.has_descriptions is False:
         report.add(

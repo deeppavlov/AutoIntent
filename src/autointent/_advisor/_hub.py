@@ -76,7 +76,7 @@ def _is_warm_cached(model_name: str) -> bool:
     weight_files = ["model.safetensors", "pytorch_model.bin", "model.safetensors.index.json"]
     for fname in weight_files:
         path = try_to_load_from_cache(model_name, fname)
-        if path is not None and path is not False:
+        if isinstance(path, str):
             return True
 
     # sharded models won't match the single-file probe; fall back to a scan
@@ -114,11 +114,17 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
         if size:
             total_file_bytes += int(size)
 
+    # Track whether either size came from the Hub or from the name-pattern fallback;
+    # if any field was filled by heuristic, downgrade confidence so the report flips
+    # low_confidence rather than misreporting hub-grade accuracy.
+    confidence = "hub"
     if params_millions == 0:
         params_millions = _heuristic_params_millions(model_name)
+        confidence = "heuristic"
 
     if total_file_bytes == 0:
         total_file_bytes = int(params_millions * 1_000_000 * weight_bytes_per_param)
+        confidence = "heuristic"
 
     return ModelMeta(
         name=model_name,
@@ -126,7 +132,7 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
         weight_bytes_per_param=weight_bytes_per_param,
         total_file_bytes=total_file_bytes,
         cached_locally=_is_warm_cached(model_name),
-        confidence="hub",
+        confidence=confidence,
     )
 
 

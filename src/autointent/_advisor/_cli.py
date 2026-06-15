@@ -5,9 +5,10 @@ Two subcommands:
 * ``inspect`` — show what a given preset / config will cost on this machine.
 * ``recommend`` — pick the best-fitting bundled preset for this machine.
 
-Both subcommands accept either a real ``--dataset`` (path to load with
-``Dataset.from_*`` constructors) or ``--n-samples / --n-classes / --avg-tokens``
-placeholders so the script is useful before the user has built a dataset.
+Both subcommands accept either a real ``--dataset`` (Hub id or local
+csv/json/jsonl/parquet path loaded via ``datasets.load_dataset``) or
+``--n-samples / --n-classes / --avg-tokens`` placeholders so the script is
+useful before the user has built a dataset.
 """
 
 from __future__ import annotations
@@ -19,8 +20,8 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from datasets import ClassLabel, Sequence, load_dataset
 
-from autointent import Dataset
 from autointent.utils import load_preset
 
 from ._estimates import run_preflight
@@ -79,33 +80,105 @@ def _stats_from_args(args: argparse.Namespace) -> DatasetStats:
     )
 
 
+_UTTERANCE_COLS = ("utterance", "text", "sentence", "query", "input")
+_LABEL_COLS = ("label", "labels", "intent", "target")
+# Map file extension → datasets builder name. Anything else is treated as a Hub
+# repo id or a directory and passed to load_dataset directly.
+_FILE_BUILDERS = {".csv": "csv", ".tsv": "csv", ".json": "json", ".jsonl": "json", ".parquet": "parquet"}
+
+
 def _stats_from_dataset(path: str, *, multilabel: bool) -> DatasetStats:
-    """Best-effort: load a dataset from disk via the existing Dataset constructor."""
+    """Best-effort: load via HF ``datasets.load_dataset``.
+
+    Accepts a Hub repo id ('DeepPavlov/clinc150') or a local file path
+    (.csv / .json / .jsonl / .parquet) / dataset directory. Falls back to a
+    placeholder on any loader error so the advisor stays best-effort.
+    """
+    builder = _FILE_BUILDERS.get(Path(path).suffix.lower())
     try:
-        ds = Dataset.from_json(path) if path.endswith(".json") else Dataset.from_hub(path)
-    except (OSError, ValueError) as e:
+        ds = load_dataset(builder, data_files=path) if builder else load_dataset(path)
+    except (OSError, ValueError, FileNotFoundError) as e:
         logger.warning("Failed to load dataset %s: %s", path, e)
         return DatasetStats.placeholder(multilabel=multilabel)
 
-    train = ds.get("train") or next(iter(ds.values()), None)
+    train = ds["train"] if "train" in ds else next(iter(ds.values()), None)
     if train is None:
         return DatasetStats.placeholder(multilabel=multilabel)
 
-    utt_col = getattr(ds, "utterance_feature", "utterance")
+    cols = train.column_names
+    utt_col = next((c for c in _UTTERANCE_COLS if c in cols), cols[0] if cols else None)
+    label_col = next((c for c in _LABEL_COLS if c in cols), None)
+
+    detected_multilabel, n_classes = _label_shape(train, label_col, fallback_multilabel=multilabel)
+
     sample = train[:1000] if len(train) > 1000 else train[:]
-    lengths = [len(str(s).split()) for s in sample.get(utt_col, [])]
+    lengths = [len(str(s).split()) for s in (sample.get(utt_col, []) if utt_col else [])]
     avg_tokens = int(sum(lengths) / max(1, len(lengths))) if lengths else 32
-    p95 = sorted(lengths)[int(len(lengths) * 0.95)] if lengths else avg_tokens * 2
+    if lengths:
+        sorted_lengths = sorted(lengths)
+        idx = max(0, min(len(sorted_lengths) - 1, int(round((len(sorted_lengths) - 1) * 0.95))))
+        p95 = sorted_lengths[idx]
+    else:
+        p95 = avg_tokens * 2
 
     return DatasetStats(
         n_samples=len(train),
-        n_classes=getattr(ds, "n_classes", 0) or 0,
+        n_classes=n_classes,
         avg_tokens=avg_tokens,
         p95_tokens=p95,
-        multilabel=getattr(ds, "multilabel", multilabel),
-        has_descriptions=getattr(ds, "has_descriptions", None),
+        multilabel=detected_multilabel,
+        has_descriptions=None,
+        rare_classes=_rare_classes(train, label_col, detected_multilabel, n_classes) if label_col else [],
         source=f"dataset:{path}",
     )
+
+
+def _label_shape(train: Any, label_col: str | None, *, fallback_multilabel: bool) -> tuple[bool, int]:
+    """Derive (multilabel, n_classes) from the HF feature schema, with a value-based fallback."""
+    if label_col is None:
+        return fallback_multilabel, 0
+    feature = train.features.get(label_col)
+    if isinstance(feature, Sequence):
+        inner = feature.feature
+        if isinstance(inner, ClassLabel):
+            return True, inner.num_classes
+        # Sequence of plain ints — n_classes = max label index + 1.
+        max_idx = max((max(row) for row in train[label_col] if row), default=-1)
+        return True, max_idx + 1
+    if isinstance(feature, ClassLabel):
+        return False, feature.num_classes
+    # Plain int/string column. Detect multilabel from the first non-empty row, then count uniques.
+    is_multi = len(train) > 0 and isinstance(train[0][label_col], (list, tuple))
+    if is_multi:
+        max_idx = max((max(row) for row in train[label_col] if row), default=-1)
+        return True, max_idx + 1
+    return False, len({label for label in train[label_col] if label is not None})
+
+
+def _rare_classes(train: Any, label_col: str, multilabel: bool, n_classes: int, min_count: int = 3) -> list[str]:
+    """Return labels with fewer than ``min_count`` samples in the train split.
+
+    Used to surface the LogisticRegressionCV(cv=3) failure case before fit.
+    Returns an empty list on any error so the advisor stays best-effort.
+    """
+    try:
+        labels = train[label_col]
+    except (KeyError, AttributeError, TypeError):
+        return []
+    counts: dict[str, int] = {}
+    if multilabel:
+        for row in labels:
+            if not row:
+                continue
+            for i, v in enumerate(row):
+                if v:
+                    counts[str(i)] = counts.get(str(i), 0) + 1
+        for i in range(n_classes):
+            counts.setdefault(str(i), 0)
+    else:
+        for label in labels:
+            counts[str(label)] = counts.get(str(label), 0) + 1
+    return sorted(name for name, c in counts.items() if c < min_count)
 
 
 def _add_common_dataset_args(p: argparse.ArgumentParser) -> None:
