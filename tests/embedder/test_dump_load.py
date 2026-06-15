@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-from sentence_transformers import SentenceTransformer
 
 from autointent._wrappers.embedder import Embedder
 from autointent.configs import SentenceTransformerEmbeddingConfig
+from tests.conftest import tiny_sentence_transformer
 
 from .conftest import backend_configs
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 def test_load_from_disk(on_windows):
     """Test loading embedder from disk with custom saved model."""
-    model = SentenceTransformer("sergeyzh/rubert-tiny-turbo")
+    model = tiny_sentence_transformer()
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as tmp_dir:
         model.save(str(Path(tmp_dir) / "weights"))

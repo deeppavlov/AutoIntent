@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 import numpy as np
@@ -9,12 +8,8 @@ from autointent.context.data_handler import DataHandler
 from autointent.modules import LLMDescriptionScorer
 
 
-@pytest.mark.skipif(
-    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
-    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
-)
 @pytest.mark.parametrize("multilabel", [True, False])
-def test_description_scorer_llm(dataset, multilabel):
+def test_description_scorer_llm(dataset, multilabel, patch_llm_scorer_generator):
     if multilabel:
         dataset = dataset.to_multilabel()
     data_handler = DataHandler(dataset)
@@ -45,6 +40,23 @@ def test_description_scorer_llm(dataset, multilabel):
     assert len(predictions) == len(test_utterances)
     assert metadata is None
 
+
+@pytest.mark.parametrize("multilabel", [True, False])
+def test_description_scorer_llm_dump_load_roundtrip(dataset, multilabel, patch_llm_scorer_generator):
+    if multilabel:
+        dataset = dataset.to_multilabel()
+    data_handler = DataHandler(dataset)
+
+    scorer = LLMDescriptionScorer(temperature=0.3, generator_config={"temperature": 0}, multilabel=multilabel)
+    scorer.fit(
+        data_handler.train_utterances(0),
+        data_handler.train_labels(0),
+        data_handler.intent_descriptions,
+    )
+
+    test_utterances = ["What is the balance on my account?", "How do I reset my online banking password?"]
+    predictions = scorer.predict(test_utterances)
+
     with tempfile.TemporaryDirectory() as temp_dir:
         scorer.dump(temp_dir)
         del scorer
@@ -53,11 +65,7 @@ def test_description_scorer_llm(dataset, multilabel):
         np.testing.assert_almost_equal(predictions, new_predictions, decimal=5)
 
 
-@pytest.mark.skipif(
-    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
-    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
-)
-def test_llm_description_in_pipeline(dataset):
+def test_llm_description_in_pipeline(dataset, patch_llm_scorer_generator):
     """Test LLMDescriptionScorer as part of an AutoML pipeline."""
     search_space = [
         {

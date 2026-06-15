@@ -1,8 +1,9 @@
 """Tests for structured output functionality."""
 
-import os
+import json
 from typing import Literal
 
+import httpx
 import pytest
 from pydantic import BaseModel, Field
 
@@ -21,51 +22,79 @@ class Person(BaseModel):
     hobbies: list[str] = Field(description="List of the person's hobbies and interests")
 
 
+VALID_PERSON_JSON = json.dumps(
+    {
+        "reasoning": "ok",
+        "name": "Alice Example",
+        "age": 30,
+        "email": "alice@example.com",
+        "occupation": "engineer",
+        "is_active": True,
+        "status": "active",
+        "hobbies": ["reading"],
+    }
+)
+
+
+def _chat_completion_response(content: str) -> httpx.Response:
+    return httpx.Response(
+        200,
+        json={
+            "id": "chatcmpl-test",
+            "object": "chat.completion",
+            "created": 0,
+            "model": "gpt-test",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {"role": "assistant", "content": content},
+                    "finish_reason": "stop",
+                }
+            ],
+            "usage": {"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
+        },
+    )
+
+
 @pytest.fixture
-def generator():
+def generator(respx_openai):
     """Create a generator instance for testing."""
     return Generator(max_tokens=1000, use_cache=False)
 
 
-@pytest.mark.skipif(
-    not os.getenv("OPENAI_API_KEY") or not os.getenv("OPENAI_MODEL_NAME"),
-    reason="OPENAI_API_KEY and OPENAI_MODEL_NAME environment variables are required for this test",
-)
 class TestStructuredOutput:
     """Test structured output functionality for different backends."""
 
-    def test_basic_chat_completion(self, generator):
-        """Test basic chat completion functionality."""
+    def test_basic_chat_completion(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_chat_completion_response("hi! here's a joke"))
         response = generator.get_chat_completion(messages=[{"role": Role.USER, "content": "hi! tell me a joke"}])
         assert isinstance(response, str)
         assert len(response) > 0
 
     @pytest.mark.asyncio
-    async def test_async_chat_completion(self, generator):
-        """Test async chat completion functionality."""
+    async def test_async_chat_completion(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_chat_completion_response("hi! here's a joke"))
         response = await generator.get_chat_completion_async(
             messages=[{"role": Role.USER, "content": "hi! tell me a joke"}]
         )
         assert isinstance(response, str)
         assert len(response) > 0
 
-    def test_structured_output(self, generator):
-        """Test that async structured output works without failing."""
+    def test_structured_output(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_chat_completion_response(VALID_PERSON_JSON))
         result = generator.get_structured_output_sync(
             messages=[{"role": Role.USER, "content": "Create a person"}],
             output_model=Person,
             max_retries=5,
         )
-
         assert isinstance(result, Person)
 
     @pytest.mark.asyncio
-    async def test_structured_output_async(self, generator):
-        """Test that async structured output works without failing."""
+    async def test_structured_output_async(self, generator, respx_openai):
+        respx_openai.post("/v1/chat/completions").mock(return_value=_chat_completion_response(VALID_PERSON_JSON))
         result = await generator.get_structured_output_async(
             messages=[{"role": Role.USER, "content": "Create a person"}],
             output_model=Person,
             max_retries=5,
         )
-
         assert isinstance(result, Person)

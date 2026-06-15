@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 from functools import partial
 from pathlib import Path
@@ -27,6 +28,8 @@ if TYPE_CHECKING:
     from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
+
+GENERATOR_CONFIG_FILENAME = "generator_config.json"
 
 
 class IntentCategorization(BaseModel):
@@ -278,13 +281,28 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
     def _init_event_loop(self) -> None:
         if self.max_concurrent is not None:
-            loop = asyncio.get_event_loop()
-            if loop.is_closed():
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
                 loop = asyncio.new_event_loop()
+            else:
+                if loop.is_closed():
+                    loop = asyncio.new_event_loop()
             self._event_loop = loop
 
     def dump(self, path: str) -> None:
-        Dumper.dump(self, Path(path), exclude=[asyncio.BaseEventLoop])
+        dump_path = Path(path)
+        # generator_config is handled below via a JSON sidecar; excluding `dict`
+        # from the generic Dumper silences its "cannot be dumped" error log.
+        # _generator is temporarily detached so the Dumper doesn't try to handle
+        # it via GeneratorDumper — load() recreates it from generator_config.
+        generator = self.__dict__.pop("_generator", None)
+        try:
+            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, dict])
+        finally:
+            if generator is not None:
+                self._generator = generator
+        (dump_path / GENERATOR_CONFIG_FILENAME).write_text(json.dumps(self.generator_config))
 
     @classmethod
     def load(
@@ -294,5 +312,8 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         cross_encoder_config: CrossEncoderConfig | None = None,
     ) -> LLMDescriptionScorer:
         instance = super().load(path=path, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
+        config_path = Path(path) / GENERATOR_CONFIG_FILENAME
+        instance.generator_config = json.loads(config_path.read_text()) if config_path.exists() else {}
+        instance._generator = Generator(**instance.generator_config)  # noqa: SLF001
         instance._init_event_loop()  # noqa: SLF001
         return instance

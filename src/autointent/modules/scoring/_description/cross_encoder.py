@@ -42,7 +42,7 @@ class CrossEncoderDescriptionScorer(BaseDescriptionScorer):
 
         # Initialize cross-encoder scorer
         scorer = CrossEncoderDescriptionScorer(
-            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            cross_encoder_config="cross-encoder/ms-marco-MiniLM-L6-v2",
             temperature=1.2
         )
 

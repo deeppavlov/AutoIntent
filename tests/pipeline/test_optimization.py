@@ -1,11 +1,10 @@
 import importlib.resources as ires
-import os
 
 import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
-from tests.conftest import get_search_space, setup_environment
+from tests.conftest import apply_test_models, get_search_space, setup_environment
 
 
 @pytest.mark.parametrize(
@@ -26,6 +25,7 @@ def test_with_regex(dataset, data_config, refit_after):
     search_space = get_search_space("regex")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(data_config)
@@ -38,6 +38,7 @@ def test_no_node_separation(dataset_no_oos):
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=None))
@@ -48,6 +49,7 @@ def test_no_node_separation(dataset_no_oos):
 def test_full_config(dataset_no_oos):
     config_path = ires.files("tests.assets.configs").joinpath("full_training.yaml")
     pipeline_optimizer = Pipeline.from_optimization_config(config_path)
+    apply_test_models(pipeline_optimizer)
     pipeline_optimizer.fit(dataset_no_oos, refit_after=False)
 
 
@@ -60,6 +62,7 @@ def test_bayes(dataset, sampler):
     search_space = get_search_space("optuna")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
@@ -74,20 +77,15 @@ def test_bayes(dataset, sampler):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        pytest.param(
-            "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
-            ),
-        ),
+        "description_with_llm",
     ],
 )
-def test_cv(dataset, task_type):
+def test_cv(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
     pipeline_optimizer.set_config(DataConfig(scheme="cv", separation_ratio=0.5))
@@ -107,20 +105,15 @@ def test_cv(dataset, task_type):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        pytest.param(
-            "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
-            ),
-        ),
+        "description_with_llm",
     ],
 )
-def test_no_context_optimization(dataset, task_type):
+def test_no_context_optimization(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=False, clear_ram=False))
     pipeline_optimizer.set_config(DataConfig(scheme="ho", separation_ratio=0.5))
@@ -138,20 +131,15 @@ def test_no_context_optimization(dataset, task_type):
         "multiclass",
         "multilabel",
         "description_no_llm",
-        pytest.param(
-            "description_with_llm",
-            marks=pytest.mark.skipif(
-                not (os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_MODEL_NAME")),
-                reason="LLM HTTP server is not available.",
-            ),
-        ),
+        "description_with_llm",
     ],
 )
-def test_dump_modules(dataset, task_type):
+def test_dump_modules(dataset, task_type, patch_llm_scorer_generator):
     project_dir = setup_environment()
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
 
@@ -172,6 +160,7 @@ def test_optimization_validation_metric_names(dataset, task_type):
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
+    apply_test_models(pipeline_optimizer)
 
     if task_type == "multiclass":
         dataset = dataset.to_multilabel()

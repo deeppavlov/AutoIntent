@@ -1205,7 +1205,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": null,
+                "revision": "c5ee24cb16019beea0893ab7796b1df96625c6b8",
                 "train_head": false
             }
         },
@@ -1223,7 +1223,7 @@
                     "truncation": true
                 },
                 "trust_remote_code": false,
-                "revision": "refs/pr/16"
+                "revision": "79779625a0a40f1eee8496e16056bc0d7766df22"
             }
         },
         "hpo_config": {

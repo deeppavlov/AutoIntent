@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.resources as ires
 from typing import TYPE_CHECKING
 
 from datasets import concatenate_datasets
@@ -16,10 +17,10 @@ def count_oos(split: HFDataset):
 
 
 def create_clinc150_subset():
-    clinc = Dataset.from_hub("DeepPavlov/clinc150")
+    snapshot_path = ires.files("tests.assets.data").joinpath("clinc150_oos_input.json")
+    clinc = Dataset.from_json(str(snapshot_path))
 
-    intents_subset = clinc.intents[:4]
-    intent_ids = [intent.id for intent in intents_subset]
+    intent_ids = [intent.id for intent in clinc.intents]
 
     train = clinc["train"].filter(lambda sample: sample["label"] in intent_ids)
     oos = clinc["train"].filter(lambda sample: sample["label"] is None)

@@ -1,18 +1,15 @@
-"""Tests specific to OpenAI backend functionality."""
+"""Tests for the OpenAI embedder backend contract.
 
-import os
+The real OpenaiEmbeddingBackend is never exercised in CI; this file pins the
+shape contract that FakeOpenaiEmbeddingBackend must uphold so consumers
+(Embedder, VectorIndex) keep working when patched.
+"""
 
 import numpy as np
 import pytest
 
-from autointent._wrappers.embedder.openai import OpenaiEmbeddingBackend
 from autointent.configs import OpenaiEmbeddingConfig, TaskTypeEnum
-
-# Skip all tests if OpenAI API key is not available
-pytestmark = pytest.mark.skipif(
-    not os.getenv("OPENAI_API_KEY"),
-    reason="OpenAI API key not available (set OPENAI_API_KEY environment variable)",
-)
+from tests._fixtures.fake_openai_embedding import FakeOpenaiEmbeddingBackend as OpenaiEmbeddingBackend
 
 
 @pytest.fixture
