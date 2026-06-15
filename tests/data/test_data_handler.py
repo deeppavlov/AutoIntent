@@ -1,4 +1,5 @@
 from collections import Counter
+from typing import Any
 
 import pytest
 
@@ -10,7 +11,7 @@ from autointent.schemas import Sample
 
 
 @pytest.fixture
-def sample_multiclass_data():
+def sample_multiclass_data() -> dict[str, Any]:
     return {
         "train": [
             {"utterance": "hello", "label": 0},
@@ -46,7 +47,7 @@ def sample_multiclass_data():
 
 
 @pytest.fixture
-def sample_multilabel_data():
+def sample_multilabel_data() -> dict[str, Any]:
     return {
         "train": [
             {"utterance": "hello and goodbye", "label": [0, 1]},
@@ -69,11 +70,11 @@ def sample_multilabel_data():
     }
 
 
-def mock_split():
+def mock_split() -> list[dict[str, Any]]:
     return [{"utterance": "Hello!", "label": 0}]
 
 
-def test_data_handler_initialization(sample_multiclass_data):
+def test_data_handler_initialization(sample_multiclass_data: dict[str, Any]) -> None:
     handler = DataHandler(
         dataset=Dataset.from_dict(sample_multiclass_data), config=DataConfig(separation_ratio=0.5), random_seed=42
     )
@@ -86,7 +87,7 @@ def test_data_handler_initialization(sample_multiclass_data):
     assert handler.test_labels() == [0, 1]
 
 
-def test_data_handler_multilabel_mode(sample_multilabel_data):
+def test_data_handler_multilabel_mode(sample_multilabel_data: dict[str, Any]) -> None:
     handler = DataHandler(
         dataset=Dataset.from_dict(sample_multilabel_data), config=DataConfig(separation_ratio=0.5), random_seed=42
     )
@@ -105,13 +106,13 @@ def test_data_handler_multilabel_mode(sample_multilabel_data):
 
 
 @pytest.mark.parametrize("label", [0, [0, 1, 0], None])
-def test_sample_initialization(label):
+def test_sample_initialization(label: int | list[int] | None) -> None:
     sample = Sample(utterance="Hello!", label=label)
     assert sample.label == label
 
 
 @pytest.mark.parametrize("label", [-1, [-1], []])
-def test_sample_validation(label):
+def test_sample_validation(label: int | list[int]) -> None:
     with pytest.raises(ValueError):  # noqa: PT011
         Sample(utterance="Hello!", label=label)
 
@@ -139,7 +140,7 @@ def test_sample_validation(label):
         },
     ],
 )
-def test_dataset_initialization(mapping):
+def test_dataset_initialization(mapping: dict[str, list[dict[str, Any]]]) -> None:
     dataset = Dataset.from_dict(mapping)
     for split in mapping:
         assert split in dataset
@@ -161,7 +162,7 @@ def test_dataset_initialization(mapping):
         {"train": mock_split(), "validation": mock_split(), "validation_0": mock_split(), "validation_1": mock_split()},
     ],
 )
-def test_dataset_validation(mapping):
+def test_dataset_validation(mapping: dict[str, list[dict[str, Any]]]) -> None:
     with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
 
@@ -178,16 +179,16 @@ def test_dataset_validation(mapping):
         {"train": [{"utterance": "Hello!"}]},
     ],
 )
-def test_intents_validation(mapping):
+def test_intents_validation(mapping: dict[str, list[dict[str, Any]]]) -> None:
     with pytest.raises(ValueError):  # noqa: PT011
         Dataset.from_dict(mapping)
 
 
-def count_oos(split):
+def count_oos(split: Any) -> int:
     return len(split.filter(lambda sample: sample["label"] is None))
 
 
-def test_cv_folding(dataset):
+def test_cv_folding(dataset: Dataset) -> None:
     DataHandler(dataset, config=DataConfig(scheme="cv", n_folds=3))
 
     desired_specs = {
@@ -202,11 +203,11 @@ def test_cv_folding(dataset):
         assert count_oos(dataset[split_name]) == desired_specs[split_name]["oos"]
 
 
-def count_oos_labels(split):
+def count_oos_labels(split: list[Any]) -> int:
     return sum(sample is None for sample in split)
 
 
-def test_cv_iterator(dataset):
+def test_cv_iterator(dataset: Dataset) -> None:
     dh = DataHandler(dataset, config=DataConfig(scheme="cv", n_folds=3))
 
     desired_specs = [
@@ -232,7 +233,7 @@ def test_cv_iterator(dataset):
         assert count_oos_labels(y_val) == specs["val"]["oos"]
 
 
-def test_few_shot_split(dataset):
+def test_few_shot_split(dataset: Dataset) -> None:
     dh = DataHandler(dataset, config=DataConfig(scheme="ho", is_few_shot_train=True, examples_per_intent=2))
 
     desired_specs = {
@@ -249,7 +250,7 @@ def test_few_shot_split(dataset):
         )
 
 
-def _make_multiclass_mapping_with_oos(*, with_validation: bool) -> dict:
+def _make_multiclass_mapping_with_oos(*, with_validation: bool) -> dict[str, Any]:
     # Ensure enough samples per class so stratified splitting doesn't fail.
     in_domain = [{"utterance": f"c0_{i}", "label": 0} for i in range(50)] + [
         {"utterance": f"c1_{i}", "label": 1} for i in range(50)
@@ -257,7 +258,7 @@ def _make_multiclass_mapping_with_oos(*, with_validation: bool) -> dict:
 
     oos = [{"utterance": f"oos_{i}"} for i in range(20)]
 
-    mapping: dict = {
+    mapping: dict[str, Any] = {
         "train": [*in_domain, *oos],
         "intents": [{"id": 0}, {"id": 1}],
     }
@@ -279,7 +280,7 @@ def _split_has_oos_labels(dh: DataHandler, split_name: str) -> bool:
     return any(lab is None for lab in dh.dataset[split_name][dh.dataset.label_feature])
 
 
-def test_ho_oos_without_separation_ratio_duplicates_and_filters_scoring_splits():
+def test_ho_oos_without_separation_ratio_duplicates_and_filters_scoring_splits() -> None:
     """If OOS exists and separation_ratio is None, scoring splits must be OOS-free."""
     dataset = Dataset.from_dict(_make_multiclass_mapping_with_oos(with_validation=False))
     dh = DataHandler(dataset, config=DataConfig(scheme="ho", separation_ratio=None), random_seed=42)
@@ -297,7 +298,7 @@ def test_ho_oos_without_separation_ratio_duplicates_and_filters_scoring_splits()
     assert _split_has_oos_labels(dh, "validation_1") is True
 
 
-def test_ho_oos_with_user_validation_duplicates_validation_when_needed():
+def test_ho_oos_with_user_validation_duplicates_validation_when_needed() -> None:
     """If user provides validation with OOS, it should be duplicated and filtered for scoring."""
     dataset = Dataset.from_dict(_make_multiclass_mapping_with_oos(with_validation=True))
     dh = DataHandler(dataset, config=DataConfig(scheme="ho", separation_ratio=None), random_seed=42)
