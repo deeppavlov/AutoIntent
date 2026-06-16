@@ -7,9 +7,10 @@ import pytest
 
 from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules.decision import JinoosDecision
-from tests.conftest import setup_environment
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     import numpy.typing as npt
 
     from tests.modules.decision.conftest import FitData
@@ -49,12 +50,12 @@ def test_fails_on_wrong_clf_problem(multilabel_fit_data: FitData) -> None:
         predictor.fit(*multilabel_fit_data)
 
 
-def test_dump_load(multiclass_fit_data: FitData) -> None:
+def test_dump_load(multiclass_fit_data: FitData, tmp_path: Path) -> None:
     predictor = JinoosDecision()
     predictor.fit(*multiclass_fit_data)
     predictions = predictor.predict(multiclass_fit_data[0])
 
-    path = setup_environment() / "jinoos_module"
+    path = tmp_path / "jinoos_module"
     predictor.dump(str(path))
     del predictor
 
