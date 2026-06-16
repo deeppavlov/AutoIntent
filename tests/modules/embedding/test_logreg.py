@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from autointent.configs import HashingVectorizerEmbeddingConfig
 from autointent.modules.embedding import LogregAimedEmbedding
-from tests.conftest import get_test_embedder_config, setup_environment
+from tests.conftest import get_test_embedder_config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_get_assets_returns_correct_artifact_for_logreg() -> None:
@@ -39,14 +46,14 @@ def test_predict_evaluates_model() -> None:
     assert probas[1][1] > probas[1][0]
 
 
-def test_dump_load() -> None:
+def test_dump_load(tmp_path: Path) -> None:
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
     predictions = module.predict(["hello", "bye"])
 
-    dump_path = setup_environment()
+    dump_path = tmp_path
 
     module.dump(str(dump_path))
     del module

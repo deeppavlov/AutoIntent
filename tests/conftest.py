@@ -58,12 +58,6 @@ def _disable_transformers_mistral_regex_patch() -> None:
 _disable_transformers_mistral_regex_patch()
 
 
-def setup_environment() -> Path:
-    # tests is a regular package, so importlib.resources.files returns a
-    # concrete Path here; cast asserts that to mypy without changing behavior.
-    return cast("Path", ires.files("tests").joinpath("logs"))
-
-
 def get_dataset_path() -> Path:
     return cast("Path", ires.files("tests.assets.data").joinpath("clinc_subset.json"))
 

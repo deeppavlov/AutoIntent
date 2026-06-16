@@ -7,9 +7,11 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig, SentenceTransformerEmbeddingConfig
 from autointent.nodes import NodeOptimizer
-from tests.conftest import apply_test_models, setup_environment
+from tests.conftest import apply_test_models
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from autointent import Dataset
     from autointent.generation import Generator
 
@@ -29,8 +31,8 @@ if TYPE_CHECKING:
         "zero-shot-encoders",
     ],
 )
-def test_presets(dataset: Dataset, preset: str, patch_llm_scorer_generator: Generator) -> None:
-    project_dir = setup_environment()
+def test_presets(dataset: Dataset, preset: str, patch_llm_scorer_generator: Generator, tmp_path: Path) -> None:
+    project_dir = tmp_path
 
     pipeline_optimizer = Pipeline.from_preset(preset)  # type: ignore[arg-type]  # reason: parametrize values are runtime strings; mypy can't narrow to the SearchSpacePreset Literal
     apply_test_models(pipeline_optimizer)
