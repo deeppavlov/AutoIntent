@@ -292,6 +292,7 @@ module = [
     "testcontainers.opensearch",
     "wandb",
     "warm_hf_cache",
+    "compute_matrix",
     "dspy",
     "dspy.evaluate.auto_evaluation",
     "codecarbon",

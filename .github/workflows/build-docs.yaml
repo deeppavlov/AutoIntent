@@ -10,6 +10,10 @@ on:
   pull_request:
     branches:
       - dev
+    # `labeled` lets adding the `full-ci` label re-trigger the docs build on
+    # an open PR; ordinary PR commits skip it (see build-docs.if) to avoid the
+    # ~20 min `make test-docs` run on every push.
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 concurrency:
@@ -23,6 +27,14 @@ jobs:
   build-docs:
     name: Build Documentation
     runs-on: ubuntu-latest
+    # The docs build (~20 min) is gated behind `full-ci` on PRs: it still runs
+    # on every push to dev, on releases, and on manual dispatch, but on a PR it
+    # only runs when the `full-ci` label is present. build-docs is not a
+    # required check (only ruff/mypy/all-tests are), so skipping it on a regular
+    # PR does not block merge; docs breakage is caught on the push to dev.
+    if: >-
+      github.event_name != 'pull_request'
+      || contains(github.event.pull_request.labels.*.name, 'full-ci')
 
     steps:
       - name: Checkout code

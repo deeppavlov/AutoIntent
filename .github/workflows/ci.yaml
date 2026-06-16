@@ -21,6 +21,13 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
+    # The `labeled` trigger fires for *any* label, but only `full-ci` should
+    # do work. Skip the whole run when some other label is added, so stray
+    # labels don't burn a redundant CI run. Every non-`labeled` event (push,
+    # opened/synchronize/reopened) proceeds because github.event.action is
+    # then not 'labeled'. When this is false the run no-ops and `all-tests`
+    # still reports success (see its guarded step below).
+    if: github.event.action != 'labeled' || github.event.label.name == 'full-ci'
     outputs:
       matrix: ${{ steps.compute.outputs.matrix }}
       warm_os: ${{ steps.compute.outputs.warm_os }}
@@ -167,7 +174,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check that every test job succeeded
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        # First clause mirrors `setup.if`: a non-`full-ci` `labeled` event
+        # skips the whole matrix on purpose, so those skips are not a
+        # failure and `all-tests` stays green for the unchanged SHA. Every
+        # other event keeps the strict failure/cancelled/skipped gate.
+        if: >-
+          (github.event.action != 'labeled' || github.event.label.name == 'full-ci')
+          && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped'))
         run: |
           echo "One or more test jobs did not succeed:"
           echo '${{ toJson(needs) }}'

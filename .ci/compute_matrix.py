@@ -56,6 +56,9 @@ def collect_os_list(matrix: dict) -> list[str]:
 
 def is_full(event_name: str, labels: list[str]) -> bool:
     """Return True iff this run should fan out across the full OS/Python matrix."""
+    # Any push that reaches this workflow is a push to `dev` (ci.yaml pins
+    # on.push.branches: [dev]), so the branch is implied and not re-checked
+    # here. If more push branches are ever added there, revisit this.
     if event_name == "push":
         return True
     return FULL_CI_LABEL in labels
@@ -80,7 +83,7 @@ def parse_labels(raw: str) -> list[str]:
 
 
 def main() -> int:
-    """Compute matrix from env, write outputs, log a summary, return 0."""
+    """Compute matrix from env, log a summary, write outputs; return exit code."""
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
 
     event_name = os.environ.get("EVENT_NAME", "")
@@ -96,17 +99,19 @@ def main() -> int:
         "full": "true" if full else "false",
     }
 
-    output_path = os.environ.get("GITHUB_OUTPUT")
-    if output_path:
-        lines = "".join(f"{key}={value}\n" for key, value in payload.items())
-        with Path(output_path).open("a", encoding="utf-8") as fh:
-            fh.write(lines)
-
     logger.info("event_name=%s", event_name)
     logger.info("labels=%s", labels)
     logger.info("full=%s", full)
     logger.info("matrix=%s", payload["matrix"])
     logger.info("warm_os=%s", payload["warm_os"])
+
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if not output_path:
+        logger.error("GITHUB_OUTPUT is not set; cannot emit step outputs")
+        return 1
+    lines = "".join(f"{key}={value}\n" for key, value in payload.items())
+    with Path(output_path).open("a", encoding="utf-8") as fh:
+        fh.write(lines)
     return 0
 
 
