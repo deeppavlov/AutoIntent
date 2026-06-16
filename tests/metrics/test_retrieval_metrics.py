@@ -136,6 +136,4 @@ def test_oos_ignoring(
     candidates_labels: CANDIDATE_TYPE,
     ground_truth: float,
 ) -> None:
-    # retrieval_hit_rate is decorated with @ignore_oos which accepts OOS-bearing labels at runtime
-    # even though its public signature is LABELS_VALUE_TYPE (without OOS).
-    assert ground_truth == retrieval_hit_rate(query_labels, candidates_labels)  # type: ignore[arg-type]  # reason: ignore_oos decorator runtime-accepts OOS labels; src signature doesn't reflect that
+    assert ground_truth == retrieval_hit_rate(query_labels, candidates_labels)
