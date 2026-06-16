@@ -7,6 +7,7 @@ heuristic value rather than raising. The advisor flips the report's
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 from dataclasses import dataclass
@@ -14,7 +15,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from huggingface_hub import HfApi, scan_cache_dir, try_to_load_from_cache
+from huggingface_hub import HfApi, hf_hub_download, scan_cache_dir, try_to_load_from_cache
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,11 @@ class ModelMeta:
     total_file_bytes: int
     cached_locally: bool
     confidence: str  # "hub" | "heuristic"
+    # Architecture shape read straight from the model's config.json when reachable;
+    # None when the file couldn't be fetched/parsed. Estimates fall back to a
+    # BERT-base default in that case.
+    hidden_size: int | None = None
+    n_layers: int | None = None
 
     @property
     def disk_gb(self) -> float:
@@ -69,6 +75,30 @@ def _heuristic_params_millions(model_name: str) -> float:
         if pattern.search(model_name):
             return float(m)
     return 110.0  # generic BERT-base default
+
+
+def _shape_from_config(model_name: str) -> tuple[int | None, int | None]:
+    """Return ``(hidden_size, num_hidden_layers)`` straight from the model's config.json.
+
+    ``hf_hub_download`` caches the file after the first call, so repeated lookups
+    in the same process (or across CLI invocations) hit local disk. Returns
+    ``(None, None)`` on any failure — the advisor stays best-effort.
+    """
+    try:
+        path = hf_hub_download(model_name, "config.json")
+    except Exception as e:  # noqa: BLE001
+        logger.debug("config.json download(%s) failed: %s", model_name, e)
+        return None, None
+    try:
+        cfg = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        logger.debug("config.json parse(%s) failed: %s", model_name, e)
+        return None, None
+    # Cover the common HF naming variants: BERT/Llama/Gemma use hidden_size +
+    # num_hidden_layers; T5/MT5 use d_model + num_layers; GPT-2/Neo use n_embd + n_layer.
+    hidden = cfg.get("hidden_size") or cfg.get("d_model") or cfg.get("n_embd")
+    layers = cfg.get("num_hidden_layers") or cfg.get("num_layers") or cfg.get("n_layer")
+    return (int(hidden) if hidden else None, int(layers) if layers else None)
 
 
 def _is_warm_cached(model_name: str) -> bool:
@@ -126,6 +156,14 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
         total_file_bytes = int(params_millions * 1_000_000 * weight_bytes_per_param)
         confidence = "heuristic"
 
+    hidden_size, n_layers = _shape_from_config(model_name)
+    if hidden_size is None or n_layers is None:
+        logger.warning(
+            "Could not read hidden_size / num_hidden_layers from config.json for %s; "
+            "activation-memory estimates will fall back to BERT-base defaults (768 / 12).",
+            model_name,
+        )
+
     return ModelMeta(
         name=model_name,
         params_millions=params_millions,
@@ -133,10 +171,17 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
         total_file_bytes=total_file_bytes,
         cached_locally=_is_warm_cached(model_name),
         confidence=confidence,
+        hidden_size=hidden_size,
+        n_layers=n_layers,
     )
 
 
 def _heuristic_metadata(model_name: str) -> ModelMeta:
+    logger.warning(
+        "Falling back to name-pattern heuristic for %s; "
+        "activation-memory estimates will use BERT-base defaults (hidden=768, layers=12).",
+        model_name,
+    )
     params_millions = _heuristic_params_millions(model_name)
     weight_bytes_per_param = 4
     total_file_bytes = int(params_millions * 1_000_000 * weight_bytes_per_param)
