@@ -23,10 +23,9 @@ def test_default_chat_template(dataset: Dataset) -> None:
     template = EnglishSynthesizerTemplate(dataset, split="train_0")
     prompt = template(dataset.intents[0], n_examples=1)
     for msg in prompt:
-        assert not has_unfilled_fields(msg["content"])
-    # reason: legacy sentinel check; prompt is list[Message] (TypedDict), so a str is
-    # never in it. Preserving original test behavior per Phase B no-semantic-change rule.
-    assert "extra_instructions" not in prompt  # type: ignore[comparison-overlap]
+        content = msg["content"]
+        assert not has_unfilled_fields(content)
+        assert "extra_instructions" not in content
 
 
 def test_extra_instructions(dataset: Dataset) -> None:
