@@ -7,9 +7,10 @@ import pytest
 
 from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules.decision import AdaptiveDecision
-from tests.conftest import setup_environment
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from tests.modules.decision.conftest import FitData
 
 
@@ -37,12 +38,12 @@ def test_fails_on_wrong_clf_problem(multiclass_fit_data: FitData) -> None:
         predictor.fit(*multiclass_fit_data)
 
 
-def test_dump_load(multilabel_fit_data: FitData) -> None:
+def test_dump_load(multilabel_fit_data: FitData, tmp_path: Path) -> None:
     predictor = AdaptiveDecision()
     predictor.fit(*multilabel_fit_data)
     preds = predictor.predict(multilabel_fit_data[0])
 
-    path = setup_environment() / "adaptive_module"
+    path = tmp_path / "adaptive_module"
     predictor.dump(str(path))
     del predictor
 
