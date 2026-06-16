@@ -10,10 +10,9 @@ from __future__ import annotations
 from ._estimates import run_preflight
 from ._hardware import HardwareProfile, detect_hardware
 from ._report import DatasetStats, Finding, PreflightReport, RecommendationResult, ResourceEstimate, Severity
-from ._workflows import BUNDLED_PRESETS, inspect, load_config, recommend, stats_from_dataset
+from ._workflows import inspect, load_config, recommend, stats_from_dataset
 
 __all__ = [
-    "BUNDLED_PRESETS",
     "DatasetStats",
     "Finding",
     "HardwareProfile",
