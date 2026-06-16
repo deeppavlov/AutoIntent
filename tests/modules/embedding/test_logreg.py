@@ -1,10 +1,15 @@
-from pathlib import Path
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from autointent.configs import HashingVectorizerEmbeddingConfig
 from autointent.modules.embedding import LogregAimedEmbedding
 from tests.conftest import get_test_embedder_config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_get_assets_returns_correct_artifact_for_logreg() -> None:
