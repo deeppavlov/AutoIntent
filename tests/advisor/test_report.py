@@ -25,7 +25,7 @@ class TestSeverityOrdering:
         r.add("data", Severity.TIGHT, "warn")
         assert r.headroom == Severity.TIGHT
         r.add("config", Severity.OVER, "fail")
-        assert r.headroom == Severity.OVER
+        assert r.headroom == Severity.OVER  # type: ignore[comparison-overlap]
 
     def test_is_feasible_flips_on_any_red(self) -> None:
         r = PreflightReport()

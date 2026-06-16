@@ -56,21 +56,21 @@ def test_every_preset_inspects_without_raising(preset: str) -> None:
 
 
 def test_heavy_preset_is_infeasible_on_2gb_budget() -> None:
-    cfg = load_preset("transformers-heavy")  # type: ignore[arg-type]
+    cfg = load_preset("transformers-heavy")
     stats = DatasetStats.placeholder(n_samples=5000, n_classes=20, avg_tokens=40)
     report = run_preflight(cfg, stats, _profile(vram_gb=2.0), preset_name="transformers-heavy")
     assert not report.is_feasible, "deberta-v3-large should not fit in 2 GB"
 
 
 def test_light_preset_is_feasible_on_8gb_budget() -> None:
-    cfg = load_preset("transformers-light")  # type: ignore[arg-type]
+    cfg = load_preset("transformers-light")
     stats = DatasetStats.placeholder(n_samples=1000, n_classes=10, avg_tokens=24)
     report = run_preflight(cfg, stats, _profile(vram_gb=8.0), preset_name="transformers-light")
     assert report.is_feasible
 
 
 def test_n_jobs_doubles_vram_findings() -> None:
-    cfg = load_preset("transformers-light")  # type: ignore[arg-type]
+    cfg = load_preset("transformers-light")
     cfg = {**cfg, "hpo_config": {**(cfg.get("hpo_config") or {}), "n_jobs": 4}}
     stats = DatasetStats.placeholder()
     report = run_preflight(cfg, stats, _profile(vram_gb=4.0))
