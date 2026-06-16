@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, Mock
 
 from autointent.generation.chat_templates import EnglishSynthesizerTemplate
 from autointent.generation.utterances import UtteranceGenerator
 
+if TYPE_CHECKING:
+    from autointent import Dataset
 
-def has_unfilled_fields(template):
+
+def has_unfilled_fields(template: str) -> bool:
     try:
         # Attempt to format the string with empty values
         template.format(**{})  # noqa: PIE804
@@ -13,22 +19,23 @@ def has_unfilled_fields(template):
         return True  # Unfilled fields detected
 
 
-def test_default_chat_template(dataset):
+def test_default_chat_template(dataset: Dataset) -> None:
     template = EnglishSynthesizerTemplate(dataset, split="train_0")
     prompt = template(dataset.intents[0], n_examples=1)
     for msg in prompt:
-        assert not has_unfilled_fields(msg["content"])
-    assert "extra_instructions" not in prompt
+        content = msg["content"]
+        assert not has_unfilled_fields(content)
+        assert "extra_instructions" not in content
 
 
-def test_extra_instructions(dataset):
+def test_extra_instructions(dataset: Dataset) -> None:
     template = EnglishSynthesizerTemplate(dataset, split="train_0", extra_instructions="football")
     prompt = template(dataset.intents[0], n_examples=1)[0]["content"]
     assert "extra_instructions" not in prompt
     assert "football" in prompt
 
 
-def test_on_dataset(dataset):
+def test_on_dataset(dataset: Dataset) -> None:
     mock_llm = Mock()
     mock_llm.get_chat_completion.return_value = "1. LLM answer"
 
@@ -53,7 +60,7 @@ def test_on_dataset(dataset):
     assert len(new_samples) == len(dataset.intents)
 
 
-def test_on_dataset_async(dataset):
+def test_on_dataset_async(dataset: Dataset) -> None:
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "1. LLM answer"
 
@@ -78,7 +85,7 @@ def test_on_dataset_async(dataset):
     assert len(new_samples) == len(dataset.intents)
 
 
-def test_on_dataset_async_with_batch_size(dataset):
+def test_on_dataset_async_with_batch_size(dataset: Dataset) -> None:
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "1. LLM answer"
 

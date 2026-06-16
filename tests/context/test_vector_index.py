@@ -12,21 +12,27 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
-from autointent.configs import EmbedderConfig, FaissConfig, OpenSearchConfig
+from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
+from autointent.configs import (
+    FaissConfig,
+    HashingVectorizerEmbeddingConfig,
+    OpenSearchConfig,
+    TaskTypeEnum,
+    VectorIndexConfig,
+)
 from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
-    from autointent.configs import EmbedderConfig
+    from types import ModuleType
+
 
 def _docker_available() -> bool:
     """Detect whether Docker is reachable for testcontainers (skipped on most Windows CI)."""
     if shutil.which("docker") is None:
         return False
     try:
-        result = subprocess.run(
-            ["docker", "info"], capture_output=True, timeout=5, check=False
-        )
+        result = subprocess.run(["docker", "info"], capture_output=True, timeout=5, check=False)
     except (OSError, subprocess.TimeoutExpired):
         return False
     return result.returncode == 0
@@ -34,7 +40,10 @@ def _docker_available() -> bool:
 
 _DOCKER_AVAILABLE = _docker_available()
 
-# Backend configurations for parametrization
+# Backend configurations for parametrization.
+# vector_config is heterogeneous: FaissConfig is a concrete config; "opensearch_lazy" is a sentinel
+# string resolved inside the vector_index fixture to a real OpenSearchConfig (it needs the
+# session-scoped opensearch_container fixture, which can't be constructed at parametrize-collect time).
 backend_configs = [
     pytest.param(FaissConfig(), id="faiss"),
     pytest.param(
@@ -53,27 +62,31 @@ class TestVectorIndex:
     """Unified test class for VectorIndex with different backends."""
 
     @pytest.fixture
-    def embedder_config(self) -> EmbedderConfig:
+    def embedder_config(self) -> HashingVectorizerEmbeddingConfig:
         """Create a lightweight embedder config for testing."""
         return get_test_embedder_config()
 
     @pytest.fixture
     def vector_index(
-        self, embedder_config: EmbedderConfig, vector_config, request
+        self,
+        embedder_config: HashingVectorizerEmbeddingConfig,
+        vector_config: FaissConfig | str,
+        request: pytest.FixtureRequest,
     ) -> VectorIndex:
         """Create a VectorIndex instance for testing."""
-        if vector_config == "opensearch_lazy":
+        resolved_config: FaissConfig | OpenSearchConfig
+        if isinstance(vector_config, str) and vector_config == "opensearch_lazy":
             host, port = request.getfixturevalue("opensearch_container")
             unique_id = str(uuid.uuid4())[:8]
-            vector_config = OpenSearchConfig(
+            resolved_config = OpenSearchConfig(
                 hosts=[{"host": host, "port": port}],
                 index_name=f"test_index_{unique_id}",
             )
-        elif isinstance(vector_config, OpenSearchConfig):
-            unique_id = str(uuid.uuid4())[:8]
-            vector_config.index_name = f"test_index_{unique_id}"
+        else:
+            assert isinstance(vector_config, FaissConfig)
+            resolved_config = vector_config
 
-        return VectorIndex(embedder_config=embedder_config, config=vector_config)
+        return VectorIndex(embedder_config=embedder_config, config=resolved_config)
 
     @pytest.fixture
     def sample_texts(self) -> list[str]:
@@ -91,7 +104,7 @@ class TestVectorIndex:
         """Sample labels corresponding to texts."""
         return [0, 1, 0, 2, 1]
 
-    def test_initialization(self, vector_index: VectorIndex, vector_config):
+    def test_initialization(self, vector_index: VectorIndex, vector_config: FaissConfig | str) -> None:
         """Test VectorIndex initialization."""
         if isinstance(vector_config, str):  # placeholder for opensearch
             assert isinstance(vector_index.config, OpenSearchConfig)
@@ -100,7 +113,9 @@ class TestVectorIndex:
         assert hasattr(vector_index, "embedder")
         assert not hasattr(vector_index, "index")
 
-    def test_add_texts_and_labels(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
+    def test_add_texts_and_labels(
+        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
+    ) -> None:
         """Test adding texts and labels to the index."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -112,7 +127,7 @@ class TestVectorIndex:
         assert embeddings.shape[0] == len(sample_texts)
         assert embeddings.shape[1] > 0  # Should have some dimensions
 
-    def test_add_multiple_batches(self, vector_index: VectorIndex):
+    def test_add_multiple_batches(self, vector_index: VectorIndex) -> None:
         """Test adding multiple batches of data."""
         # Add first batch
         texts1 = ["Hello world", "Good morning"]
@@ -128,7 +143,7 @@ class TestVectorIndex:
         embeddings = vector_index.get_all_embeddings()
         assert embeddings.shape[0] == 4
 
-    def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
+    def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test querying the index with text."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -148,12 +163,14 @@ class TestVectorIndex:
                 assert hasattr(doc, "text")
                 assert hasattr(doc, "label")
 
-    def test_query_by_embedding(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
+    def test_query_by_embedding(
+        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
+    ) -> None:
         """Test querying the index with embeddings."""
         vector_index.add(sample_texts, sample_labels)
 
         # Get embeddings for query
-        query_embeddings = vector_index.embedder.embed(["How to reset password?"], "query")
+        query_embeddings = vector_index.embedder.embed(["How to reset password?"], TaskTypeEnum.query)
 
         distances, documents = vector_index.query(query_embeddings, k=3)
 
@@ -162,12 +179,12 @@ class TestVectorIndex:
         assert len(distances[0]) == 3  # k=3 neighbors
         assert len(documents[0]) == 3
 
-    def test_query_empty_index_raises_error(self, vector_index: VectorIndex):
+    def test_query_empty_index_raises_error(self, vector_index: VectorIndex) -> None:
         """Test that querying an empty index raises an error."""
         with pytest.raises(ValueError, match="Index is not created yet"):
             vector_index.get_all_embeddings()
 
-    def test_query_with_k_larger_than_index(self, vector_index: VectorIndex):
+    def test_query_with_k_larger_than_index(self, vector_index: VectorIndex) -> None:
         """Test querying with k larger than the number of indexed documents."""
         texts = ["Hello world"]
         labels = [0]
@@ -192,7 +209,7 @@ class TestVectorIndex:
             assert len(distances[0]) <= 1
             assert len(documents[0]) <= 1
 
-    def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
+    def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test clearing the index from RAM."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -208,7 +225,7 @@ class TestVectorIndex:
             embeddings = vector_index.get_all_embeddings()
             assert embeddings.shape[0] == 0
 
-    def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]):
+    def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test dumping and loading the vector index."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -240,7 +257,7 @@ class TestVectorIndex:
 
     def test_load_with_embedder_override(
         self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
-    ):
+    ) -> None:
         """Test loading with embedder config override."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -255,10 +272,12 @@ class TestVectorIndex:
             # Load with override
             loaded_index = VectorIndex.load(dump_path, embedder_override_config=override_config)
 
-            # Check that loaded index works with overridden config
+            # Check that loaded index works with overridden config.
+            # EmbedderConfig is a union; n_features is on HashingVectorizerEmbeddingConfig only.
+            assert isinstance(loaded_index.embedder.config, HashingVectorizerEmbeddingConfig)
             assert loaded_index.embedder.config.n_features == 512
 
-    def test_error_handling_mismatched_lengths(self, vector_index: VectorIndex):
+    def test_error_handling_mismatched_lengths(self, vector_index: VectorIndex) -> None:
         """Test error handling when texts and labels have different lengths."""
         texts = ["Hello", "World"]
         labels = [0, 1, 2]  # Wrong length
@@ -268,7 +287,7 @@ class TestVectorIndex:
 
     def test_backend_specific_behavior(
         self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
-    ):
+    ) -> None:
         """Test backend-specific behavior differences."""
         vector_index.add(sample_texts, sample_labels)
 
@@ -281,24 +300,25 @@ class TestVectorIndex:
             # OpenSearch should have a client and index name
             assert hasattr(vector_index.index, "_client")
             assert hasattr(vector_index.index, "_index_name")
-            # Index name should be auto-generated if not provided
+            # Index name should be auto-generated if not provided.
+            # vector_index.index is typed as BaseIndexBackend, but OpenSearchConfig implies
+            # the concrete OpenSearchBackend (which has the index_name property).
+            assert isinstance(vector_index.index, OpenSearchBackend)
             assert vector_index.index.index_name is not None
 
 
 class TestVectorIndexEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_abstract_config_raises_error(self):
+    def test_abstract_config_raises_error(self) -> None:
         """Test that using abstract VectorIndexConfig raises an error."""
-        from autointent.configs import VectorIndexConfig
-
         embedder_config = get_test_embedder_config()
 
         vector_index = VectorIndex(embedder_config=embedder_config, config=VectorIndexConfig())
         with pytest.raises(TypeError, match="Passed abstract vector index config"):
             vector_index.add(["test"], [0])
 
-    def test_opensearch_dependency_error(self, monkeypatch):
+    def test_opensearch_dependency_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Test OpenSearch dependency error handling."""
         # Mock opensearchpy import to fail
 
@@ -310,7 +330,7 @@ class TestVectorIndexEdgeCases:
                 del sys.modules["opensearchpy"]
 
             # Mock import to raise ImportError
-            def mock_import(name, *args, **kwargs):
+            def mock_import(name: str, *args: object, **kwargs: object) -> ModuleType | None:
                 if name == "opensearchpy":
                     msg = "No module named opensearchpy"
                     raise ImportError(msg)

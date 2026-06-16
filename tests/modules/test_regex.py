@@ -2,7 +2,8 @@ import tempfile
 
 import pytest
 
-from autointent.modules import SimpleRegex
+from autointent.custom_types import LabelType
+from autointent.modules.regex import SimpleRegex
 from autointent.schemas import Intent
 
 
@@ -10,7 +11,7 @@ from autointent.schemas import Intent
     ("partial_match", "expected_predictions"),
     [(".*", [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1]]), ("frozen", [[0], [0], [0], [0], [0, 1]])],
 )
-def test_base_regex(partial_match, expected_predictions):
+def test_base_regex(partial_match: str, expected_predictions: list[LabelType]) -> None:
     train_data = [
         Intent(id=0, name="accept_reservations", regex_full_match=[".*"], regex_partial_match=[".*"]),
         Intent(id=1, name="account_blocked", regex_partial_match=[partial_match]),
@@ -30,6 +31,7 @@ def test_base_regex(partial_match, expected_predictions):
     assert predictions == expected_predictions
 
     predictions, metadata = matcher.predict_with_metadata(test_data)
+    assert metadata is not None
     assert len(predictions) == len(test_data) == len(metadata)
 
     assert "partial_matches" in metadata[0]

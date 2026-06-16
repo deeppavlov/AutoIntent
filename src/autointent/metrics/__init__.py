@@ -13,6 +13,7 @@ from .decision import (
 from .regex import RegexMetricFn, regex_partial_accuracy, regex_partial_precision
 from .retrieval import (
     RetrievalMetricFn,
+    RetrievalMetricFnWithOOS,
     retrieval_hit_rate,
     retrieval_hit_rate_intersecting,
     retrieval_hit_rate_macro,
@@ -31,6 +32,7 @@ from .retrieval import (
 )
 from .scoring import (
     ScoringMetricFn,
+    ScoringMetricFnWithOOS,
     scoring_accuracy,
     scoring_f1,
     scoring_hit_rate,
@@ -111,7 +113,9 @@ __all__ = [
     "DecisionMetricFn",
     "RegexMetricFn",
     "RetrievalMetricFn",
+    "RetrievalMetricFnWithOOS",
     "ScoringMetricFn",
+    "ScoringMetricFnWithOOS",
     "decision_accuracy",
     "decision_f1",
     "decision_precision",

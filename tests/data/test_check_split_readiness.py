@@ -12,7 +12,7 @@ from autointent.custom_types import Split
 
 
 @pytest.fixture
-def dataset_enough_samples():
+def dataset_enough_samples() -> Dataset:
     """Multiclass dataset with ≥2 samples per class (no OOS). Ready for stratification."""
     return Dataset.from_dict(
         {
@@ -42,7 +42,7 @@ def dataset_enough_samples():
 
 
 @pytest.fixture
-def dataset_three_classes_two_each():
+def dataset_three_classes_two_each() -> Dataset:
     """3 classes, 2 samples each (no OOS). Useful for split-size feasibility tests."""
     return Dataset.from_dict(
         {
@@ -64,7 +64,7 @@ def dataset_three_classes_two_each():
 
 
 @pytest.fixture
-def dataset_underpopulated():
+def dataset_underpopulated() -> Dataset:
     """Multiclass dataset with one class having only 1 sample. Not ready for stratification."""
     return Dataset.from_dict(
         {
@@ -86,7 +86,7 @@ def dataset_underpopulated():
 
 
 @pytest.fixture
-def dataset_two_classes_barely_enough():
+def dataset_two_classes_barely_enough() -> Dataset:
     """Two classes with exactly 2 samples each. Ready for default min_samples_per_class=2."""
     return Dataset.from_dict(
         {
@@ -108,7 +108,7 @@ def dataset_two_classes_barely_enough():
     )
 
 
-def test_check_split_readiness_ready_when_enough_samples(dataset_enough_samples):
+def test_check_split_readiness_ready_when_enough_samples(dataset_enough_samples: Dataset) -> None:
     """When every class has ≥ min_samples_per_class, result is ready."""
     result = check_split_readiness(
         dataset_enough_samples,
@@ -123,7 +123,7 @@ def test_check_split_readiness_ready_when_enough_samples(dataset_enough_samples)
     assert result.reason is None
 
 
-def test_check_split_readiness_not_ready_underpopulated(dataset_underpopulated):
+def test_check_split_readiness_not_ready_underpopulated(dataset_underpopulated: Dataset) -> None:
     """When at least one class has fewer than min samples, result is not ready."""
     result = check_split_readiness(
         dataset_underpopulated,
@@ -142,7 +142,7 @@ def test_check_split_readiness_not_ready_underpopulated(dataset_underpopulated):
     assert "1 (need 2)" in result.reason
 
 
-def test_check_split_readiness_missing_split(dataset_enough_samples):
+def test_check_split_readiness_missing_split(dataset_enough_samples: Dataset) -> None:
     """When split is not in dataset, result is not ready with reason."""
     result = check_split_readiness(
         dataset_enough_samples,
@@ -151,10 +151,11 @@ def test_check_split_readiness_missing_split(dataset_enough_samples):
     )
     assert result.ready is False
     assert result.underpopulated_classes == []
+    assert result.reason is not None
     assert "nonexistent_split" in result.reason
 
 
-def test_check_split_readiness_oos_allow_none(dataset_unsplitted):
+def test_check_split_readiness_oos_allow_none(dataset_unsplitted: Dataset) -> None:
     """When dataset has OOS and allow_oos_in_train is None, result is not ready."""
     with pytest.raises(ValueError, match="allow_oos_in_train"):
         check_split_readiness(
@@ -165,7 +166,7 @@ def test_check_split_readiness_oos_allow_none(dataset_unsplitted):
         )
 
 
-def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitted):
+def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitted: Dataset) -> None:
     """With OOS and allow_oos_in_train=False, in-domain classes are checked; clinc subset has enough."""
     result = check_split_readiness(
         dataset_unsplitted,
@@ -178,7 +179,7 @@ def test_check_split_readiness_oos_allow_false_enough_in_domain(dataset_unsplitt
     assert result.reason is None
 
 
-def test_check_split_readiness_multiclass_too_small_test_split(dataset_three_classes_two_each):
+def test_check_split_readiness_multiclass_too_small_test_split(dataset_three_classes_two_each: Dataset) -> None:
     """Even with >=2/class, stratification can fail if test split can't include all classes."""
     result = check_split_readiness(
         dataset_three_classes_two_each,
@@ -192,7 +193,7 @@ def test_check_split_readiness_multiclass_too_small_test_split(dataset_three_cla
     assert "too few test samples" in result.reason
 
 
-def test_check_split_readiness_multiclass_too_small_train_split(dataset_three_classes_two_each):
+def test_check_split_readiness_multiclass_too_small_train_split(dataset_three_classes_two_each: Dataset) -> None:
     """Even with >=2/class, stratification can fail if train split can't include all classes."""
     result = check_split_readiness(
         dataset_three_classes_two_each,
@@ -206,7 +207,7 @@ def test_check_split_readiness_multiclass_too_small_train_split(dataset_three_cl
     assert "too few train samples" in result.reason
 
 
-def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_barely_enough):
+def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_barely_enough: Dataset) -> None:
     """Custom min_samples_per_class is respected."""
     result = check_split_readiness(
         dataset_two_classes_barely_enough,
@@ -227,7 +228,7 @@ def test_check_split_readiness_min_samples_per_class_param(dataset_two_classes_b
     assert result_strict.min_samples_per_class_required == 3
 
 
-def test_check_split_readiness_multilabel_returns_ready():
+def test_check_split_readiness_multilabel_returns_ready() -> None:
     """Multilabel datasets are checked by per-label positive counts."""
     dataset = Dataset.from_dict(
         {
@@ -257,7 +258,7 @@ def test_check_split_readiness_multilabel_returns_ready():
     assert result.reason is not None
 
 
-def test_check_split_readiness_marks_declared_but_unseen_intent_as_underpopulated():
+def test_check_split_readiness_marks_declared_but_unseen_intent_as_underpopulated() -> None:
     """Intents with 0 samples should be flagged so callers can filter them out."""
     dataset = Dataset.from_dict(
         {
@@ -287,7 +288,7 @@ def test_check_split_readiness_marks_declared_but_unseen_intent_as_underpopulate
     assert result.reason is not None
 
 
-def test_check_split_readiness_multilabel_oos_allow_true_checks_oos_label():
+def test_check_split_readiness_multilabel_oos_allow_true_checks_oos_label() -> None:
     """Multilabel + OOS + allow_oos_in_train=True should not crash and should include OOS label."""
     dataset = Dataset.from_dict(
         {
@@ -317,7 +318,7 @@ def test_check_split_readiness_multilabel_oos_allow_true_checks_oos_label():
     assert result.reason is not None
 
 
-def test_check_split_readiness_multilabel_oos_allow_true_ready_when_oos_sufficient():
+def test_check_split_readiness_multilabel_oos_allow_true_ready_when_oos_sufficient() -> None:
     """When OOS count meets minimum, multilabel readiness can be true."""
     dataset = Dataset.from_dict(
         {
@@ -347,7 +348,7 @@ def test_check_split_readiness_multilabel_oos_allow_true_ready_when_oos_sufficie
     assert result.reason is None
 
 
-def test_split_dataset_multilabel_oos_allow_true_does_not_raise():
+def test_split_dataset_multilabel_oos_allow_true_does_not_raise() -> None:
     """Sanity-check: split_dataset supports multilabel+OOS when allow_oos_in_train=True."""
     dataset = Dataset.from_dict(
         {
@@ -378,7 +379,7 @@ def test_split_dataset_multilabel_oos_allow_true_does_not_raise():
     assert len(test) > 0
 
 
-def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samples):
+def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samples: Dataset) -> None:
     """When check_split_readiness says ready, split_dataset does not raise."""
     result = check_split_readiness(
         dataset_enough_samples,
@@ -400,7 +401,7 @@ def test_check_split_readiness_consistent_with_split_dataset(dataset_enough_samp
     assert len(test) > 0
 
 
-def test_check_split_readiness_underpopulated_implies_split_raises(dataset_underpopulated):
+def test_check_split_readiness_underpopulated_implies_split_raises(dataset_underpopulated: Dataset) -> None:
     """When check_split_readiness says not ready (underpopulated), split_dataset raises."""
     result = check_split_readiness(
         dataset_underpopulated,
@@ -421,7 +422,7 @@ def test_check_split_readiness_underpopulated_implies_split_raises(dataset_under
         )
 
 
-def test_stratified_splitter_multilabel_allow_oos_all_oos_raises_value_error():
+def test_stratified_splitter_multilabel_allow_oos_all_oos_raises_value_error() -> None:
     """Multilabel OOS mapping needs an in-domain row to infer label dimensionality."""
     from datasets import Dataset as HFDataset
 

@@ -26,7 +26,7 @@ class OpenSearchBackend(BaseIndexBackend):
 
     def __init__(self, config: OpenSearchConfig, vector_size: int) -> None:
         try:
-            import opensearchpy  # type: ignore[import-not-found]
+            import opensearchpy
 
             self._opensearchpy = opensearchpy
         except ImportError as e:

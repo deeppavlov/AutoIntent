@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from autointent import Dataset
@@ -5,9 +7,9 @@ from autointent.context.data_handler._stratification import split_dataset
 from autointent.custom_types import Split
 
 
-def test_train_test_split(dataset_unsplitted):
+def test_train_test_split(dataset_unsplitted: Dataset) -> None:
     dataset = dataset_unsplitted
-    kwargs = {
+    kwargs: dict[str, Any] = {
         "dataset": dataset,
         "split": Split.TRAIN,
         "test_size": 0.5,
@@ -26,7 +28,7 @@ def test_train_test_split(dataset_unsplitted):
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST)
 
 
-def test_multilabel_train_test_split(dataset_unsplitted):
+def test_multilabel_train_test_split(dataset_unsplitted: Dataset) -> None:
     dataset = dataset_unsplitted
     dataset = dataset.to_multilabel()
     dataset[Split.TRAIN], dataset[Split.TEST] = split_dataset(
@@ -44,7 +46,7 @@ def test_multilabel_train_test_split(dataset_unsplitted):
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST)
 
 
-def test_multilabel_train_test_split_multi_hot_preserves_label_coverage():
+def test_multilabel_train_test_split_multi_hot_preserves_label_coverage() -> None:
     dataset = Dataset.from_dict(
         {
             "train": [
@@ -72,7 +74,7 @@ def test_multilabel_train_test_split_multi_hot_preserves_label_coverage():
     assert dataset.get_n_classes(Split.TRAIN) == dataset.get_n_classes(Split.TEST) == dataset.n_classes
 
 
-def test_multilabel_train_test_split_few_shot(dataset_unsplitted):
+def test_multilabel_train_test_split_few_shot(dataset_unsplitted: Dataset) -> None:
     dataset = dataset_unsplitted
     dataset = dataset.to_multilabel()
     dataset[Split.TRAIN], dataset[Split.TEST] = split_dataset(
@@ -93,7 +95,7 @@ def test_multilabel_train_test_split_few_shot(dataset_unsplitted):
 
 
 @pytest.mark.parametrize("allow_oos_in_train", [True, False])
-def test_multiclass_train_test_split_few_shot(dataset_unsplitted, allow_oos_in_train):
+def test_multiclass_train_test_split_few_shot(dataset_unsplitted: Dataset, allow_oos_in_train: bool) -> None:
     train_num_rows = 10 if allow_oos_in_train else 8
     test_num_rows = 26 if allow_oos_in_train else 28
     examples_per_intent = 2

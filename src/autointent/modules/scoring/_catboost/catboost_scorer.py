@@ -107,7 +107,7 @@ class CatBoostScorer(BaseScorer):
         early_stopping_rounds: int = 100,
         iterations: int = 1000,
         depth: int = 6,
-        **catboost_kwargs: dict[str, Any],
+        **catboost_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import catboost
         require("catboost", extra="catboost")
@@ -140,7 +140,7 @@ class CatBoostScorer(BaseScorer):
         early_stopping_rounds: PositiveInt = 100,
         iterations: PositiveInt = 1000,
         depth: PositiveInt = 6,
-        **catboost_kwargs: dict[str, Any],
+        **catboost_kwargs: Any,  # noqa: ANN401
     ) -> CatBoostScorer:
         if embedder_config is None:
             embedder_config = context.resolve_embedder()

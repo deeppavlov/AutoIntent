@@ -1,8 +1,20 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 import pytest
 
 from autointent.exceptions import MismatchNumClassesError
-from autointent.modules import TunableDecision
+from autointent.modules.decision import TunableDecision
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
+
+    from autointent.custom_types import ListOfGenericLabels
+    from tests.modules.decision.conftest import FitData
 
 
 @pytest.mark.parametrize(
@@ -20,8 +32,13 @@ from autointent.modules import TunableDecision
         ),
     ],
 )
-def test_predict_scenarios(request, fixture_name, scores, desired):
-    fit_data = request.getfixturevalue(fixture_name)
+def test_predict_scenarios(
+    request: pytest.FixtureRequest,
+    fixture_name: str,
+    scores: npt.NDArray[Any],
+    desired: ListOfGenericLabels,
+) -> None:
+    fit_data: FitData = request.getfixturevalue(fixture_name)
 
     predictor = TunableDecision()
     predictor.fit(*fit_data)
@@ -30,7 +47,7 @@ def test_predict_scenarios(request, fixture_name, scores, desired):
     assert predictions == desired
 
 
-def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
+def test_fails_on_wrong_n_classes_predict(multiclass_fit_data: FitData) -> None:
     predictor = TunableDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
@@ -39,16 +56,16 @@ def test_fails_on_wrong_n_classes_predict(multiclass_fit_data):
 
 
 @pytest.mark.parametrize("fit_fixture", ["multiclass_fit_data", "multilabel_fit_data"])
-def test_dump_load(fit_fixture, request, tmp_path):
-    fit_data = request.getfixturevalue(fit_fixture)
+def test_dump_load(fit_fixture: str, request: pytest.FixtureRequest, tmp_path: Path) -> None:
+    fit_data: FitData = request.getfixturevalue(fit_fixture)
     predictor = TunableDecision()
     predictor.fit(*fit_data)
     predictions = predictor.predict(fit_data[0])
 
-    predictor.dump(tmp_path)
+    predictor.dump(str(tmp_path))
     del predictor
 
-    predictor = TunableDecision.load(tmp_path)
+    predictor = TunableDecision.load(str(tmp_path))
     assert hasattr(predictor, "thresh")
     assert predictor.thresh is not None
     assert isinstance(predictor.thresh, np.ndarray)

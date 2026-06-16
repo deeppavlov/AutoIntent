@@ -8,7 +8,7 @@ from autointent.schemas import Sample
 
 
 @pytest.fixture
-def dataset():
+def dataset() -> Dataset:
     return Dataset.from_dict(
         {
             "intents": [
@@ -24,7 +24,7 @@ def dataset():
     )
 
 
-def test_human_utterance_generator_sync(dataset):
+def test_human_utterance_generator_sync(dataset: Dataset) -> None:
     mock_llm = Mock()
     mock_llm.get_chat_completion.return_value = "Human-like utterance"
 
@@ -44,7 +44,7 @@ def test_human_utterance_generator_sync(dataset):
     assert all("label" in sample.dict() for sample in new_samples)
 
 
-def test_human_utterance_generator_async(dataset):
+def test_human_utterance_generator_async(dataset: Dataset) -> None:
     mock_llm = AsyncMock()
     mock_llm.get_chat_completion_async.return_value = "Human-like utterance"
 
@@ -63,7 +63,7 @@ def test_human_utterance_generator_async(dataset):
     assert all("label" in sample.dict() for sample in new_samples)
 
 
-def test_human_utterance_generator_respects_critic(dataset):
+def test_human_utterance_generator_respects_critic(dataset: Dataset) -> None:
     mock_llm = Mock()
     mock_llm.get_chat_completion.return_value = "Generated utterance"
 

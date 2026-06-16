@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import httpx
 import pytest
@@ -11,6 +11,9 @@ from pydantic import BaseModel, Field, model_validator
 
 from autointent.generation import Generator, RetriesExceededError
 from autointent.generation.chat_templates import Role
+
+if TYPE_CHECKING:
+    from respx.router import MockRouter
 
 
 class Person(BaseModel):
@@ -75,12 +78,14 @@ def _resp(content: str) -> httpx.Response:
 
 
 @pytest.fixture
-def generator(respx_openai):
+def generator(respx_openai: MockRouter) -> Generator:
     return Generator(max_tokens=1000, use_cache=False)
 
 
 class TestStructuredOutput:
-    def test_structured_output_sync_success_with_enough_retries(self, generator, respx_openai):
+    def test_structured_output_sync_success_with_enough_retries(
+        self, generator: Generator, respx_openai: MockRouter
+    ) -> None:
         respx_openai.post("/v1/chat/completions").mock(
             side_effect=[_resp(INVALID_PERSON_JSON), _resp(INVALID_PERSON_JSON), _resp(VALID_PERSON_JSON)]
         )
@@ -92,7 +97,9 @@ class TestStructuredOutput:
         assert isinstance(result, Person)
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_success_with_enough_retries(self, generator, respx_openai):
+    async def test_structured_output_async_success_with_enough_retries(
+        self, generator: Generator, respx_openai: MockRouter
+    ) -> None:
         respx_openai.post("/v1/chat/completions").mock(
             side_effect=[_resp(INVALID_PERSON_JSON), _resp(INVALID_PERSON_JSON), _resp(VALID_PERSON_JSON)]
         )
@@ -103,7 +110,9 @@ class TestStructuredOutput:
         )
         assert isinstance(result, Person)
 
-    def test_structured_output_sync_failure_with_insufficient_retries(self, generator, respx_openai):
+    def test_structured_output_sync_failure_with_insufficient_retries(
+        self, generator: Generator, respx_openai: MockRouter
+    ) -> None:
         respx_openai.post("/v1/chat/completions").mock(return_value=_resp(INVALID_PERSON_JSON))
         with pytest.raises(RetriesExceededError):
             generator.get_structured_output_sync(
@@ -113,7 +122,9 @@ class TestStructuredOutput:
             )
 
     @pytest.mark.asyncio
-    async def test_structured_output_async_failure_with_insufficient_retries(self, generator, respx_openai):
+    async def test_structured_output_async_failure_with_insufficient_retries(
+        self, generator: Generator, respx_openai: MockRouter
+    ) -> None:
         respx_openai.post("/v1/chat/completions").mock(return_value=_resp(INVALID_PERSON_JSON))
         with pytest.raises(RetriesExceededError):
             await generator.get_structured_output_async(

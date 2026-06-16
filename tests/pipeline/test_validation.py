@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
 
 from autointent import Pipeline
 
+if TYPE_CHECKING:
+    from autointent import Dataset
 
-def test_validate_search_space_multiclass(dataset):
+
+def test_validate_search_space_multiclass(dataset: Dataset) -> None:
     search_space = [
         {
             "node_type": "decision",
@@ -17,7 +24,7 @@ def test_validate_search_space_multiclass(dataset):
         pipeline_optimizer.validate_modules(dataset, mode="raise")
 
 
-def test_validate_search_space_multilabel(dataset):
+def test_validate_search_space_multilabel(dataset: Dataset) -> None:
     dataset = dataset.to_multilabel()
 
     search_space = [

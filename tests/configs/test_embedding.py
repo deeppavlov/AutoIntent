@@ -1,10 +1,12 @@
+from typing import Any
+
 import pytest
 
 from autointent.nodes import NodeOptimizer
 
 
 @pytest.fixture
-def valid_embedding_config():
+def valid_embedding_config() -> dict[str, Any]:
     """Fixture for a valid EmbeddingNode configuration."""
     return {
         "node_type": "embedding",
@@ -20,7 +22,7 @@ def valid_embedding_config():
     }
 
 
-def test_valid_embedding_config(valid_embedding_config):
+def test_valid_embedding_config(valid_embedding_config: dict[str, Any]) -> None:
     """Test that a valid embedding config passes validation."""
     node = NodeOptimizer(**valid_embedding_config)
     assert node.node_type == "embedding"
@@ -30,9 +32,9 @@ def test_valid_embedding_config(valid_embedding_config):
     assert "embedder_config" in node.modules_search_spaces[0]
 
 
-def test_invalid_embedding_config_missing_field():
+def test_invalid_embedding_config_missing_field() -> None:
     """Test that a missing required field raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "embedding",
         # Missing "target_metric"
         "search_space": [
@@ -48,9 +50,9 @@ def test_invalid_embedding_config_missing_field():
         NodeOptimizer(**invalid_config)
 
 
-def test_invalid_embedding_config_wrong_type():
+def test_invalid_embedding_config_wrong_type() -> None:
     """Test that an invalid field type raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "embedding",
         "target_metric": "retrieval_mrr",
         "search_space": [
