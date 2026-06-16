@@ -128,7 +128,7 @@ class TestVramForTransformer:
         inf_acts = inf_total - inf_weights
         assert inf_acts > 0
         assert train_acts > inf_acts
-        # 12-layer model: training activations should be at least ~5× inference.
+        # 12-layer model: training activations should be at least ~5x inference.
         assert train_acts / inf_acts > 5
 
     def test_amp_does_not_reduce_weight_side_vram(self, meta: ModelMeta) -> None:
@@ -503,7 +503,8 @@ class TestPerDriverBatchHint:
             _profile(vram_gb=64.0),
         )
         d = next(d for d in report.resource.drivers if d["module"] == "bert")
-        assert d["max_batch_size"] is not None and d["max_batch_size"] > 32
+        assert d["max_batch_size"] is not None
+        assert d["max_batch_size"] > 32
 
     def test_multiple_drivers_carry_independent_max_batch(self) -> None:
         cfg = {

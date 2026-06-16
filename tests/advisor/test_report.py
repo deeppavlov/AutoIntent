@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from autointent._advisor._report import (
@@ -81,5 +83,5 @@ class TestToDictSerialization:
 
     def test_finding_is_frozen(self) -> None:
         f = Finding(phase="resource", severity=Severity.AMPLE, message="ok")
-        with pytest.raises(Exception):  # noqa: PT011 - dataclass.FrozenInstanceError varies
+        with pytest.raises(dataclasses.FrozenInstanceError):
             f.message = "changed"  # type: ignore[misc]

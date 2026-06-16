@@ -8,7 +8,7 @@ report straight through.
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ._report import PreflightReport
@@ -18,7 +18,7 @@ _PHASE_ORDER = ("resource", "data", "config")
 _PHASE_LABEL = {"resource": "Resource", "data": "Data", "config": "Config"}
 
 
-def _batch_hint(driver: dict) -> str:
+def _batch_hint(driver: dict[str, Any]) -> str:
     """Per-driver batch annotation: '64 → 32', '64', '64 (no fit)', or ''."""
     bs = driver.get("batch_size")
     if bs is None:
@@ -37,12 +37,11 @@ _DRIVERS_LIMIT = 8
 _DRIVERS_HEADERS = ("Node", "Model", "Mode", "VRAM", "Time", "Batch", "Source")
 
 
-def _render_drivers_table(drivers: list[dict]) -> list[str]:
+def _render_drivers_table(drivers: list[dict[str, Any]]) -> list[str]:
     """Format the Drivers of cost section as an aligned table."""
     visible = drivers[:_DRIVERS_LIMIT]
-    rows: list[tuple[str, ...]] = []
-    for d in visible:
-        rows.append((
+    rows: list[tuple[str, ...]] = [
+        (
             f"{d['node_type']}.{d['module']}",
             str(d["model"]),
             str(d["mode"]),
@@ -50,7 +49,9 @@ def _render_drivers_table(drivers: list[dict]) -> list[str]:
             f"{d['time_hours']:.2f} h",
             _batch_hint(d),
             f"[{d['confidence']}]",
-        ))
+        )
+        for d in visible
+    ]
 
     widths = [len(h) for h in _DRIVERS_HEADERS]
     for row in rows:
@@ -113,8 +114,7 @@ def render_text(report: PreflightReport) -> str:
 
     if report.notes:
         lines.append("Notes:")
-        for note in report.notes:
-            lines.append(f"  • {note}")
+        lines.extend(f"  • {note}" for note in report.notes)
         lines.append("")
 
     summary = f"Verdict: {'feasible' if report.is_feasible else 'INFEASIBLE'} "

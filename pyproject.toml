@@ -296,6 +296,12 @@ module = [
     "dspy.evaluate.auto_evaluation",
     "codecarbon",
     "catboost",
+    "openai",
+    "openai.*",
+    "tiktoken",
+    "peft",
+    "sentence_transformers",
+    "psutil",
 ]
 ignore_missing_imports = true
 

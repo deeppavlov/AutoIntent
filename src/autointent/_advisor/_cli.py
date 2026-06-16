@@ -17,7 +17,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from datasets import ClassLabel, Sequence, load_dataset
@@ -27,9 +27,15 @@ from autointent.utils import load_preset
 from ._estimates import run_preflight
 from ._hardware import detect_hardware
 from ._render import render_json, render_recommendation, render_text
-from ._report import DatasetStats, PreflightReport, Severity
+from ._report import DatasetStats, Severity
+
+if TYPE_CHECKING:
+    from ._report import PreflightReport
 
 logger = logging.getLogger("autointent.advisor")
+
+_SAMPLE_LIMIT = 1000
+_P95_PERCENTILE = 0.95
 
 BUNDLED_PRESETS = [
     "transformers-heavy",
@@ -111,12 +117,12 @@ def _stats_from_dataset(path: str, *, multilabel: bool) -> DatasetStats:
 
     detected_multilabel, n_classes = _label_shape(train, label_col, fallback_multilabel=multilabel)
 
-    sample = train[:1000] if len(train) > 1000 else train[:]
+    sample = train[:_SAMPLE_LIMIT] if len(train) > _SAMPLE_LIMIT else train[:]
     lengths = [len(str(s).split()) for s in (sample.get(utt_col, []) if utt_col else [])]
     avg_tokens = int(sum(lengths) / max(1, len(lengths))) if lengths else 32
     if lengths:
         sorted_lengths = sorted(lengths)
-        idx = max(0, min(len(sorted_lengths) - 1, int(round((len(sorted_lengths) - 1) * 0.95))))
+        idx = max(0, min(len(sorted_lengths) - 1, round((len(sorted_lengths) - 1) * _P95_PERCENTILE)))
         p95 = sorted_lengths[idx]
     else:
         p95 = avg_tokens * 2
@@ -133,7 +139,7 @@ def _stats_from_dataset(path: str, *, multilabel: bool) -> DatasetStats:
     )
 
 
-def _label_shape(train: Any, label_col: str | None, *, fallback_multilabel: bool) -> tuple[bool, int]:
+def _label_shape(train: Any, label_col: str | None, *, fallback_multilabel: bool) -> tuple[bool, int]:  # noqa: ANN401
     """Derive (multilabel, n_classes) from the HF feature schema, with a value-based fallback."""
     if label_col is None:
         return fallback_multilabel, 0
@@ -155,7 +161,13 @@ def _label_shape(train: Any, label_col: str | None, *, fallback_multilabel: bool
     return False, len({label for label in train[label_col] if label is not None})
 
 
-def _rare_classes(train: Any, label_col: str, multilabel: bool, n_classes: int, min_count: int = 3) -> list[str]:
+def _rare_classes(
+    train: Any,  # noqa: ANN401
+    label_col: str,
+    multilabel: bool,
+    n_classes: int,
+    min_count: int = 3,
+) -> list[str]:
     """Return labels with fewer than ``min_count`` samples in the train split.
 
     Used to surface the LogisticRegressionCV(cv=3) failure case before fit.
@@ -293,7 +305,7 @@ def main(argv: list[str] | None = None) -> int:
         level=logging.DEBUG if args.verbose else logging.WARNING,
         format="%(levelname)s %(name)s: %(message)s",
     )
-    return args.func(args)
+    return int(args.func(args))
 
 
 if __name__ == "__main__":

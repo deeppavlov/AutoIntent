@@ -8,10 +8,10 @@ heuristic value rather than raising. The advisor flips the report's
 from __future__ import annotations
 
 import logging
-import os
 import re
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from huggingface_hub import HfApi, scan_cache_dir, try_to_load_from_cache
@@ -54,7 +54,7 @@ class ModelMeta:
 
 
 @lru_cache(maxsize=1)
-def hub_reachable(timeout_s: float = 2.0) -> bool:
+def hub_reachable() -> bool:
     """Single up-front probe. Memoized per process."""
     try:
         HfApi().list_models(limit=1)
@@ -157,7 +157,7 @@ def resolve_model(model_name: str) -> ModelMeta:
     Always returns a value — never raises — so the advisor can keep going
     on offline machines or for unknown checkpoints.
     """
-    if model_name.startswith("local:") or os.path.isabs(model_name):
+    if model_name.startswith("local:") or Path(model_name).is_absolute():
         return ModelMeta(
             name=model_name,
             params_millions=_heuristic_params_millions(model_name),

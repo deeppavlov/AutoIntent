@@ -12,6 +12,7 @@ import os
 import platform
 import shutil
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Literal
 
 import psutil
@@ -23,6 +24,9 @@ Accelerator = Literal["cuda", "mps", "cpu"]
 
 # matches macOS PYTORCH_MPS_HIGH_WATERMARK_RATIO default
 MPS_DEFAULT_BUDGET_RATIO = 0.7
+
+_HIGH_GPU_VRAM_GB = 24
+_MID_GPU_VRAM_GB = 12
 
 
 @dataclass
@@ -41,20 +45,20 @@ class HardwareProfile:
             return "cpu"
         if self.accelerator == "mps":
             return "apple-silicon"
-        if self.vram_gb >= 24:
+        if self.vram_gb >= _HIGH_GPU_VRAM_GB:
             return "high-gpu"
-        if self.vram_gb >= 12:
+        if self.vram_gb >= _MID_GPU_VRAM_GB:
             return "mid-gpu"
         return "low-gpu"
 
 
 def _detect_ram_gb() -> float:
-    return psutil.virtual_memory().total / (1024**3)
+    return float(psutil.virtual_memory().total) / (1024**3)
 
 
 def _detect_free_disk_gb(path: str | None = None) -> float:
-    cache = path or os.environ.get("HF_HOME") or os.path.expanduser("~/.cache/huggingface")
-    probe_path = cache if os.path.exists(cache) else os.path.expanduser("~")
+    cache = Path(path or os.environ.get("HF_HOME") or Path("~/.cache/huggingface").expanduser())
+    probe_path = cache if cache.exists() else Path("~").expanduser()
     try:
         usage = shutil.disk_usage(probe_path)
         return usage.free / (1024**3)

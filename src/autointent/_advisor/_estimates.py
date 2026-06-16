@@ -9,16 +9,26 @@ treat them as ballparks, not budgets.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from autointent.configs._optimization import HPOConfig
 
-from ._hardware import HardwareProfile
-from ._hub import ModelMeta, hub_reachable, resolve_model
-from ._report import DatasetStats, PreflightReport, ResourceEstimate, Severity
+from ._hub import hub_reachable, resolve_model
+from ._report import PreflightReport, ResourceEstimate, Severity
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from ._hardware import HardwareProfile
+    from ._hub import ModelMeta
+    from ._report import DatasetStats
+
+_MULTICLASS_THRESHOLD = 2
+_PARAMS_LARGE = 300
+_PARAMS_BASE = 100
+_PARAMS_SMALL = 50
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +60,7 @@ def _validated_config(config: dict[str, Any]) -> _AdvisorConfig:
     except ValidationError as e:
         logger.warning("Advisor config failed validation; falling back to defaults: %s", e)
         return _AdvisorConfig()
+
 
 # Severity thresholds as a fraction of available budget: at or above _TIGHT
 # downgrades to Severity.TIGHT; at or above _OVER downgrades to Severity.OVER.
@@ -94,22 +105,18 @@ def _extract_model_names(module_entry: dict[str, Any]) -> list[str]:
     candidates: list[str] = []
     cfg = module_entry.get("classification_model_config")
     if isinstance(cfg, list):
-        for c in cfg:
-            if isinstance(c, dict) and c.get("model_name"):
-                candidates.append(c["model_name"])
+        candidates.extend(c["model_name"] for c in cfg if isinstance(c, dict) and c.get("model_name"))
     elif isinstance(cfg, dict) and cfg.get("model_name"):
         candidates.append(cfg["model_name"])
     embedder_cfg = module_entry.get("embedder_config")
     if isinstance(embedder_cfg, list):
-        for c in embedder_cfg:
-            if isinstance(c, dict) and c.get("model_name"):
-                candidates.append(c["model_name"])
+        candidates.extend(c["model_name"] for c in embedder_cfg if isinstance(c, dict) and c.get("model_name"))
     elif isinstance(embedder_cfg, dict) and embedder_cfg.get("model_name"):
         candidates.append(embedder_cfg["model_name"])
     return candidates
 
 
-def _max_int(value: Any, default: int) -> int:
+def _max_int(value: Any, default: int) -> int:  # noqa: ANN401
     if value is None:
         return default
     if isinstance(value, list) and value:
@@ -163,7 +170,7 @@ def _vram_for_transformer(
     batch_size: int = 0,
     seq_len: int = _DEFAULT_SEQ_LEN,
 ) -> float:
-    """Total VRAM in GB: weights + grads + optimizer state + activations × batch.
+    """Total VRAM in GB: weights + grads + optimizer state + activations x batch.
 
     Activation accounting differs by mode — training keeps per-layer outputs for
     backward; inference only needs one or two layers in flight.
@@ -200,11 +207,11 @@ def _n_layers(meta: ModelMeta | None) -> int:
     if meta is None:
         return 12
     params = meta.params_millions
-    if params >= 300:
+    if params >= _PARAMS_LARGE:
         return 24
-    if params >= 100:
+    if params >= _PARAMS_BASE:
         return 12
-    if params >= 50:
+    if params >= _PARAMS_SMALL:
         return 8
     return 6
 
@@ -218,20 +225,17 @@ def _activations_gb_per_sample(
 ) -> float:
     """Heuristic activation memory per sample.
 
-    Training: ``seq_len × hidden × layers × const`` — per-layer outputs are kept
+    Training: ``seq_len x hidden x layers x const`` — per-layer outputs are kept
     for backward.
-    Inference: ``seq_len × hidden × const`` — only one or two layers' outputs in
+    Inference: ``seq_len x hidden x const`` — only one or two layers' outputs in
     flight at once.
     Mixed precision halves activation bytes.
     """
     hidden = _embedder_dim(meta)
-    if is_training:
-        # Training keeps every layer's outputs for backward → scales × n_layers.
-        # The 16-byte/token/layer coefficient bundles fp32 activation + ~4× backward overhead.
-        bytes_per_sample = seq_len * hidden * _n_layers(meta) * 16
-    else:
-        # Inference only holds ~1-2 layers' outputs in flight at once.
-        bytes_per_sample = seq_len * hidden * 8
+    # Training keeps every layer's outputs for backward -> scales x n_layers.
+    # The 16-byte/token/layer coefficient bundles fp32 activation + ~4x backward overhead.
+    # Inference only holds ~1-2 layers' outputs in flight at once.
+    bytes_per_sample = seq_len * hidden * _n_layers(meta) * 16 if is_training else seq_len * hidden * 8
     if mixed_precision:
         bytes_per_sample //= 2
     return bytes_per_sample / (1024**3)
@@ -265,11 +269,11 @@ def _embedder_dim(meta: ModelMeta | None) -> int:
     if meta is None:
         return 768
     params = meta.params_millions
-    if params >= 300:
+    if params >= _PARAMS_LARGE:
         return 1024
-    if params >= 100:
+    if params >= _PARAMS_BASE:
         return 768
-    if params >= 50:
+    if params >= _PARAMS_SMALL:
         return 512
     return 384
 
@@ -313,7 +317,7 @@ def _ram_for_catboost(*, stats: DatasetStats, n_features: int, iterations: int, 
     data_bytes = 4.0 * stats.n_samples * n_features
     histograms_bytes = 4.0 * n_features * _CATBOOST_DEFAULT_BINS
     trees_bytes = iterations * (2**depth) * _CATBOOST_BYTES_PER_TREE_NODE
-    return (data_bytes + histograms_bytes + trees_bytes) / (1024**3)
+    return float((data_bytes + histograms_bytes + trees_bytes) / (1024**3))
 
 
 def _time_for_catboost(
@@ -360,7 +364,7 @@ def _classify_severity(estimate: float, budget: float) -> Severity:
     return Severity.AMPLE
 
 
-def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
+def _resource_phase(  # noqa: PLR0912, C901, PLR0915 - kept linear for clarity
     config: dict[str, Any],
     stats: DatasetStats,
     hardware: HardwareProfile,
@@ -394,7 +398,7 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             transformer_entries.append((node_idx, node_type, entry))
 
     # Track the heaviest module per node so dump_modules accounting is bounded by
-    # "one selected variant per node × n_trials", not "sum of every candidate".
+    # "one selected variant per node x n_trials", not "sum of every candidate".
     node_max_weights: dict[int, float] = {}
 
     for node_idx, node_type, entry in transformer_entries:
@@ -490,7 +494,9 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
             on_gpu = entry.get("task_type") == "GPU" and hardware.accelerator == "cuda"
             # CatBoost's MultiClass loss grows per-class trees only above binary;
             # binary uses Logloss with one tree per iteration.
-            cb_class_mult = max(1, stats.n_classes) if stats.n_classes > 2 or stats.multilabel else 1
+            cb_class_mult = (
+                max(1, stats.n_classes) if stats.n_classes > _MULTICLASS_THRESHOLD or stats.multilabel else 1
+            )
             ram_total = _ram_for_catboost(
                 stats=stats,
                 n_features=embedder_dim,
@@ -569,7 +575,6 @@ def _resource_phase(  # noqa: PLR0912 - kept linear for clarity
         msg += f" vs available {hardware.vram_gb:.1f} GB"
         report.add("resource", vram_sev, msg, metric="vram")
 
-
     ram_sev = _classify_severity(effective_ram, hardware.ram_gb)
     report.add(
         "resource",
@@ -635,13 +640,14 @@ def _data_phase(
         max_len = _max_int(max_len_value, 512)
         if p95 > max_len:
             severity = Severity.OVER if p95 > max_len * 1.5 else Severity.TIGHT
+            module_name = entry.get("module_name", "?")
             report.add(
                 "data",
                 severity,
-                f"Train tokens p95~{p95} exceeds {entry.get('module_name', '?')}.max_length={max_len}; expect silent truncation.",
+                f"Train tokens p95~{p95} exceeds {module_name}.max_length={max_len}; expect silent truncation.",
             )
 
-    # rare class × linear-CV (LogisticRegressionCV cv=3 needs ≥3 samples/class;
+    # rare class x linear-CV (LogisticRegressionCV cv=3 needs >=3 samples/class;
     # multilabel path uses one-vs-rest without CV so the failure can't occur there)
     has_linear = any(e.get("module_name") == "linear" for _, e in _walk_modules(config.get("search_space") or []))
     if has_linear and stats.rare_classes and not stats.multilabel:
@@ -651,7 +657,7 @@ def _data_phase(
             (f"LogisticRegressionCV (cv=3) will fail: classes {stats.rare_classes[:5]} have <3 samples."),
         )
 
-    # partial descriptions × description scorer
+    # partial descriptions x description scorer
     description_modules = {"description_bi", "description_cross", "description_llm"}
     has_description = any(
         e.get("module_name") in description_modules for _, e in _walk_modules(config.get("search_space") or [])
