@@ -36,7 +36,15 @@ A `.vscode/settings.json` file has been added to the project root, which points 
 
 4. You can open a PR!
 
-Every commit in any PR triggers github actions with automated tests. All checks block merging into the main branch (with rare exceptions).
+Every commit in any PR triggers GitHub Actions. By default, PR commits run a **minimal** test matrix (Ubuntu + Python 3.14 only) and **skip** the docs build, to keep per-commit cost and turnaround low. The required checks — `ruff`, `mypy`, and the aggregated `all-tests` — block merging into `dev` (with rare exceptions).
+
+### Running the full CI matrix (`full-ci` label)
+
+The **full** matrix — Ubuntu on Python 3.10–3.14 plus Windows on Python 3.10 — and the documentation build (`make test-docs`, ~20 min) run automatically on every push to `dev`. On a PR they run only when the PR carries the **`full-ci`** label.
+
+- Add the `full-ci` label to a PR to run the full matrix and docs build before merge. Use it for changes that touch CI, packaging, cross-platform code, or documentation.
+- The label is **sticky**: once added, every subsequent commit on that PR runs the full suite until you remove the label.
+- Because ordinary PR commits only run the minimal matrix and skip docs, a cross-platform, cross-Python, or docs regression may not surface until the push to `dev` after merge. Add `full-ci` ahead of merging anything risky.
 
 Sometimes waiting for CI can be long, and sometimes it's more convenient to run individual tests:
 - Check that your changes don't break existing features
@@ -82,7 +90,7 @@ Use this checklist when cutting a new package release (for example `0.3.0`). Doc
 1. **Align versions** across `pyproject.toml`, `docs/source/conf.py` (`release`), and `CHANGELOG.md`.
 2. **Update prose** under `docs/source/` (`.rst` files).
 3. **Update tutorials** in the repo-root `user_guides/` directory — not under `docs/source/user_guides/`, which is generated at build time and gitignored.
-4. **Run doctests** (same as CI on PRs and pushes to `dev`):
+4. **Run doctests** (same as CI on pushes to `dev` and on `full-ci` PRs):
    ```bash
    make test-docs
    ```
