@@ -5,21 +5,54 @@ on:
     branches:
       - dev
   pull_request:
+    # `labeled` is required so adding the `full-ci` label re-triggers CI
+    # with the full OS/Python matrix on an open PR.
+    types: [opened, synchronize, reopened, labeled]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Decide matrix scope once and fan out to every downstream job.
+  # Full matrix (all OSes + all Python versions) runs on push to dev and
+  # on PRs carrying the `full-ci` label. Default PR commits only run
+  # ubuntu-latest + Python 3.14 to keep per-commit cost low.
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    # The `labeled` trigger fires for *any* label, but only `full-ci` should
+    # do work. Skip the whole run when some other label is added, so stray
+    # labels don't burn a redundant CI run. Every non-`labeled` event (push,
+    # opened/synchronize/reopened) proceeds because github.event.action is
+    # then not 'labeled'. When this is false the run no-ops and `all-tests`
+    # still reports success (see its guarded step below).
+    if: github.event.action != 'labeled' || github.event.label.name == 'full-ci'
+    outputs:
+      matrix: ${{ steps.compute.outputs.matrix }}
+      warm_os: ${{ steps.compute.outputs.warm_os }}
+      full: ${{ steps.compute.outputs.full }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Compute matrix
+        id: compute
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: python .ci/compute_matrix.py
+
   warm-cache:
     name: Warm HF cache
+    needs: setup
     strategy:
       fail-fast: false
+      # Per-OS runners are needed because actions/cache pins by ${{ runner.os }}
+      # so Linux test jobs only restore caches saved by a Linux runner (likewise
+      # for Windows). The prewarm config itself is shared (.ci/hf-prewarm.yaml).
       matrix:
-        # Per-OS runners are needed because actions/cache pins by ${{ runner.os }}
-        # so Linux test jobs only restore caches saved by a Linux runner (likewise
-        # for Windows). The prewarm config itself is shared (.ci/hf-prewarm.yaml).
-        os: [ubuntu-latest, windows-latest]
+        os: ${{ fromJSON(needs.setup.outputs.warm_os) }}
     runs-on: ${{ matrix.os }}
     # Best-effort: an HF outage here must not cancel every PR. Test jobs
     # `needs: warm-cache` but proceed regardless via continue-on-error.
@@ -59,25 +92,27 @@ jobs:
 
   unit-tests:
     name: unit-tests
-    needs: warm-cache
+    needs: [setup, warm-cache]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
       test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
       extras: --extra openai
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   test-embedder:
     name: test-embedder
-    needs: warm-cache
+    needs: [setup, warm-cache]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
       test_command: pytest -n auto tests/embedder/ tests/callback/
       extras: --extra sentence-transformers --extra transformers
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   test-scorers:
     name: test-scorers
-    needs: warm-cache
+    needs: [setup, warm-cache]
     strategy:
       fail-fast: false
       matrix:
@@ -87,33 +122,37 @@ jobs:
     with:
       test_command: pytest -n auto tests/modules/scoring/
       extras: ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   test-presets:
     name: test-presets
-    needs: warm-cache
+    needs: [setup, warm-cache]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
       test_command: pytest -n auto tests/pipeline/test_presets.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   test-optimization:
     name: test-optimization
-    needs: warm-cache
+    needs: [setup, warm-cache]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
       test_command: pytest -n auto tests/pipeline/test_optimization.py tests/pipeline/test_pipeline_interruption.py tests/pipeline/test_validation.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   test-inference:
     name: test-inference
-    needs: warm-cache
+    needs: [setup, warm-cache]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
       test_command: pytest -n auto tests/pipeline/test_inference.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
+      matrix: ${{ needs.setup.outputs.matrix }}
 
   # Single aggregator over every test fan-out so the GitHub ruleset only
   # needs one required check ("all-tests") instead of 54 matrix entries.
@@ -135,7 +174,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check that every test job succeeded
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        # First clause mirrors `setup.if`: a non-`full-ci` `labeled` event
+        # skips the whole matrix on purpose, so those skips are not a
+        # failure and `all-tests` stays green for the unchanged SHA. Every
+        # other event keeps the strict failure/cancelled/skipped gate.
+        if: >-
+          (github.event.action != 'labeled' || github.event.label.name == 'full-ci')
+          && (contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped'))
         run: |
           echo "One or more test jobs did not succeed:"
           echo '${{ toJson(needs) }}'

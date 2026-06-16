@@ -12,6 +12,10 @@ on:
         type: string
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
+      matrix:
+        required: true
+        type: string
+        description: 'JSON-encoded strategy.matrix payload (os / python-version / include)'
 
 # No concurrency block here. The parent workflow (ci.yaml) owns the
 # concurrency group for the whole run; if reusable-test sets its own group
@@ -26,12 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ ubuntu-latest ]
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", ]
-        include:
-          - os: windows-latest
-            python-version: "3.10"
+      matrix: ${{ fromJSON(inputs.matrix) }}
 
     steps:
     - name: Checkout code
