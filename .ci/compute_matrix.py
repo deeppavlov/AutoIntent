@@ -1,14 +1,29 @@
-"""Decide test matrix scope and emit it to GITHUB_OUTPUT.
+# ruff: noqa: INP001
+# .ci/ is a top-level script directory invoked by GitHub Actions, not a
+# Python package, so no __init__.py here (mirrors .ci/warm_hf_cache.py).
+"""Decide test matrix scope and emit it to ``GITHUB_OUTPUT``.
 
-Full matrix runs on push to dev and on PRs labeled `full-ci`.
+Full matrix runs on push to ``dev`` and on PRs labeled ``full-ci``.
 Otherwise (default PR commits) only ubuntu-latest + Python 3.14 runs.
+
+Inputs come from environment variables:
+
+* ``EVENT_NAME`` - the GitHub event name (``push`` / ``pull_request``).
+* ``LABELS_JSON`` - ``toJSON(github.event.pull_request.labels.*.name)``
+  from the workflow; ``null`` / missing on non-PR events.
+* ``GITHUB_OUTPUT`` - file the runner reads to pick up step outputs.
+
+The script writes ``matrix``, ``warm_os`` and ``full`` to that output
+file and mirrors them to the log for debuggability.
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
+from pathlib import Path
 
 FULL_MATRIX = {
     "os": ["ubuntu-latest"],
@@ -23,8 +38,11 @@ MINIMAL_MATRIX = {
 
 FULL_CI_LABEL = "full-ci"
 
+logger = logging.getLogger("compute_matrix")
+
 
 def collect_os_list(matrix: dict) -> list[str]:
+    """Return the unique runner OSes referenced by ``matrix`` (base + includes)."""
     seen: list[str] = []
     for entry in matrix.get("os", []):
         if entry not in seen:
@@ -37,12 +55,19 @@ def collect_os_list(matrix: dict) -> list[str]:
 
 
 def is_full(event_name: str, labels: list[str]) -> bool:
+    """Return True iff this run should fan out across the full OS/Python matrix."""
     if event_name == "push":
         return True
     return FULL_CI_LABEL in labels
 
 
 def parse_labels(raw: str) -> list[str]:
+    """Parse the ``LABELS_JSON`` env var into a list of label names.
+
+    Returns an empty list when the value is missing, ``"null"`` (the
+    ``toJSON`` rendering of a missing PR object), malformed, or not a
+    JSON array of strings.
+    """
     if not raw:
         return []
     try:
@@ -55,6 +80,9 @@ def parse_labels(raw: str) -> list[str]:
 
 
 def main() -> int:
+    """Compute matrix from env, write outputs, log a summary, return 0."""
+    logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
+
     event_name = os.environ.get("EVENT_NAME", "")
     labels = parse_labels(os.environ.get("LABELS_JSON", ""))
 
@@ -62,22 +90,23 @@ def main() -> int:
     matrix = FULL_MATRIX if full else MINIMAL_MATRIX
     warm_os = collect_os_list(matrix)
 
-    output_path = os.environ.get("GITHUB_OUTPUT")
     payload = {
         "matrix": json.dumps(matrix),
         "warm_os": json.dumps(warm_os),
         "full": "true" if full else "false",
     }
-    if output_path:
-        with open(output_path, "a", encoding="utf-8") as fh:
-            for key, value in payload.items():
-                fh.write(f"{key}={value}\n")
 
-    print(f"event_name={event_name}", file=sys.stderr)
-    print(f"labels={labels}", file=sys.stderr)
-    print(f"full={full}", file=sys.stderr)
-    print(f"matrix={payload['matrix']}", file=sys.stderr)
-    print(f"warm_os={payload['warm_os']}", file=sys.stderr)
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if output_path:
+        lines = "".join(f"{key}={value}\n" for key, value in payload.items())
+        with Path(output_path).open("a", encoding="utf-8") as fh:
+            fh.write(lines)
+
+    logger.info("event_name=%s", event_name)
+    logger.info("labels=%s", labels)
+    logger.info("full=%s", full)
+    logger.info("matrix=%s", payload["matrix"])
+    logger.info("warm_os=%s", payload["warm_os"])
     return 0
 
 
