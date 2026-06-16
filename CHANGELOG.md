@@ -24,6 +24,7 @@ Compared to [0.3.0](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.0
 
 - **Full OS × Python matrix** is now gated behind the `full-ci` PR label and `dev` pushes; ordinary PRs run a faster default matrix (#318).
 - **`mypy --strict`** is enforced on `tests/` to prevent type drift between fixtures and production code (#316).
+- **Soft `mypy` profile** added for `docs/` and `user_guides/` so tutorials and Sphinx helpers are type-checked without forcing them onto strict mode (#320).
 - **Live-API tests** (OpenAI, OpenSearch) are mocked in CI — no network calls or credentials required to run the suite locally (#301).
 - **HF cache prewarm** workflow plus a `.ci/warm_hf_cache.py` helper keyed off `DEFAULT_REVISIONS` removes the long-standing Hub rate-limit flakes in the matrix (#294).
 - **GitHub Actions** runners bumped to Node 24 images (#300).
