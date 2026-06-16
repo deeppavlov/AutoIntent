@@ -22,7 +22,7 @@ class TestEmbedderBasic:
         """Create an Embedder instance for testing."""
         return Embedder(embedder_config)
 
-    def test_embedding_calculation(self, embedder: Embedder):
+    def test_embedding_calculation(self, embedder: Embedder) -> None:
         """Test basic embedding calculation functionality."""
         test_utterances = ["Hello world", "Test sentence", "Another example"]
 
@@ -34,7 +34,7 @@ class TestEmbedderBasic:
         if hasattr(embedder.config, "similarity_fn_name"):
             assert np.allclose(np.linalg.norm(embeddings, axis=1), 1.0, atol=1e-5)  # normalized
 
-    def test_embedding_reproducibility(self, embedder: Embedder):
+    def test_embedding_reproducibility(self, embedder: Embedder) -> None:
         """Test that embeddings are reproducible for same input."""
         test_utterances = ["Hello world", "Test sentence"]
 
@@ -43,13 +43,13 @@ class TestEmbedderBasic:
 
         np.testing.assert_allclose(embeddings1, embeddings2, rtol=1e-5)
 
-    def test_single_utterance(self, embedder: Embedder):
+    def test_single_utterance(self, embedder: Embedder) -> None:
         """Test embedding calculation for single utterance."""
         embeddings = embedder.embed(["Single test sentence"])
         assert embeddings.shape[0] == 1
         assert embeddings.shape[1] > 0
 
-    def test_similarity_calculation(self, embedder: Embedder):
+    def test_similarity_calculation(self, embedder: Embedder) -> None:
         """Test similarity calculation between embeddings."""
         utterances = ["Hello world", "Test sentence", "Another test"]
         embeddings = embedder.embed(utterances)
@@ -62,7 +62,7 @@ class TestEmbedderBasic:
         assert np.all(sim_matrix >= -1.0)
         assert np.all(sim_matrix <= 1.0)
 
-    def test_similarity_symmetry(self, embedder: Embedder):
+    def test_similarity_symmetry(self, embedder: Embedder) -> None:
         """Test that similarity is symmetric."""
         utterances = ["Hello world", "Test sentence"]
         embeddings = embedder.embed(utterances)

@@ -13,7 +13,7 @@ from tests._fixtures.fake_openai_embedding import FakeOpenaiEmbeddingBackend as 
 
 
 @pytest.fixture
-def openai_backend_config():
+def openai_backend_config() -> OpenaiEmbeddingConfig:
     """Create an OpenAI backend config for testing."""
     return OpenaiEmbeddingConfig(
         model_name="text-embedding-3-small",
@@ -25,7 +25,7 @@ def openai_backend_config():
 
 
 @pytest.fixture
-def openai_backend(openai_backend_config: OpenaiEmbeddingConfig):
+def openai_backend(openai_backend_config: OpenaiEmbeddingConfig) -> OpenaiEmbeddingBackend:
     """Create an OpenAI backend instance."""
     return OpenaiEmbeddingBackend(openai_backend_config)
 
@@ -33,23 +33,27 @@ def openai_backend(openai_backend_config: OpenaiEmbeddingConfig):
 class TestOpenaiBackend:
     """Test OpenAI-specific backend functionality."""
 
-    def test_backend_initialization(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_backend_initialization(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test backend initialization."""
         assert openai_backend.supports_training is False
         assert openai_backend._client is None  # Client should be lazy-loaded
         assert openai_backend._async_client is None
 
-    def test_client_lazy_loading(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_client_lazy_loading(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test that client is lazy-loaded."""
         assert openai_backend._client is None
 
         # Client should be loaded on first API call
         embeddings = openai_backend.embed(["Test sentence"])
+        # reason: mypy narrowed `_client` to `None` from the prior assert and
+        # cannot see the mutation inside `.embed()`. The post-call assert and
+        # subsequent shape checks are the whole point of this test
+        # (lazy load: None -> non-None), so suppress the unreachable cascade.
         assert openai_backend._client is not None
-        assert embeddings.shape[0] == 1
+        assert embeddings.shape[0] == 1  # type: ignore[unreachable]
         assert embeddings.shape[1] > 0
 
-    def test_similarity_calculation(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_similarity_calculation(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test cosine similarity calculation."""
         embeddings = openai_backend.embed(["Hello", "World", "Hello world"])
 
@@ -66,7 +70,7 @@ class TestOpenaiBackend:
         hello_to_hello_world = similarity[0, 1]
         assert hello_to_hello_world > hello_to_world
 
-    def test_hash_calculation(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_hash_calculation(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test hash calculation for caching."""
         hash1 = openai_backend.get_hash()
         hash2 = openai_backend.get_hash()
@@ -75,7 +79,7 @@ class TestOpenaiBackend:
         assert hash1 == hash2
         assert isinstance(hash1, int)
 
-    def test_different_models_different_hashes(self):
+    def test_different_models_different_hashes(self) -> None:
         """Test that different models produce different hashes."""
         config1 = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
@@ -89,7 +93,7 @@ class TestOpenaiBackend:
 
         assert backend1.get_hash() != backend2.get_hash()
 
-    def test_dimensions_parameter(self):
+    def test_dimensions_parameter(self) -> None:
         """Test that dimensions parameter affects embeddings."""
         # Test with different dimensions (if supported by model)
         config_with_dims = OpenaiEmbeddingConfig(
@@ -104,7 +108,7 @@ class TestOpenaiBackend:
         # Check that embeddings have the specified dimensions
         assert embeddings.shape[1] == 512
 
-    def test_batch_processing(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_batch_processing(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test batch processing functionality."""
         utterances = ["First sentence", "Second sentence", "Third sentence", "Fourth sentence"]
 
@@ -115,7 +119,7 @@ class TestOpenaiBackend:
         assert embeddings.shape[0] == 4
         assert embeddings.shape[1] > 0
 
-    def test_async_processing_initialization(self):
+    def test_async_processing_initialization(self) -> None:
         """Test async processing initialization."""
         config = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
@@ -130,7 +134,7 @@ class TestOpenaiBackend:
         embeddings = backend.embed(["Test", "async", "processing"])
         assert embeddings.shape[0] == 3
 
-    def test_prompts_application(self):
+    def test_prompts_application(self) -> None:
         """Test that prompts are applied correctly."""
         config = OpenaiEmbeddingConfig(
             model_name="text-embedding-3-small",
@@ -149,7 +153,7 @@ class TestOpenaiBackend:
         # Embeddings should be different when prompts are applied
         assert not np.allclose(embeddings_no_prompt, embeddings_with_prompt, rtol=1e-3)
 
-    def test_return_tensors_functionality(self, openai_backend: OpenaiEmbeddingBackend):
+    def test_return_tensors_functionality(self, openai_backend: OpenaiEmbeddingBackend) -> None:
         """Test return_tensors parameter."""
         utterances = ["Hello world", "Test sentence"]
 

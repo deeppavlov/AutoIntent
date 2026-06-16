@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
@@ -7,12 +10,16 @@ import pytest
 from autointent._wrappers.embedder import Embedder
 from autointent.configs import EmbedderFineTuningConfig
 from autointent.context.data_handler import DataHandler
+from tests._helpers import is_strict_labels
 from tests.conftest import tiny_sentence_transformer, tiny_sentence_transformer_config
+
+if TYPE_CHECKING:
+    from autointent import Dataset
 
 pytest.importorskip("sentence_transformers", reason="Sentence Transformers library is required for these tests")
 
 
-def test_finetune_dump_load(dataset, on_windows):
+def test_finetune_dump_load(dataset: Dataset, on_windows: bool) -> None:
     """Test scenario: fine-tune -> dump -> load."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -37,10 +44,14 @@ def test_finetune_dump_load(dataset, on_windows):
         test_utterances = ["Test sentence for embedding", "Another test utterance"]
         original_embeddings = embedder_original.embed(test_utterances)
 
-        # Fine-tune the model
+        # Fine-tune the model. data_handler.train_labels returns ListOfGenericLabels
+        # (may contain None for OOS); the test dataset has no OOS, so narrow to
+        # the strict ListOfLabels for the typed API.
+        labels = data_handler.train_labels(0)
+        assert is_strict_labels(labels)
         embedder_original.train(
             utterances=data_handler.train_utterances(0),
-            labels=data_handler.train_labels(0),
+            labels=labels,
             config=train_config,
         )
 
@@ -70,7 +81,7 @@ def test_finetune_dump_load(dataset, on_windows):
         )
 
 
-def test_dump_load_finetune(dataset, on_windows):
+def test_dump_load_finetune(dataset: Dataset, on_windows: bool) -> None:
     """Test scenario: dump -> load -> fine-tune."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -109,9 +120,12 @@ def test_dump_load_finetune(dataset, on_windows):
         # Step 3: Fine-tune the loaded embedder
         loaded_before_training = embedder_loaded.embed(test_utterances)
 
+        # Narrow labels: dataset has no OOS, so ListOfGenericLabels narrows to ListOfLabels.
+        labels = data_handler.train_labels(0)
+        assert is_strict_labels(labels)
         embedder_loaded.train(
             utterances=data_handler.train_utterances(0),
-            labels=data_handler.train_labels(0),
+            labels=labels,
             config=train_config,
         )
 
@@ -122,7 +136,7 @@ def test_dump_load_finetune(dataset, on_windows):
         )
 
 
-def test_load_from_disk_finetune_dump_load(dataset, on_windows):
+def test_load_from_disk_finetune_dump_load(dataset: Dataset, on_windows: bool) -> None:
     """Test scenario: load sentence transformer from disk -> fine-tune -> dump -> load."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -150,9 +164,12 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
 
         # Step 3: Fine-tune the embedder loaded from disk
         train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
+        # Narrow labels: dataset has no OOS, so ListOfGenericLabels narrows to ListOfLabels.
+        labels = data_handler.train_labels(0)
+        assert is_strict_labels(labels)
         embedder_from_disk.train(
             utterances=data_handler.train_utterances(0),
-            labels=data_handler.train_labels(0),
+            labels=labels,
             config=train_config,
         )
 
@@ -181,7 +198,7 @@ def test_load_from_disk_finetune_dump_load(dataset, on_windows):
         )
 
 
-def test_embeddings_consistency_across_workflows(dataset, on_windows):
+def test_embeddings_consistency_across_workflows(dataset: Dataset, on_windows: bool) -> None:
     """Test that different workflows produce consistent results when starting from same model."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
 
@@ -196,17 +213,17 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
     train_config = EmbedderFineTuningConfig(epoch_num=1, batch_size=4)
 
     test_utterances = ["Test sentence for embedding"]
-    train_data = {
-        "utterances": data_handler.train_utterances(0)[:50],  # Same small subset
-        "labels": data_handler.train_labels(0)[:50],
-    }
+    # Narrow labels: dataset has no OOS, so ListOfGenericLabels narrows to ListOfLabels.
+    utterances_subset = data_handler.train_utterances(0)[:50]
+    labels_subset = data_handler.train_labels(0)[:50]
+    assert is_strict_labels(labels_subset)
 
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
         # Workflow 1: Direct fine-tune
         embedder1 = Embedder(embedder_config)
-        embedder1.train(**train_data, config=train_config)
+        embedder1.train(utterances=utterances_subset, labels=labels_subset, config=train_config)
         embeddings1 = embedder1.embed(test_utterances)
 
         # Workflow 2: Dump -> Load -> Fine-tune
@@ -214,7 +231,7 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
         dump_path2 = temp_path / "workflow2"
         embedder2.dump(dump_path2)
         embedder2_loaded = Embedder.load(dump_path2)
-        embedder2_loaded.train(**train_data, config=train_config)
+        embedder2_loaded.train(utterances=utterances_subset, labels=labels_subset, config=train_config)
         embeddings2 = embedder2_loaded.embed(test_utterances)
 
         # Both workflows should produce similar results (allowing for minor training variance)
@@ -225,7 +242,7 @@ def test_embeddings_consistency_across_workflows(dataset, on_windows):
         )
 
 
-def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
+def test_multiple_dump_load_cycles_after_finetuning(dataset: Dataset, on_windows: bool) -> None:
     """Test that multiple dump/load cycles preserve fine-tuned model state."""
     pytest.importorskip("accelerate", reason="Accelerate library is required for this test")
     data_handler = DataHandler(dataset)
@@ -241,11 +258,14 @@ def test_multiple_dump_load_cycles_after_finetuning(dataset, on_windows):
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=on_windows) as temp_dir:
         temp_path = Path(temp_dir)
 
-        # Fine-tune original embedder
+        # Fine-tune original embedder. Narrow labels: dataset has no OOS, so
+        # ListOfGenericLabels narrows to ListOfLabels.
         embedder_original = Embedder(embedder_config)
+        labels = data_handler.train_labels(0)
+        assert is_strict_labels(labels)
         embedder_original.train(
             utterances=data_handler.train_utterances(0),
-            labels=data_handler.train_labels(0),
+            labels=labels,
             config=train_config,
         )
 

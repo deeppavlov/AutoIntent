@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def mock_generator():
+def mock_generator() -> Mock:
     generator = Mock(spec=Generator)
     generator.get_chat_completion.return_value = "test_utterance"
     generator.get_chat_completion_async = AsyncMock(return_value="test_utterance")
@@ -20,12 +20,12 @@ def mock_generator():
 
 
 @pytest.fixture
-def mock_prompt_maker():
+def mock_prompt_maker() -> Mock:
     return Mock(return_value=[Mock()])
 
 
 @pytest.fixture
-def unbalanced_dataset():
+def unbalanced_dataset() -> Dataset:
     return Dataset.from_dict(
         {
             "intents": [{"id": 0, "name": "A"}, {"id": 1, "name": "B"}],
@@ -38,7 +38,7 @@ def unbalanced_dataset():
     )
 
 
-def test_balancer(unbalanced_dataset, mock_generator, mock_prompt_maker):
+def test_balancer(unbalanced_dataset: Dataset, mock_generator: Mock, mock_prompt_maker: Mock) -> None:
     balancer = DatasetBalancer(generator=mock_generator, prompt_maker=mock_prompt_maker)
     logger.info("Before balancing:")
     for sample in unbalanced_dataset[Split.TRAIN]:
@@ -61,4 +61,3 @@ def test_balancer(unbalanced_dataset, mock_generator, mock_prompt_maker):
     original_utterances = {s["utterance"] for s in unbalanced_dataset[Split.TRAIN]}
     balanced_utterances = {s["utterance"] for s in balanced[Split.TRAIN]}
     assert original_utterances.issubset(balanced_utterances)
-

@@ -1,16 +1,25 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
+from autointent.configs import HashingVectorizerEmbeddingConfig
 from autointent.modules.embedding import LogregAimedEmbedding
-from tests.conftest import get_test_embedder_config, setup_environment
+from tests.conftest import get_test_embedder_config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
-def test_get_assets_returns_correct_artifact_for_logreg():
+def test_get_assets_returns_correct_artifact_for_logreg() -> None:
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     artifact = module.get_assets()
+    assert isinstance(artifact.config, HashingVectorizerEmbeddingConfig)
     assert artifact.config.n_features == 512
 
 
-def test_fit_trains_model():
+def test_fit_trains_model() -> None:
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
@@ -19,10 +28,11 @@ def test_fit_trains_model():
 
     assert module._classifier.coef_ is not None
     assert len(module._classifier.coef_) > 0
+    assert module._label_encoder is not None
     assert module._label_encoder.classes_.tolist() == [0, 1]
 
 
-def test_predict_evaluates_model():
+def test_predict_evaluates_model() -> None:
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
 
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
@@ -36,17 +46,17 @@ def test_predict_evaluates_model():
     assert probas[1][1] > probas[1][0]
 
 
-def test_dump_load():
+def test_dump_load(tmp_path: Path) -> None:
     module = LogregAimedEmbedding(embedder_config=get_test_embedder_config())
     utterances = ["hello", "goodbye", "hi", "bye", "bye", "hello", "welcome", "hi123", "hiii", "bye-bye", "bye!"]
     labels = [0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1]
     module.fit(utterances, labels)
     predictions = module.predict(["hello", "bye"])
 
-    dump_path = setup_environment()
+    dump_path = tmp_path
 
-    module.dump(dump_path)
+    module.dump(str(dump_path))
     del module
-    module = LogregAimedEmbedding.load(dump_path)
+    module = LogregAimedEmbedding.load(str(dump_path))
     predictions_loaded = module.predict(["hello", "bye"])
     assert np.allclose(predictions, predictions_loaded)

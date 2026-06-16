@@ -1,15 +1,28 @@
 from __future__ import annotations
 
 import importlib.resources as ires
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pytest
+import yaml
 
 from autointent import Dataset
 from autointent.utils import load_search_space
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
     from pathlib import Path
+
+    from sentence_transformers import SentenceTransformer
+
+    from autointent import Pipeline
+    from autointent.configs import (
+        CrossEncoderConfig,
+        HashingVectorizerEmbeddingConfig,
+        HFModelConfig,
+        SentenceTransformerEmbeddingConfig,
+    )
+    from autointent.nodes import NodeOptimizer
 
 
 def _disable_transformers_mistral_regex_patch() -> None:
@@ -34,7 +47,9 @@ def _disable_transformers_mistral_regex_patch() -> None:
     if base is None or not hasattr(base, "_patch_mistral_regex"):
         return
 
-    def _noop_patch_mistral_regex(cls, tokenizer, *args, **kwargs):
+    def _noop_patch_mistral_regex(  # type: ignore[no-untyped-def]  # reason: monkey-patched into transformers internal classmethod; transformers is in ignore_missing_imports so signature types are unavailable
+        cls, tokenizer, *args, **kwargs
+    ):
         return tokenizer
 
     base._patch_mistral_regex = classmethod(_noop_patch_mistral_regex)
@@ -43,44 +58,52 @@ def _disable_transformers_mistral_regex_patch() -> None:
 _disable_transformers_mistral_regex_patch()
 
 
-def setup_environment() -> Path:
-    return ires.files("tests").joinpath("logs")
-
-
-def get_dataset_path():
-    return ires.files("tests.assets.data").joinpath("clinc_subset.json")
+def get_dataset_path() -> Path:
+    return cast("Path", ires.files("tests.assets.data").joinpath("clinc_subset.json"))
 
 
 @pytest.fixture
-def dataset():
+def dataset() -> Dataset:
     return Dataset.from_json(get_dataset_path())
 
 
 @pytest.fixture
-def dataset_unsplitted():
-    path = ires.files("tests.assets.data").joinpath("clinc_subset_unsplitted.json")
+def dataset_unsplitted() -> Dataset:
+    path = cast("Path", ires.files("tests.assets.data").joinpath("clinc_subset_unsplitted.json"))
     return Dataset.from_json(path)
 
 
 @pytest.fixture
-def dataset_no_oos():
-    path = ires.files("tests.assets.data").joinpath("clinc_no_oos.json")
+def dataset_no_oos() -> Dataset:
+    path = cast("Path", ires.files("tests.assets.data").joinpath("clinc_no_oos.json"))
     return Dataset.from_json(path)
 
 
 TaskType = Literal["multiclass", "multilabel", "description_no_llm", "description_with_llm", "optuna", "light", "regex"]
 
 
-def get_search_space_path(task_type: TaskType):
-    return ires.files("tests.assets.configs").joinpath(f"{task_type}.yaml")
+def get_search_space_path(task_type: TaskType) -> Path:
+    return cast("Path", ires.files("tests.assets.configs").joinpath(f"{task_type}.yaml"))
 
 
-def get_search_space(task_type: TaskType):
+def get_search_space(task_type: TaskType) -> list[dict[str, Any]]:
     path = get_search_space_path(task_type)
     return load_search_space(path)
 
 
-def get_test_embedder_config(**kwargs):
+def load_optimization_config(name: str) -> dict[str, Any]:
+    """Load a full OptimizationConfig YAML from tests/assets/configs.
+
+    Distinct from `get_search_space`: a search space is a list of node-level
+    dicts, while an OptimizationConfig is a top-level dict that *contains* a
+    `search_space` key alongside `sampler`, `data_config`, etc.
+    """
+    path = cast("Path", ires.files("tests.assets.configs").joinpath(f"{name}.yaml"))
+    with path.open(encoding="utf-8") as f:
+        return cast("dict[str, Any]", yaml.safe_load(f))
+
+
+def get_test_embedder_config(**kwargs: Any) -> HashingVectorizerEmbeddingConfig:
     """Get lightweight embedder config for tests (HashingVectorizer-based).
 
     This function returns a HashingVectorizer-based embedder config that is:
@@ -98,7 +121,7 @@ def get_test_embedder_config(**kwargs):
     """
     from autointent.configs import HashingVectorizerEmbeddingConfig
 
-    defaults = {
+    defaults: dict[str, Any] = {
         "n_features": 512,
         "use_cache": False,
     }
@@ -120,21 +143,21 @@ TINY_CROSS_ENCODER = "cross-encoder/ms-marco-MiniLM-L6-v2"
 TINY_SENTENCE_TRANSFORMER = "sergeyzh/rubert-tiny-turbo"
 
 
-def tiny_bert_config():
+def tiny_bert_config() -> HFModelConfig:
     """HFModelConfig pinned at TINY_BERT; revision auto-filled by validator."""
     from autointent.configs import HFModelConfig
 
     return HFModelConfig(model_name=TINY_BERT)
 
 
-def tiny_cross_encoder_config():
+def tiny_cross_encoder_config() -> CrossEncoderConfig:
     """CrossEncoderConfig pinned at TINY_CROSS_ENCODER."""
     from autointent.configs import CrossEncoderConfig
 
     return CrossEncoderConfig(model_name=TINY_CROSS_ENCODER)
 
 
-def tiny_sentence_transformer_config(**overrides):
+def tiny_sentence_transformer_config(**overrides: Any) -> SentenceTransformerEmbeddingConfig:
     """SentenceTransformerEmbeddingConfig pinned at TINY_SENTENCE_TRANSFORMER.
 
     Default kwargs match the lightweight test profile used in
@@ -142,7 +165,7 @@ def tiny_sentence_transformer_config(**overrides):
     """
     from autointent.configs import SentenceTransformerEmbeddingConfig
 
-    base = {
+    base: dict[str, Any] = {
         "model_name": TINY_SENTENCE_TRANSFORMER,
         "batch_size": 4,
         "device": "cpu",
@@ -152,7 +175,7 @@ def tiny_sentence_transformer_config(**overrides):
     return SentenceTransformerEmbeddingConfig(**base)
 
 
-def tiny_sentence_transformer():
+def tiny_sentence_transformer() -> SentenceTransformer:
     """Pinned SentenceTransformer instance for tests that need the raw class.
 
     Use this instead of ``SentenceTransformer(TINY_SENTENCE_TRANSFORMER)``.
@@ -172,7 +195,7 @@ def tiny_sentence_transformer():
     return SentenceTransformer(TINY_SENTENCE_TRANSFORMER, revision=DEFAULT_REVISIONS[TINY_SENTENCE_TRANSFORMER])
 
 
-def apply_test_models(pipeline) -> None:
+def apply_test_models(pipeline: Pipeline) -> None:
     """Retarget every HF model slot in a Pipeline at the canonical test set.
 
     Use this right after Pipeline.from_preset(...) in preset tests. After this
@@ -195,7 +218,7 @@ def apply_test_models(pipeline) -> None:
     _retarget_search_space_models(pipeline)
 
 
-def _retarget_search_space_models(pipeline) -> None:
+def _retarget_search_space_models(pipeline: Pipeline) -> None:
     """Walk pipeline.nodes -> NodeOptimizer.modules_search_spaces and rewrite
     any embedded model_name fields to the canonical tiny equivalents.
 
@@ -207,15 +230,21 @@ def _retarget_search_space_models(pipeline) -> None:
     Each field can be either a dict (single value) or a list of dicts
     (Optuna categorical). We rewrite the model_name in every dict found.
     """
-    # pipeline.nodes is a dict[NodeType, NodeOptimizer] (see Pipeline.__init__).
-    for node in pipeline.nodes.values():
+    # pipeline.nodes is a dict[NodeType, NodeOptimizer] right after
+    # Pipeline.from_preset(...). The type system widens this to
+    # NodeOptimizer | InferenceNode (the union accepted by Pipeline.__init__);
+    # the cast asserts the freshly-constructed-from-preset invariant. If a
+    # caller passes an inference Pipeline, the next attribute access raises
+    # AttributeError — same as the original untyped code.
+    nodes: dict[Any, NodeOptimizer] = cast("dict[Any, NodeOptimizer]", pipeline.nodes)
+    for node in nodes.values():
         for entry in node.modules_search_spaces:
             _rewrite_field(entry, "classification_model_config", TINY_BERT)
             _rewrite_field(entry, "embedder_config", TINY_SENTENCE_TRANSFORMER)
             _rewrite_field(entry, "cross_encoder_config", TINY_CROSS_ENCODER)
 
 
-def _rewrite_field(entry: dict, field_name: str, new_model_name: str) -> None:
+def _rewrite_field(entry: dict[str, Any], field_name: str, new_model_name: str) -> None:
     value = entry.get(field_name)
     if value is None:
         return
@@ -243,10 +272,10 @@ import re as _re  # noqa: E402
 _HF_SHA = _re.compile(r"^[0-9a-f]{40}$")
 
 
-def _make_hf_guard(orig, label: str):
+def _make_hf_guard(orig: Callable[..., Any], label: str) -> Callable[..., Any]:
     """Wrap an HF entry point so calls with revision not matching a 40-hex SHA raise."""
 
-    def guarded(repo_id, *args, revision=None, **kwargs):
+    def guarded(repo_id: str, *args: Any, revision: str | None = None, **kwargs: Any) -> Any:
         if revision is None or not _HF_SHA.match(revision):
             msg = (
                 f"Unpinned HF call: {label}({repo_id!r}, ..., revision={revision!r}). "
@@ -259,7 +288,7 @@ def _make_hf_guard(orig, label: str):
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _forbid_unpinned_hf_calls():
+def _forbid_unpinned_hf_calls() -> Iterator[None]:
     """Session-scoped autouse guard: every call into huggingface_hub goes through
     a wrapper that fails if revision isn't a 40-hex SHA.
 
@@ -278,9 +307,8 @@ def _forbid_unpinned_hf_calls():
     tests that need a raw ``SentenceTransformer`` instance.
     """
     import huggingface_hub
-    from _pytest.monkeypatch import MonkeyPatch
 
-    mp = MonkeyPatch()
+    mp = pytest.MonkeyPatch()
     try:
         mp.setattr(
             huggingface_hub, "hf_hub_download", _make_hf_guard(huggingface_hub.hf_hub_download, "hf_hub_download")
@@ -292,7 +320,9 @@ def _forbid_unpinned_hf_calls():
         # HfApi.model_info is a bound method; wrap as a regular function on the class.
         orig_api_model_info = huggingface_hub.HfApi.model_info
 
-        def _guarded_api_model_info(self, repo_id, *args, revision=None, **kwargs):
+        def _guarded_api_model_info(
+            self: Any, repo_id: str, *args: Any, revision: str | None = None, **kwargs: Any
+        ) -> Any:
             if revision is None or not _HF_SHA.match(revision):
                 msg = (
                     f"Unpinned HF call: HfApi.model_info({repo_id!r}, revision={revision!r}). "

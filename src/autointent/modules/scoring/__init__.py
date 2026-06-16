@@ -1,5 +1,5 @@
 from ._bert import BertScorer
-from ._catboost import CatBoostScorer
+from ._catboost import CatBoostScorer, FeaturesType
 from ._description import BiEncoderDescriptionScorer, CrossEncoderDescriptionScorer, LLMDescriptionScorer
 from ._dnnc import DNNCScorer
 from ._gcn import GCNScorer
@@ -19,6 +19,7 @@ __all__ = [
     "CatBoostScorer",
     "CrossEncoderDescriptionScorer",
     "DNNCScorer",
+    "FeaturesType",
     "GCNScorer",
     "KNNScorer",
     "LLMDescriptionScorer",

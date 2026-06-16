@@ -61,8 +61,8 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
     def __init__(self, config: OpenaiEmbeddingConfig) -> None:
         self.config = config
         # Mirror the lazy-client attributes the real backend has so existing tests work.
-        self._client = None
-        self._async_client = None
+        self._client: object | None = None
+        self._async_client: object | None = None
 
     def clear_ram(self) -> None:
         self._client = None
@@ -102,7 +102,8 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
     ) -> npt.NDArray[np.float32]:
         # Inputs are already unit-normalised; cosine = dot product.
-        return embeddings1 @ embeddings2.T
+        result: npt.NDArray[np.float32] = embeddings1 @ embeddings2.T
+        return result
 
     def get_hash(self) -> int:
         # Stable hash from model_name + dimensions; matches real backend semantics.
@@ -134,7 +135,7 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
 
 @pytest.fixture
-def patch_openai_embedding_backend(monkeypatch):
+def patch_openai_embedding_backend(monkeypatch: pytest.MonkeyPatch) -> None:
     """Rebind OpenaiEmbeddingBackend inside Embedder so the factory builds the fake.
 
     Verified call sites (src/autointent/_wrappers/embedder/embedder.py):

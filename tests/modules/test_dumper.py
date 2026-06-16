@@ -14,14 +14,14 @@ from tests.conftest import get_test_embedder_config, tiny_cross_encoder_config
 
 
 class TestSimpleAttributes:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.integer = 1
         self.float = 1.0
         self.string = "test"
         self.boolean = True
         self.array = np.array([1, 2, 3])
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         assert self.integer == 1
         assert self.float == 1.0
         assert self.string == "test"
@@ -30,18 +30,19 @@ class TestSimpleAttributes:
 
 
 class TestTags:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.tags = TagsList(tags=[Tag(name="hello", intent_ids=[0]), Tag(name="world", intent_ids=[1])])
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         assert self.tags == TagsList(tags=[Tag(name="hello", intent_ids=[0]), Tag(name="world", intent_ids=[1])])
 
 
 class TestTransformers:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+        # reason: transformers AutoTokenizer.from_pretrained is untyped in stubs
+        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")  # type: ignore[no-untyped-call]
         self._tokenizer_predictions = np.array(self.tokenizer(["hello", "world"]).input_ids)
         self.transformer = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
 
@@ -50,7 +51,7 @@ class TestTransformers:
                 self.transformer(input_ids=torch.tensor(self._tokenizer_predictions)).logits.cpu().numpy()
             )
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         tokenizer_predictions = self.tokenizer(["hello", "world"]).input_ids
         np.testing.assert_almost_equal(self._tokenizer_predictions, tokenizer_predictions, decimal=4)
         with torch.no_grad():
@@ -62,25 +63,25 @@ class TestTransformers:
 
 
 class TestVectorIndex:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.vector_index = VectorIndex(
             embedder_config=get_test_embedder_config(),
             config=FaissConfig(),
         )
         self.vector_index.add(texts=["hello", "world"], labels=[0, 1])
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         assert self.vector_index.config == FaissConfig()
 
 
 class TestEmbedder:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.embedder = Embedder(
             embedder_config=get_test_embedder_config(),
         )
         self._embedder_predictions = self.embedder.embed(["hello", "world"])
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         np.testing.assert_almost_equal(
             self._embedder_predictions,
             self.embedder.embed(["hello", "world"]),
@@ -89,12 +90,12 @@ class TestEmbedder:
 
 
 class TestSklearnEstimator:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.estimator = LogisticRegression()
         self.estimator.fit([[1, 2, 3], [4, 5, 6]], [0, 1])
         self._estimator_predictions = self.estimator.predict([[1, 2, 3], [4, 5, 6]])
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         np.testing.assert_almost_equal(
             self._estimator_predictions,
             self.estimator.predict([[1, 2, 3], [4, 5, 6]]),
@@ -103,7 +104,7 @@ class TestSklearnEstimator:
 
 
 class TestRanker:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.ranker = Ranker(
             cross_encoder_config=tiny_cross_encoder_config().model_copy(update={"train_head": True}),
         )
@@ -115,7 +116,7 @@ class TestRanker:
             [("hello", "world"), ("bye", "earth")],
         )
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         np.testing.assert_almost_equal(
             self._ranker_predictions,
             self.ranker.predict([("hello", "world"), ("bye", "earth")]),
@@ -124,7 +125,7 @@ class TestRanker:
 
 
 class TestCrossEncoderConfig:
-    def init_attributes(self):
+    def init_attributes(self) -> None:
         self.pydantic_model = CrossEncoderConfig(
             model_name="cross-encoder/ms-marco-MiniLM-L6-v2",
             train_head=True,
@@ -134,7 +135,7 @@ class TestCrossEncoderConfig:
             tokenizer_config=TokenizerConfig(max_length=512, padding="longest", truncation=False),
         )
 
-    def check_attributes(self):
+    def check_attributes(self) -> None:
         assert self.pydantic_model.model_name == "cross-encoder/ms-marco-MiniLM-L6-v2"
         assert self.pydantic_model.train_head
         assert self.pydantic_model.device == "cpu"
@@ -190,7 +191,7 @@ def _transformers_is_installed() -> bool:
         TestCrossEncoderConfig,
     ],
 )
-def test_dumper(test_class):
+def test_dumper(test_class: type) -> None:
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         test_obj = test_class()
         test_obj.init_attributes()

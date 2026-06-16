@@ -12,6 +12,8 @@ from ._converter import transform
 if TYPE_CHECKING:
     import numpy.typing as npt
 
+    from autointent.custom_types import ListOfGenericLabels
+
     from .custom_types import CANDIDATE_TYPE, LABELS_VALUE_TYPE
 
 
@@ -36,6 +38,24 @@ class RetrievalMetricFn(Protocol):
         :param k: Number of top items to consider for each query
         :return: Score of the retrieval metric
         """
+        ...
+
+
+class RetrievalMetricFnWithOOS(Protocol):
+    """Protocol for retrieval metrics that accept OOS-bearing query labels.
+
+    Returned by `ignore_oos`: the decorator filters out `None` entries from
+    `query_labels` (and their paired candidate lists) before delegating to
+    the underlying `RetrievalMetricFn`.
+    """
+
+    def __call__(
+        self,
+        query_labels: ListOfGenericLabels,
+        candidates_labels: CANDIDATE_TYPE,
+        k: int | None = None,
+    ) -> float:
+        """Calculate retrieval metric, dropping OOS-flagged queries first."""
         ...
 
 
@@ -114,11 +134,11 @@ def _average_precision(query_label: int, candidate_labels: npt.NDArray[np.int64]
     return sum_precision / num_relevant if num_relevant > 0 else 0.0
 
 
-def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFn:
+def ignore_oos(func: RetrievalMetricFn) -> RetrievalMetricFnWithOOS:
     """Ignore OOS in metrics calculation (decorator)."""
 
     @wraps(func)
-    def wrapper(query_labels: LABELS_VALUE_TYPE, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
+    def wrapper(query_labels: ListOfGenericLabels, candidates_labels: CANDIDATE_TYPE, k: int | None = None) -> float:
         query_labels_filtered = [lab for lab in query_labels if lab is not None]
         candidates_labels_filtered = [
             cand for cand, lab in zip(candidates_labels, query_labels, strict=True) if lab is not None

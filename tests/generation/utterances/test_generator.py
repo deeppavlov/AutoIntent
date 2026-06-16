@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -5,29 +8,32 @@ import pytest
 from autointent.generation import Generator
 from autointent.generation.chat_templates import Message
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 pytest.importorskip("openai", reason="OpenAI library is required")
 
 
 @pytest.fixture(autouse=True)
-def set_env_vars(monkeypatch):
+def set_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
     monkeypatch.setenv("OPENAI_API_KEY", "fake-api-key")
     monkeypatch.setenv("OPENAI_MODEL_NAME", "gpt-3.5-turbo")
 
 
 @pytest.fixture
-def mock_openai_client():
+def mock_openai_client() -> Iterator[MagicMock]:
     with patch("openai.OpenAI") as mock_client:
         yield mock_client
 
 
-def test_generator_initialization(mock_openai_client):
+def test_generator_initialization(mock_openai_client: MagicMock) -> None:
     generator = Generator()
     assert generator.client == mock_openai_client.return_value
     assert generator.model_name == "gpt-3.5-turbo"
 
 
-def test_get_chat_completion(mock_openai_client):
+def test_get_chat_completion(mock_openai_client: MagicMock) -> None:
     mock_response = MagicMock()
     mock_response.choices = [MagicMock(message=MagicMock(content="Test response"))]
     mock_openai_client.return_value.chat.completions.create.return_value = mock_response
@@ -41,7 +47,7 @@ def test_get_chat_completion(mock_openai_client):
 
 
 @pytest.mark.asyncio
-async def test_get_chat_completion_async():
+async def test_get_chat_completion_async() -> None:
     test_messages = [Message(role="user", content="Hello, how are you?")]
 
     mock_response = MagicMock()

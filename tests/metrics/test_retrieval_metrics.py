@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -8,6 +12,10 @@ from autointent.metrics.retrieval import (
     retrieval_ndcg,
     retrieval_precision,
 )
+
+if TYPE_CHECKING:
+    from autointent.custom_types import ListOfLabels, ListOfLabelsWithOOS
+    from autointent.metrics.custom_types import CANDIDATE_TYPE
 
 
 @pytest.mark.parametrize(
@@ -22,7 +30,12 @@ from autointent.metrics.retrieval import (
         ([3, 1], [[2, 1, 1], [2, 4, 4]], None, 0.0),
     ],
 )
-def test_map(query_labels, candidates_labels, k, ground_truth):
+def test_map(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_map(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -38,7 +51,12 @@ def test_map(query_labels, candidates_labels, k, ground_truth):
         ([1, 3], [[2, 1, 1], [3, 1, 1]], 2, 1.0),
     ],
 )
-def test_hit_rate(query_labels, candidates_labels, k, ground_truth):
+def test_hit_rate(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_hit_rate(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -54,7 +72,12 @@ def test_hit_rate(query_labels, candidates_labels, k, ground_truth):
         ([1, 3], [[2, 1, 1], [3, 1, 1]], 2, 0.5),
     ],
 )
-def test_precision(query_labels, candidates_labels, k, ground_truth):
+def test_precision(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_precision(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -70,7 +93,12 @@ def test_precision(query_labels, candidates_labels, k, ground_truth):
         ([1, 3], [[2, 1, 1], [3, 1, 1]], 2, 0.6934264036172708),
     ],
 )
-def test_ndcg(query_labels, candidates_labels, k, ground_truth):
+def test_ndcg(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_ndcg(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -86,7 +114,12 @@ def test_ndcg(query_labels, candidates_labels, k, ground_truth):
         ([1, 3], [[2, 1, 1], [3, 1, 1]], 2, 0.75),
     ],
 )
-def test_mrr(query_labels, candidates_labels, k, ground_truth):
+def test_mrr(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_mrr(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -98,5 +131,9 @@ def test_mrr(query_labels, candidates_labels, k, ground_truth):
         ([0, 1, 2, None], [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]], 1),
     ],
 )
-def test_oos_ignoring(query_labels, candidates_labels, ground_truth):
+def test_oos_ignoring(
+    query_labels: ListOfLabelsWithOOS,
+    candidates_labels: CANDIDATE_TYPE,
+    ground_truth: float,
+) -> None:
     assert ground_truth == retrieval_hit_rate(query_labels, candidates_labels)

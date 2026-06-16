@@ -67,7 +67,7 @@ class SklearnScorer(BaseScorer):
         self,
         clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | dict[str, Any] | None = None,
-        **clf_args: dict[str, float | str | bool],
+        **clf_args: Any,  # noqa: ANN401
     ) -> None:
         """Initialize the SklearnScorer.
 
@@ -95,7 +95,7 @@ class SklearnScorer(BaseScorer):
         context: Context,
         clf_name: str = "LogisticRegression",
         embedder_config: EmbedderConfig | str | None = None,
-        **clf_args: dict[str, float | str | bool],
+        **clf_args: Any,  # noqa: ANN401
     ) -> Self:
         """Create a SklearnScorer instance using a Context object.
 

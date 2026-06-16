@@ -45,7 +45,7 @@ class TestEmbedderPrompts:
             use_cache=False,
         )
 
-    def test_different_task_prompts(self, prompt_embedder_config: EmbedderConfig):
+    def test_different_task_prompts(self, prompt_embedder_config: EmbedderConfig) -> None:
         """Test that different task types produce different embeddings."""
         embedder = Embedder(prompt_embedder_config)
         test_utterance = ["Test sentence"]
@@ -60,7 +60,7 @@ class TestEmbedderPrompts:
         assert not np.allclose(default_emb, passage_emb, rtol=1e-3)
         assert not np.allclose(default_emb, classification_emb, rtol=1e-3)
 
-    def test_fallback_to_default_prompt(self, embedder_config: EmbedderConfig):
+    def test_fallback_to_default_prompt(self, embedder_config: EmbedderConfig) -> None:
         """Test fallback to default prompt when specific prompt not set."""
         from autointent.configs import HashingVectorizerEmbeddingConfig
 
@@ -68,6 +68,7 @@ class TestEmbedderPrompts:
         if isinstance(embedder_config, HashingVectorizerEmbeddingConfig):
             pytest.skip("HashingVectorizer doesn't support prompts")
 
+        config: EmbedderConfig
         if hasattr(embedder_config, "similarity_fn_name"):
             # SentenceTransformers config
             config = create_sentence_transformer_config(

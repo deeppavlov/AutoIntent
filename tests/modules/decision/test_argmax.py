@@ -1,19 +1,29 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 import pytest
 
 from autointent.exceptions import MismatchNumClassesError, WrongClassificationError
 from autointent.modules.decision import ArgmaxDecision
-from tests.conftest import setup_environment
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import numpy.typing as npt
+
+    from tests.modules.decision.conftest import FitData
 
 
-def test_multiclass(multiclass_fit_data, scores):
+def test_multiclass(multiclass_fit_data: FitData, scores: npt.NDArray[Any]) -> None:
     predictor = ArgmaxDecision()
     predictor.fit(*multiclass_fit_data)
     predictions = predictor.predict(scores)
     np.testing.assert_array_equal(predictions, np.array([1, 0, 2]))
 
 
-def test_fails_on_wrong_n_classes(multiclass_fit_data):
+def test_fails_on_wrong_n_classes(multiclass_fit_data: FitData) -> None:
     predictor = ArgmaxDecision()
     predictor.fit(*multiclass_fit_data)
     scores = np.array([[0.1, 0.9], [0.8, 0.2], [0.3, 0.7]])
@@ -21,22 +31,22 @@ def test_fails_on_wrong_n_classes(multiclass_fit_data):
         predictor.predict(scores)
 
 
-def test_fails_on_wrong_clf_problem(multilabel_fit_data):
+def test_fails_on_wrong_clf_problem(multilabel_fit_data: FitData) -> None:
     predictor = ArgmaxDecision()
     with pytest.raises(WrongClassificationError):
         predictor.fit(*multilabel_fit_data)
 
 
-def test_dump_load(multiclass_fit_data):
+def test_dump_load(multiclass_fit_data: FitData, tmp_path: Path) -> None:
     predictor = ArgmaxDecision()
     predictor.fit(*multiclass_fit_data)
     predictions = predictor.predict(multiclass_fit_data[0])
 
-    path = setup_environment() / "argmax_module"
-    predictor.dump(path)
+    path = tmp_path / "argmax_module"
+    predictor.dump(str(path))
     del predictor
 
-    predictor = ArgmaxDecision.load(path)
+    predictor = ArgmaxDecision.load(str(path))
     new_predictions = predictor.predict(multiclass_fit_data[0])
 
     assert all(p == n for p, n in zip(predictions, new_predictions, strict=True))

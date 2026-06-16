@@ -1,7 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
 from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood, scoring_neg_coverage, scoring_roc_auc
+
+if TYPE_CHECKING:
+    from autointent.custom_types import ListOfLabels
+    from autointent.metrics.custom_types import SCORES_VALUE_TYPE
 
 
 @pytest.mark.parametrize(
@@ -20,7 +28,7 @@ from autointent.metrics.scoring import scoring_hit_rate, scoring_log_likelihood,
         ),
     ],
 )
-def test_neg_cross_entropy(labels, scores, ground_truth):
+def test_neg_cross_entropy(labels: ListOfLabels, scores: SCORES_VALUE_TYPE, ground_truth: float) -> None:
     output = scoring_log_likelihood(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -60,7 +68,7 @@ def test_neg_cross_entropy(labels, scores, ground_truth):
         ),
     ],
 )
-def test_roc_auc(labels, scores, ground_truth):
+def test_roc_auc(labels: ListOfLabels, scores: SCORES_VALUE_TYPE, ground_truth: float) -> None:
     output = scoring_roc_auc(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -178,7 +186,7 @@ def test_roc_auc(labels, scores, ground_truth):
         ),
     ],
 )
-def test_hit_rate(labels, scores, ground_truth):
+def test_hit_rate(labels: ListOfLabels, scores: SCORES_VALUE_TYPE, ground_truth: float) -> None:
     output = scoring_hit_rate(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -244,6 +252,6 @@ def test_hit_rate(labels, scores, ground_truth):
         ),
     ],
 )
-def test_coverage(labels, scores, ground_truth):
+def test_coverage(labels: ListOfLabels, scores: SCORES_VALUE_TYPE, ground_truth: float) -> None:
     output = scoring_neg_coverage(labels, scores)
     np.testing.assert_almost_equal(output, ground_truth)

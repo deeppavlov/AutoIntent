@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 
@@ -8,6 +12,10 @@ from autointent.metrics.retrieval import (
     retrieval_ndcg_intersecting,
     retrieval_precision_intersecting,
 )
+
+if TYPE_CHECKING:
+    from autointent.custom_types import ListOfLabels, ListOfLabelsWithOOS
+    from autointent.metrics.custom_types import CANDIDATE_TYPE
 
 
 @pytest.mark.parametrize(
@@ -23,7 +31,12 @@ from autointent.metrics.retrieval import (
         ([[1, 0, 1]], [[[0, 0, 0], [0, 1, 0], [0, 1, 0]]], 2, 0.0),
     ],
 )
-def test_map(query_labels, candidates_labels, k, ground_truth):
+def test_map(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_map_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -41,7 +54,12 @@ def test_map(query_labels, candidates_labels, k, ground_truth):
         ([[1, 0, 1]], [[[0, 0, 0], [0, 1, 0], [0, 1, 0]]], 2, 0.0),
     ],
 )
-def test_hit_rate(query_labels, candidates_labels, k, ground_truth):
+def test_hit_rate(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_hit_rate_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -56,7 +74,12 @@ def test_hit_rate(query_labels, candidates_labels, k, ground_truth):
         ([[1, 0, 1], [0, 1, 1]], [[[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[1, 0, 0], [1, 0, 0], [0, 0, 1]]], 2, 0.25),
     ],
 )
-def test_precision(query_labels, candidates_labels, k, ground_truth):
+def test_precision(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_precision_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -85,7 +108,12 @@ def test_precision(query_labels, candidates_labels, k, ground_truth):
         ),
     ],
 )
-def test_ndcg(query_labels, candidates_labels, k, ground_truth):
+def test_ndcg(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_ndcg_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -118,7 +146,12 @@ def test_ndcg(query_labels, candidates_labels, k, ground_truth):
         ),
     ],
 )
-def test_mrr(query_labels, candidates_labels, k, ground_truth):
+def test_mrr(
+    query_labels: ListOfLabels,
+    candidates_labels: CANDIDATE_TYPE,
+    k: int | None,
+    ground_truth: float,
+) -> None:
     output = retrieval_mrr_intersecting(query_labels, candidates_labels, k)
     np.testing.assert_almost_equal(output, ground_truth)
 
@@ -134,5 +167,9 @@ def test_mrr(query_labels, candidates_labels, k, ground_truth):
         ([[0, 1], [0, 1], [0, 1], None], [[[0, 1], [0, 1]], [[0, 1], [0, 1]], [[0, 1], [0, 1]], [[1, 0], [1, 0]]], 1.0),
     ],
 )
-def test_oos_ignoring(query_labels, candidates_labels, ground_truth):
+def test_oos_ignoring(
+    query_labels: ListOfLabelsWithOOS,
+    candidates_labels: CANDIDATE_TYPE,
+    ground_truth: float,
+) -> None:
     assert ground_truth == retrieval_hit_rate_intersecting(query_labels, candidates_labels)

@@ -1,6 +1,9 @@
 """Tests for Generator cache semantics."""
 
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
 
 import httpx
 import pytest
@@ -9,9 +12,16 @@ from pydantic import BaseModel, Field
 from autointent.generation import Generator
 from autointent.generation.chat_templates import Role
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from respx.router import MockRouter
+
+    from autointent.generation.chat_templates import Message
+
 
 @pytest.fixture(autouse=True)
-def _isolated_cache(tmp_path, monkeypatch):
+def _isolated_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Redirect the structured-output disk cache to a fresh tmp dir each test."""
     monkeypatch.setattr("autointent.generation._cache.user_cache_dir", lambda *_: str(tmp_path))
 
@@ -37,19 +47,23 @@ def _resp(name: str, value: int) -> httpx.Response:
 
 
 @pytest.fixture
-def generator_with_cache(respx_openai):
+def generator_with_cache(respx_openai: MockRouter) -> Generator:
     return Generator(max_tokens=1000, use_cache=True, temperature=2)
 
 
 @pytest.fixture
-def generator_without_cache(respx_openai):
+def generator_without_cache(respx_openai: MockRouter) -> Generator:
     return Generator(max_tokens=1000, use_cache=False, temperature=2)
 
 
 @pytest.mark.asyncio
-async def test_cache_hit(generator_with_cache, generator_without_cache, respx_openai):
-    messages = [{"role": Role.USER, "content": "Create a random simple model"}]
-    different_messages = [{"role": Role.USER, "content": "Create a person named John with value 333"}]
+async def test_cache_hit(
+    generator_with_cache: Generator,
+    generator_without_cache: Generator,
+    respx_openai: MockRouter,
+) -> None:
+    messages: list[Message] = [{"role": Role.USER, "content": "Create a random simple model"}]
+    different_messages: list[Message] = [{"role": Role.USER, "content": "Create a person named John with value 333"}]
 
     route = respx_openai.post("/v1/chat/completions").mock(
         side_effect=[

@@ -1,10 +1,12 @@
+from typing import Any
+
 import pytest
 
 from autointent.nodes import NodeOptimizer
 
 
 @pytest.fixture
-def valid_decision_config():
+def valid_decision_config() -> dict[str, Any]:
     """Fixture for a valid DecisionNode configuration."""
     return {
         "node_type": "decision",
@@ -22,7 +24,7 @@ def valid_decision_config():
     }
 
 
-def test_valid_decision_config(valid_decision_config):
+def test_valid_decision_config(valid_decision_config: dict[str, Any]) -> None:
     """Test that a valid decision config passes validation."""
     node = NodeOptimizer(**valid_decision_config)
     assert node.node_type == "decision"
@@ -31,9 +33,9 @@ def test_valid_decision_config(valid_decision_config):
     assert node.modules_search_spaces[0]["module_name"] == "argmax"
 
 
-def test_invalid_decision_config_missing_field():
+def test_invalid_decision_config_missing_field() -> None:
     """Test that a missing required field raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "decision",
         # Missing "target_metric"
         "search_space": [{"module_name": "tunable", "n_optuna_trials": [100]}],
@@ -43,9 +45,9 @@ def test_invalid_decision_config_missing_field():
         NodeOptimizer(**invalid_config)
 
 
-def test_invalid_decision_config_wrong_type():
+def test_invalid_decision_config_wrong_type() -> None:
     """Test that an invalid field type raises ValidationError."""
-    invalid_config = {
+    invalid_config: dict[str, Any] = {
         "node_type": "decision",
         "target_metric": "decision_roc_auc",
         "search_space": [

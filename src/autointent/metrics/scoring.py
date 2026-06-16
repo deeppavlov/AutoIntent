@@ -13,6 +13,8 @@ from ._converter import transform
 from .decision import decision_accuracy, decision_f1, decision_precision, decision_recall
 
 if TYPE_CHECKING:
+    from autointent.custom_types import ListOfGenericLabels
+
     from .custom_types import LABELS_VALUE_TYPE, SCORES_VALUE_TYPE
     from .decision import DecisionMetricFn
 
@@ -45,11 +47,24 @@ class ScoringMetricFn(Protocol):
         ...
 
 
-def ignore_oos(func: ScoringMetricFn) -> ScoringMetricFn:
+class ScoringMetricFnWithOOS(Protocol):
+    """Protocol for scoring metrics that accept OOS-bearing labels.
+
+    Returned by `ignore_oos`: the decorator filters out `None` entries from
+    `labels` (and their paired score rows) before delegating to the
+    underlying `ScoringMetricFn`.
+    """
+
+    def __call__(self, labels: ListOfGenericLabels, scores: SCORES_VALUE_TYPE) -> float:
+        """Calculate scoring metric, dropping OOS-flagged samples first."""
+        ...
+
+
+def ignore_oos(func: ScoringMetricFn) -> ScoringMetricFnWithOOS:
     """Ignore OOS in metrics calculation (decorator)."""
 
     @wraps(func)
-    def wrapper(labels: LABELS_VALUE_TYPE, scores: SCORES_VALUE_TYPE) -> float:
+    def wrapper(labels: ListOfGenericLabels, scores: SCORES_VALUE_TYPE) -> float:
         labels_filtered = [lab for lab in labels if lab is not None]
         scores_filtered = [score for score, lab in zip(scores, labels, strict=True) if lab is not None]
         return func(labels_filtered, scores_filtered)  # type: ignore[arg-type]
