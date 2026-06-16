@@ -117,18 +117,21 @@ SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 """
 
 SearchSpacePreset = Literal[
-    "classic-heavy",
-    "classic-light",
-    "classic-medium",
-    "nn-heavy",
-    "nn-medium",
     "transformers-heavy",
     "transformers-light",
-    "transformers-no-hpo",
+    "nn-heavy",
     "zero-shot-llm",
+    "nn-medium",
+    "classic-heavy",
+    "transformers-no-hpo",
+    "classic-medium",
     "zero-shot-encoders",
+    "classic-light",
 ]
-"""Some presets that our library supports."""
+"""Bundled search-space presets, listed in descending quality order.
+
+The order is consumed by ``autointent._advisor.recommend`` to pick the
+highest-quality feasible preset (lower index = higher quality)."""
 
 
 class Document(BaseModel):

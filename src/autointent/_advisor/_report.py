@@ -110,3 +110,21 @@ class PreflightReport:
         d["headroom"] = self.headroom.value
         d["is_feasible"] = self.is_feasible
         return d
+
+
+@dataclass
+class RecommendationResult:
+    """Output of the recommend workflow: ranked per-preset reports plus the pick.
+
+    ``chosen`` is the best feasible preset name, or ``None`` if none fit.
+    ``results`` is the full per-preset report list in evaluation order.
+    """
+
+    chosen: str | None
+    results: list[tuple[str, PreflightReport]]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "chosen": self.chosen,
+            "results": [{"preset": name, "report": r.to_dict()} for name, r in self.results],
+        }
