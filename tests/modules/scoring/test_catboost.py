@@ -10,7 +10,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
-from autointent.modules.scoring import CatBoostScorer
+from autointent.modules.scoring import CatBoostScorer, FeaturesType
 from tests._helpers import is_strict_labels
 from tests.conftest import get_test_embedder_config
 
@@ -108,9 +108,9 @@ def test_catboost_prediction_multilabel(dataset: Dataset) -> None:
     )
 
 
-@pytest.mark.parametrize("features_type", ["text", "embedding", "both"])
+@pytest.mark.parametrize("features_type", list(FeaturesType))
 @pytest.mark.parametrize("use_embedding_features", [True, False])
-def test_catboost_features_types(dataset: Dataset, features_type: str, use_embedding_features: bool) -> None:
+def test_catboost_features_types(dataset: Dataset, features_type: FeaturesType, use_embedding_features: bool) -> None:
     """Test that CatBoostScorer works properly without an embedder (using BoW encoding)."""
     data_handler = DataHandler(dataset)
 
@@ -122,7 +122,7 @@ def test_catboost_features_types(dataset: Dataset, features_type: str, use_embed
         l2_leaf_reg=3,
         eval_metric="Accuracy",
         random_seed=42,
-        features_type=features_type,  # type: ignore[arg-type]  # reason: src signature uses FeaturesType enum; test passes the literal string form catboost accepts
+        features_type=features_type,
         use_embedding_features=use_embedding_features,
         verbose=False,
     )
