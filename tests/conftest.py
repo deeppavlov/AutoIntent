@@ -4,6 +4,7 @@ import importlib.resources as ires
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pytest
+import yaml
 
 from autointent import Dataset
 from autointent.utils import load_search_space
@@ -94,6 +95,18 @@ def get_search_space_path(task_type: TaskType) -> Path:
 def get_search_space(task_type: TaskType) -> list[dict[str, Any]]:
     path = get_search_space_path(task_type)
     return load_search_space(path)
+
+
+def load_optimization_config(name: str) -> dict[str, Any]:
+    """Load a full OptimizationConfig YAML from tests/assets/configs.
+
+    Distinct from `get_search_space`: a search space is a list of node-level
+    dicts, while an OptimizationConfig is a top-level dict that *contains* a
+    `search_space` key alongside `sampler`, `data_config`, etc.
+    """
+    path = cast("Path", ires.files("tests.assets.configs").joinpath(f"{name}.yaml"))
+    with path.open(encoding="utf-8") as f:
+        return cast("dict[str, Any]", yaml.safe_load(f))
 
 
 def get_test_embedder_config(**kwargs: Any) -> HashingVectorizerEmbeddingConfig:
