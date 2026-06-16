@@ -7,7 +7,7 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embedder_config
 from autointent.custom_types import NodeType
-from tests.conftest import apply_test_models, get_search_space, setup_environment
+from tests.conftest import apply_test_models, get_search_space
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -18,8 +18,8 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture
-def project_dir(task_type: TaskType) -> Path:
-    return setup_environment() / "test_inference" / task_type
+def project_dir(tmp_path: Path) -> Path:
+    return tmp_path
 
 
 @pytest.mark.parametrize(
@@ -124,8 +124,8 @@ def test_inference_on_the_fly(
     assert prediction == prediction_v2
 
 
-def test_load_with_overrided_params(dataset: Dataset) -> None:
-    project_dir = setup_environment() / "test_inference" / "override"
+def test_load_with_overrided_params(dataset: Dataset, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -172,8 +172,8 @@ def test_load_with_overrided_params(dataset: Dataset) -> None:
     assert loaded_scoring_module._embedder.config.tokenizer_config.max_length == 8
 
 
-def test_no_saving(dataset: Dataset) -> None:
-    project_dir = setup_environment() / "test_inference" / "no_saving"
+def test_no_saving(dataset: Dataset, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
