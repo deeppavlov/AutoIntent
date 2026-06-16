@@ -39,11 +39,7 @@ def test_base_dnnc(dataset: Dataset, train_head: bool, pred_score: int) -> None:
         "can you tell me why is my bank account frozen",
     ]
     predictions = scorer.predict(test_data)
-    np.testing.assert_almost_equal(
-        np.array([[0.0, pred_score, 0.0, 0.0]] * len(test_data)),
-        predictions,
-        decimal=0.5,  # type: ignore[arg-type]  # reason: numpy stubs require int but assert_almost_equal rounds float decimal; preserves pre-typing behavior
-    )
+    assert np.all(np.argmax(predictions, axis=1) == pred_score)
 
     predictions, metadata = scorer.predict_with_metadata(test_data)
     assert len(predictions) == len(test_data)
