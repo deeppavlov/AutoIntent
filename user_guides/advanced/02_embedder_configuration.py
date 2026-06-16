@@ -32,7 +32,7 @@ The simplest way is to pass a model name as a string:
 from autointent.modules.scoring import KNNScorer, LinearScorer
 
 # Using just the model name - sentence-transformers handles device detection
-scorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
+scorer: KNNScorer | LinearScorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
 
 # %% [markdown]
 """

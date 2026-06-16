@@ -18,7 +18,10 @@ jobs:
       - name: Install dependencies
         run: |
           uv lock
-          uv sync --group typing --group test --extra catboost --extra peft --extra transformers --extra sentence-transformers --extra openai
+          uv sync --group typing --group test --group docs --extra catboost --extra peft --extra transformers --extra sentence-transformers --extra openai
 
       - name: Run mypy
         run: uv run mypy src/autointent tests
+
+      - name: Run mypy on documentation code
+        run: uv run mypy --namespace-packages --explicit-package-bases user_guides docs/source/conf.py docs/source/docs_utils

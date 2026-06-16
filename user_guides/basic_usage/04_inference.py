@@ -13,9 +13,11 @@ Here's the basic example:
 """
 
 # %%
+from typing import Any
+
 from autointent import Dataset, Pipeline
 
-search_space = [
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",

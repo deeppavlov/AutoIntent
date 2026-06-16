@@ -6,7 +6,9 @@ This script demonstrates how to report the optimization process using the AutoIn
 """
 
 # %%
-search_space = [
+from typing import Any
+
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "embedding",
         "target_metric": "retrieval_hit_rate",
