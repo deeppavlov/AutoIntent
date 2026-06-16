@@ -9,6 +9,7 @@ import pytest
 from autointent import Dataset, Ranker
 from autointent.configs import CrossEncoderConfig
 from autointent.context.data_handler import DataHandler
+from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     import numpy as np
     import numpy.typing as npt
 
-    from autointent.custom_types import ListOfGenericLabels, ListOfLabels, RerankedItem
+    from autointent.custom_types import ListOfGenericLabels, RerankedItem
 
 pytest.importorskip("sentence_transformers")
 
@@ -66,8 +67,9 @@ def test_nli_transformer_predict_with_train_head(data_handler: DataHandler) -> N
     model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2", "train_head": True})
     texts = data_handler.train_utterances(0)
     labels = data_handler.train_labels(0)
-    # clinc_subset has no OOS samples, so labels is statically ListOfLabels at runtime.
-    model.fit(texts, cast("ListOfLabels", labels))
+    # clinc_subset has no OOS samples; assert + narrow via TypeGuard.
+    assert is_strict_labels(labels)
+    model.fit(texts, labels)
     predicted = model.predict(build_pairs(texts))
     check_predictions(predicted, labels)
 
@@ -90,8 +92,9 @@ def test_nli_transformer_predict_default_with_fit(data_handler: DataHandler) -> 
     model = Ranker(cross_encoder_config={"model_name": "cross-encoder/ms-marco-MiniLM-L6-v2", "train_head": False})
     texts = data_handler.train_utterances(0)
     labels = data_handler.train_labels(0)
-    # clinc_subset has no OOS samples, so labels is statically ListOfLabels at runtime.
-    model.fit(texts, cast("ListOfLabels", labels))
+    # clinc_subset has no OOS samples; assert + narrow via TypeGuard.
+    assert is_strict_labels(labels)
+    model.fit(texts, labels)
     predicted = model.predict(build_pairs(texts))
     check_predictions(predicted, labels)
 
