@@ -8,9 +8,10 @@ import numpy as np
 from autointent import Context, Pipeline
 from autointent._callbacks import CallbackHandler, OptimizerCallback
 from autointent.configs import DataConfig, FaissConfig, HPOConfig, LoggingConfig
-from tests.conftest import setup_environment
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from autointent import Dataset
 
 
@@ -56,8 +57,8 @@ class DummyCallback(OptimizerCallback):
         return metrics
 
 
-def test_pipeline_callbacks(dataset: Dataset) -> None:
-    project_dir = setup_environment()
+def test_pipeline_callbacks(dataset: Dataset, tmp_path: Path) -> None:
+    project_dir = tmp_path
 
     search_space: list[dict[str, Any]] = [
         {
