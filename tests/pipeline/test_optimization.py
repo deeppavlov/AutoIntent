@@ -7,7 +7,7 @@ import pytest
 
 from autointent import Pipeline
 from autointent.configs import DataConfig, HPOConfig, LoggingConfig
-from tests.conftest import apply_test_models, get_search_space, setup_environment
+from tests.conftest import apply_test_models, get_search_space
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -31,8 +31,8 @@ if TYPE_CHECKING:
         (DataConfig(scheme="cv", separation_ratio=0.5), True),
     ],
 )
-def test_with_regex(dataset: Dataset, data_config: DataConfig, refit_after: bool) -> None:
-    project_dir = setup_environment()
+def test_with_regex(dataset: Dataset, data_config: DataConfig, refit_after: bool, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space("regex")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -44,8 +44,8 @@ def test_with_regex(dataset: Dataset, data_config: DataConfig, refit_after: bool
     pipeline_optimizer.fit(dataset, refit_after=refit_after)
 
 
-def test_no_node_separation(dataset_no_oos: Dataset) -> None:
-    project_dir = setup_environment()
+def test_no_node_separation(dataset_no_oos: Dataset, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space("light")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -72,8 +72,8 @@ def test_full_config(dataset_no_oos: Dataset) -> None:
     "sampler",
     ["tpe", "random"],
 )
-def test_bayes(dataset: Dataset, sampler: SamplerType) -> None:
-    project_dir = setup_environment()
+def test_bayes(dataset: Dataset, sampler: SamplerType, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space("optuna")
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -95,8 +95,8 @@ def test_bayes(dataset: Dataset, sampler: SamplerType) -> None:
         "description_with_llm",
     ],
 )
-def test_cv(dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator) -> None:
-    project_dir = setup_environment()
+def test_cv(dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator, tmp_path: Path) -> None:
+    project_dir = tmp_path
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -123,8 +123,10 @@ def test_cv(dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: G
         "description_with_llm",
     ],
 )
-def test_no_context_optimization(dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator) -> None:
-    project_dir = setup_environment()
+def test_no_context_optimization(
+    dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator, tmp_path: Path
+) -> None:
+    project_dir = tmp_path
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
@@ -149,8 +151,10 @@ def test_no_context_optimization(dataset: Dataset, task_type: TaskType, patch_ll
         "description_with_llm",
     ],
 )
-def test_dump_modules(dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator) -> None:
-    project_dir = setup_environment()
+def test_dump_modules(
+    dataset: Dataset, task_type: TaskType, patch_llm_scorer_generator: Generator, tmp_path: Path
+) -> None:
+    project_dir = tmp_path
     search_space = get_search_space(task_type)
 
     pipeline_optimizer = Pipeline.from_search_space(search_space)
