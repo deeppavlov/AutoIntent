@@ -56,7 +56,7 @@ class TestRenderText:
         out = render_text(_populated_report())
         assert "Resource:" in out
         assert "Data:" in out
-        # Config phase has no findings → block omitted
+        # Config phase has no findings -> block omitted
         assert "Config:" not in out
 
     def test_includes_drivers_block(self) -> None:
@@ -119,7 +119,7 @@ class TestRenderRecommendation:
 
     def test_lists_chosen_preset_when_present(self) -> None:
         out = render_recommendation(self._two_reports(), chosen="a")
-        assert "→ a" in out
+        assert "-> a" in out
 
     def test_handles_no_chosen(self) -> None:
         out = render_recommendation(self._two_reports(), chosen=None)
@@ -140,7 +140,7 @@ class TestBatchHint:
     """Per-driver batch cell rendered in the Drivers-of-cost table."""
 
     def test_arrow_when_max_differs(self) -> None:
-        assert _batch_hint({"batch_size": 64, "max_batch_size": 32}) == "64 → 32"
+        assert _batch_hint({"batch_size": 64, "max_batch_size": 32}) == "64 -> 32"
 
     def test_plain_when_max_equals_current(self) -> None:
         assert _batch_hint({"batch_size": 64, "max_batch_size": 64}) == "64"
@@ -152,7 +152,7 @@ class TestBatchHint:
         assert _batch_hint({"batch_size": None, "max_batch_size": None}) == ""
 
     def test_increase_arrow(self) -> None:
-        assert _batch_hint({"batch_size": 32, "max_batch_size": 128}) == "32 → 128"
+        assert _batch_hint({"batch_size": 32, "max_batch_size": 128}) == "32 -> 128"
 
 
 def test_dataset_stats_in_text_block() -> None:

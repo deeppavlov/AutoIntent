@@ -23,14 +23,11 @@ from autointent.utils import load_preset
 
 @pytest.fixture(autouse=True)
 def _force_offline(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Pin the HF Hub probe to "offline" so tests don't hit the network."""
-    from autointent._advisor import _estimates, _hub
+    """Force HF Hub lookups to fail so tests don't hit the network."""
+    from autointent._advisor import _hub
 
-    _hub.hub_reachable.cache_clear()
     _hub.resolve_model.cache_clear()
-    offline = lambda *_a, **_kw: False  # noqa: E731
-    monkeypatch.setattr(_hub, "hub_reachable", offline)
-    monkeypatch.setattr(_estimates, "hub_reachable", offline)
+    monkeypatch.setattr(_hub, "_hub_metadata", lambda _name: None)
 
 
 def _profile(vram_gb: float = 16.0) -> HardwareProfile:
@@ -50,7 +47,6 @@ def test_every_preset_inspects_without_raising(preset: str) -> None:
     stats = DatasetStats.placeholder(n_samples=500, n_classes=10, avg_tokens=24)
     report = run_preflight(cfg, stats, _profile(vram_gb=16.0), preset_name=preset)
     assert report.preset_name == preset
-    assert report.low_confidence is True  # we forced offline
     # always at least one resource-phase finding
     assert any(f.phase == "resource" for f in report.findings)
 

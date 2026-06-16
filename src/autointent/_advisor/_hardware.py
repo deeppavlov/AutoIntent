@@ -1,7 +1,7 @@
 """Local hardware detection.
 
 Probes CPU / RAM / disk and the highest-priority accelerator available
-(CUDA → MPS → CPU). All probes are wrapped to fall back safely on a
+(CUDA -> MPS -> CPU). All probes are wrapped to fall back safely on a
 broken install (e.g. CUDA driver mismatch) rather than crash the advisor.
 """
 
@@ -27,6 +27,7 @@ MPS_DEFAULT_BUDGET_RATIO = 0.7
 
 _HIGH_GPU_VRAM_GB = 24
 _MID_GPU_VRAM_GB = 12
+_BYTES_PER_GB = 1024**3  # binary GiB convention; matches all advisor byte->GB conversions
 
 
 @dataclass
@@ -53,7 +54,7 @@ class HardwareProfile:
 
 
 def _detect_ram_gb() -> float:
-    return float(psutil.virtual_memory().total) / (1024**3)
+    return float(psutil.virtual_memory().total) / _BYTES_PER_GB
 
 
 def _detect_free_disk_gb(path: str | None = None) -> float:
@@ -61,7 +62,7 @@ def _detect_free_disk_gb(path: str | None = None) -> float:
     probe_path = cache if cache.exists() else Path("~").expanduser()
     try:
         usage = shutil.disk_usage(probe_path)
-        return usage.free / (1024**3)
+        return usage.free / _BYTES_PER_GB
     except OSError as e:
         logger.debug("disk usage probe failed at %s: %s", probe_path, e)
         return 0.0
@@ -73,7 +74,7 @@ def _detect_cuda() -> tuple[float, str] | None:
     idx = 0
     try:
         _free, total = torch.cuda.mem_get_info(idx)
-        vram_gb = total / (1024**3)
+        vram_gb = total / _BYTES_PER_GB
     except (RuntimeError, AttributeError) as e:
         logger.debug("torch.cuda.mem_get_info failed: %s", e)
         return None

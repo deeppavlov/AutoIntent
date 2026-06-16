@@ -9,72 +9,40 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Literal
 
 from huggingface_hub import HfApi, hf_hub_download, scan_cache_dir, try_to_load_from_cache
 
+Confidence = Literal["hub", "heuristic"]
+
 logger = logging.getLogger(__name__)
 
-# Coarse heuristic estimates keyed on name fragments. Used only when HF Hub
-# is unreachable and we can't get safetensors metadata. Values in millions.
-_NAME_HEURISTICS = [
-    (re.compile(r"(?i)(deberta|roberta|bert).*(xxlarge|huge)"), 1_500),
-    (re.compile(r"(?i)(deberta|roberta|bert).*xlarge"), 750),
-    (re.compile(r"(?i)(deberta|roberta|bert).*large"), 350),
-    (re.compile(r"(?i)e5.*large"), 560),
-    (re.compile(r"(?i)e5.*small"), 33),
-    (re.compile(r"(?i)mpnet"), 110),
-    (re.compile(r"(?i)minilm"), 33),
-    (re.compile(r"(?i)distil"), 66),
-    (re.compile(r"(?i)small"), 60),
-    (re.compile(r"(?i)base"), 110),
-    (re.compile(r"(?i)large"), 350),
-]
+_DEFAULT_HEURISTIC_PARAMS = 110_000_000
+_DEFAULT_BYTES_PER_PARAM = 4
+_BYTES_PER_GB = 1024**3  # using the binary GiB convention everywhere in the advisor
 
 
 @dataclass
 class ModelMeta:
     name: str
-    params_millions: float
-    weight_bytes_per_param: int
+    total_params: int
+    weight_bytes_per_param: float
     total_file_bytes: int
     cached_locally: bool
-    confidence: str  # "hub" | "heuristic"
-    # Architecture shape read straight from the model's config.json when reachable;
-    # None when the file couldn't be fetched/parsed. Estimates fall back to a
-    # BERT-base default in that case.
+    confidence: Confidence
     hidden_size: int | None = None
     n_layers: int | None = None
 
     @property
     def disk_gb(self) -> float:
-        return self.total_file_bytes / (1024**3)
+        return self.total_file_bytes / _BYTES_PER_GB
 
     @property
     def weights_gb(self) -> float:
-        return (self.params_millions * 1_000_000 * self.weight_bytes_per_param) / (1024**3)
-
-
-@lru_cache(maxsize=1)
-def hub_reachable() -> bool:
-    """Single up-front probe. Memoized per process."""
-    try:
-        HfApi().list_models(limit=1)
-    except Exception as e:  # noqa: BLE001
-        logger.debug("HF Hub probe failed: %s", e)
-        return False
-    return True
-
-
-def _heuristic_params_millions(model_name: str) -> float:
-    for pattern, m in _NAME_HEURISTICS:
-        if pattern.search(model_name):
-            return float(m)
-    return 110.0  # generic BERT-base default
+        return (self.total_params * self.weight_bytes_per_param) / _BYTES_PER_GB
 
 
 def _shape_from_config(model_name: str) -> tuple[int | None, int | None]:
@@ -98,7 +66,7 @@ def _shape_from_config(model_name: str) -> tuple[int | None, int | None]:
     # num_hidden_layers; T5/MT5 use d_model + num_layers; GPT-2/Neo use n_embd + n_layer.
     hidden = cfg.get("hidden_size") or cfg.get("d_model") or cfg.get("n_embd")
     layers = cfg.get("num_hidden_layers") or cfg.get("num_layers") or cfg.get("n_layer")
-    return (int(hidden) if hidden else None, int(layers) if layers else None)
+    return int(hidden) if hidden else None, int(layers) if layers else None
 
 
 def _is_warm_cached(model_name: str) -> bool:
@@ -124,36 +92,46 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
     except Exception as e:  # noqa: BLE001
         logger.debug("model_info(%s) failed: %s", model_name, e)
         return None
+    # Bytes-per-element for safetensors dtype strings. Used to convert the per-dtype
+    # parameter counts (info.safetensors.parameters) into a weighted average
+    # bytes-per-param for mixed-precision repos.
+    _dtype_bytes: dict[str, int] = {
+        "F64": 8,
+        "F32": 4,
+        "F16": 2,
+        "BF16": 2,
+        "I64": 8,
+        "I32": 4,
+        "I16": 2,
+        "I8": 1,
+        "U8": 1,
+        "BOOL": 1,
+    }
 
-    params_millions = 0.0
-    weight_bytes_per_param = 4
-    safetensors = getattr(info, "safetensors", None)
-    if safetensors is not None:
-        params_total = getattr(safetensors, "total", None) or sum(
-            getattr(safetensors, "parameters", {}).values() or [0]
-        )
-        if params_total:
-            params_millions = params_total / 1_000_000
-            params_map: dict[str, Any] = getattr(safetensors, "parameters", {}) or {}
-            if any("F16" in k or "BF16" in k for k in params_map):
-                weight_bytes_per_param = 2
+    total_params = 0
+    weight_bytes_per_param: float = _DEFAULT_BYTES_PER_PARAM
+    if info.safetensors is not None:
+        params_by_dtype = info.safetensors.parameters or {}
+        total_params = info.safetensors.total or sum(params_by_dtype.values())
+        if total_params:
+            total_weight_bytes = sum(
+                _dtype_bytes.get(dtype, _DEFAULT_BYTES_PER_PARAM) * count for dtype, count in params_by_dtype.items()
+            )
+            if total_weight_bytes:
+                weight_bytes_per_param = total_weight_bytes / total_params
 
-    total_file_bytes = 0
-    for sibling in getattr(info, "siblings", []) or []:
-        size = getattr(sibling, "size", None)
-        if size:
-            total_file_bytes += int(size)
+    total_file_bytes = sum(s.size for s in (info.siblings or []) if s.size)
 
     # Track whether either size came from the Hub or from the name-pattern fallback;
     # if any field was filled by heuristic, downgrade confidence so the report flips
     # low_confidence rather than misreporting hub-grade accuracy.
-    confidence = "hub"
-    if params_millions == 0:
-        params_millions = _heuristic_params_millions(model_name)
+    confidence: Confidence = "hub"
+    if total_params == 0:
+        total_params = _DEFAULT_HEURISTIC_PARAMS
         confidence = "heuristic"
 
     if total_file_bytes == 0:
-        total_file_bytes = int(params_millions * 1_000_000 * weight_bytes_per_param)
+        total_file_bytes = int(total_params * weight_bytes_per_param)
         confidence = "heuristic"
 
     hidden_size, n_layers = _shape_from_config(model_name)
@@ -166,7 +144,7 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
 
     return ModelMeta(
         name=model_name,
-        params_millions=params_millions,
+        total_params=total_params,
         weight_bytes_per_param=weight_bytes_per_param,
         total_file_bytes=total_file_bytes,
         cached_locally=_is_warm_cached(model_name),
@@ -182,17 +160,31 @@ def _heuristic_metadata(model_name: str) -> ModelMeta:
         "activation-memory estimates will use BERT-base defaults (hidden=768, layers=12).",
         model_name,
     )
-    params_millions = _heuristic_params_millions(model_name)
-    weight_bytes_per_param = 4
-    total_file_bytes = int(params_millions * 1_000_000 * weight_bytes_per_param)
+    total_file_bytes = _DEFAULT_HEURISTIC_PARAMS * _DEFAULT_BYTES_PER_PARAM
     return ModelMeta(
         name=model_name,
-        params_millions=params_millions,
-        weight_bytes_per_param=weight_bytes_per_param,
+        total_params=_DEFAULT_HEURISTIC_PARAMS,
+        weight_bytes_per_param=_DEFAULT_BYTES_PER_PARAM,
         total_file_bytes=total_file_bytes,
         cached_locally=_is_warm_cached(model_name),
         confidence="heuristic",
     )
+
+
+def _looks_like_local_path(model_name: str) -> bool:
+    """True when ``model_name`` is a filesystem path rather than an HF Hub repo id.
+
+    Hub repo ids match ``org/repo``; anything that starts with a path separator,
+    ``~``, a relative-path prefix, or a Windows drive letter, or contains a
+    backslash, is treated as a local path. We can't rely on ``Path.is_absolute()``
+    alone because POSIX-style absolute paths (``/tmp/...``) are *not* absolute
+    on Windows.
+    """
+    if model_name.startswith(("local:", "/", "~", "./", "../", "\\\\")):
+        return True
+    if "\\" in model_name:
+        return True
+    return len(model_name) >= 2 and model_name[1] == ":" and model_name[0].isalpha()  # noqa: PLR2004
 
 
 @lru_cache(maxsize=64)
@@ -202,19 +194,20 @@ def resolve_model(model_name: str) -> ModelMeta:
     Always returns a value — never raises — so the advisor can keep going
     on offline machines or for unknown checkpoints.
     """
-    if model_name.startswith("local:") or Path(model_name).is_absolute():
+    if _looks_like_local_path(model_name):
         return ModelMeta(
             name=model_name,
-            params_millions=_heuristic_params_millions(model_name),
-            weight_bytes_per_param=4,
+            total_params=_DEFAULT_HEURISTIC_PARAMS,
+            weight_bytes_per_param=_DEFAULT_BYTES_PER_PARAM,
             total_file_bytes=0,
             cached_locally=True,
             confidence="heuristic",
         )
 
-    if hub_reachable():
-        meta = _hub_metadata(model_name)
-        if meta is not None:
-            return meta
+    # _hub_metadata returns None on any failure (network outage, missing repo,
+    # SDK exception) so we don't need a separate up-front probe.
+    meta = _hub_metadata(model_name)
+    if meta is not None:
+        return meta
 
     return _heuristic_metadata(model_name)

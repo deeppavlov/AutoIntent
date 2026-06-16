@@ -13,13 +13,13 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from ._report import PreflightReport
 
-_SEVERITY_TAG = {"ample": "✓", "tight": "⚠", "over": "✗"}
+_SEVERITY_TAG = {"ample": "✓", "tight": "⚠", "over": "x"}
 _PHASE_ORDER = ("resource", "data", "config")
 _PHASE_LABEL = {"resource": "Resource", "data": "Data", "config": "Config"}
 
 
 def _batch_hint(driver: dict[str, Any]) -> str:
-    """Per-driver batch annotation: '64 → 32', '64', '64 (no fit)', or ''."""
+    """Per-driver batch annotation: '64 -> 32', '64', '64 (no fit)', or ''."""
     bs = driver.get("batch_size")
     if bs is None:
         return ""
@@ -30,7 +30,7 @@ def _batch_hint(driver: dict[str, Any]) -> str:
         return f"{bs} (no fit)"
     if mx == bs:
         return str(bs)
-    return f"{bs} → {mx}"
+    return f"{bs} -> {mx}"
 
 
 _DRIVERS_LIMIT = 8
@@ -137,9 +137,9 @@ def render_recommendation(
     """Compact table for the ``recommend`` subcommand."""
     lines = ["", "Recommendation:"]
     if chosen:
-        lines.append(f"  → {chosen}")
+        lines.append(f"  -> {chosen}")
     else:
-        lines.append("  → none of the bundled presets fit your hardware as-is.")
+        lines.append("  -> none of the bundled presets fit your hardware as-is.")
     lines.append("")
     lines.append(f"{'Preset':<24} {'Status':<14} {'VRAM':<10} {'Time':<10} {'Headroom':<10}")
     lines.append("-" * 68)

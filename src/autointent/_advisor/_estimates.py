@@ -12,11 +12,17 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import ValidationError
 
-from autointent.configs._optimization import HPOConfig
+from autointent._optimization_config import OptimizationConfig
+from autointent.configs._embedder import (
+    EmbedderConfig,
+    OpenaiEmbeddingConfig,
+    SentenceTransformerEmbeddingConfig,
+    VllmEmbeddingConfig,
+)
 
-from ._hub import hub_reachable, resolve_model
+from ._hub import resolve_model
 from ._report import PreflightReport, ResourceEstimate, Severity
 
 if TYPE_CHECKING:
@@ -27,6 +33,7 @@ if TYPE_CHECKING:
     from ._report import DatasetStats
 
 _MULTICLASS_THRESHOLD = 2
+_BYTES_PER_GB = 1024**3  # binary GiB convention; matches all advisor byte->GB conversions
 
 # Fallback architecture shape (BERT-base) used only when the model's actual
 # config.json couldn't be fetched from HF Hub — see _hub._shape_from_config.
@@ -36,48 +43,39 @@ _DEFAULT_LAYERS = 12
 logger = logging.getLogger(__name__)
 
 
-class _AdvisorConfig(BaseModel):
-    """Validated view of the advisor's input config.
-
-    Wraps the four top-level keys the phase helpers read. Unknown top-level
-    keys are ignored (preset YAMLs carry extra metadata the advisor doesn't model).
-    """
-
-    model_config = ConfigDict(extra="ignore")
-
-    hpo_config: HPOConfig = Field(default_factory=HPOConfig)
-    search_space: list[dict[str, Any]] = Field(default_factory=list)
-    refit_after: bool = False
-    dump_modules: bool = False
-    embedder_config: dict[str, Any] | None = None
-
-
-def _validated_config(config: dict[str, Any]) -> _AdvisorConfig:
-    """Validate ``config`` against ``_AdvisorConfig``; fall back to defaults on any error.
+def _validated_config(config: dict[str, Any]) -> OptimizationConfig:
+    """Validate ``config`` against the project's canonical ``OptimizationConfig``.
 
     The advisor is best-effort: a malformed user config should still produce a
-    report (with placeholder costs) rather than crashing.
+    report (with placeholder costs) rather than crashing, so any validation
+    error falls back to the model defaults.
     """
     try:
-        return _AdvisorConfig.model_validate(config)
+        return OptimizationConfig.model_validate(config)
     except ValidationError as e:
         logger.warning("Advisor config failed validation; falling back to defaults: %s", e)
-        return _AdvisorConfig()
+        # OptimizationConfig requires `search_space`; build a minimal valid default.
+        return OptimizationConfig.model_validate({"search_space": []})
 
 
-# Severity thresholds as a fraction of available budget: at or above _TIGHT
-# downgrades to Severity.TIGHT; at or above _OVER downgrades to Severity.OVER.
-_TIGHT_RATIO = 0.7
-_OVER_RATIO = 1.0
+_TIGHT_RATIO = 0.9
 
-# rough per-step seconds, keyed on device class. Scaled by params_millions / 100.
-_PER_STEP_BASELINE_S = {
-    "cpu": 0.5,
-    "low-gpu": 0.04,
-    "mid-gpu": 0.02,
-    "high-gpu": 0.01,
-    "apple-silicon": 0.08,
-}
+# Union variants of EmbedderConfig that carry a model_name attribute.
+# HashingVectorizerEmbeddingConfig and the bare BaseEmbedderConfig don't have
+# one (sklearn vectorizer / abstract base), so we filter them out below.
+_MODEL_BACKED_EMBEDDERS = (
+    SentenceTransformerEmbeddingConfig,
+    OpenaiEmbeddingConfig,
+    VllmEmbeddingConfig,
+)
+
+
+def _embedder_model_name(embedder: EmbedderConfig) -> str | None:
+    """Return the embedder's model_name when the config variant carries one."""
+    if isinstance(embedder, _MODEL_BACKED_EMBEDDERS):
+        return embedder.model_name
+    return None
+
 
 # Maps each fine-tunable transformer module to its training-mode label.
 # Modules not listed (or listed as "inference") run the encoder forward-only.
@@ -98,7 +96,7 @@ _DEFAULT_SEQ_LEN = 128
 _LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-8
 _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
 _CATBOOST_GPU_SPEEDUP = 10.0
-# LogisticRegressionCV defaults: Cs=10, cv=3 → 31 inner fits + 1 final refit.
+# LogisticRegressionCV defaults: Cs=10, cv=3 -> 31 inner fits + 1 final refit.
 _LOGREG_CV_MULTIPLIER = 31
 _CATBOOST_DEFAULT_BINS = 254
 # Bytes per histogram bucket / tree node — order-of-magnitude constants.
@@ -190,7 +188,7 @@ def _vram_for_transformer(
 
 def _ram_for_module(meta: ModelMeta, stats: DatasetStats) -> float:
     """RAM in GB. Loose upper bound."""
-    return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / (1024**3)
+    return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / _BYTES_PER_GB
 
 
 def _floor_to_power_of_two(n: int) -> int:
@@ -232,7 +230,7 @@ def _activations_gb_per_sample(
     bytes_per_sample = seq_len * hidden * _n_layers(meta) * 16 if is_training else seq_len * hidden * 8
     if mixed_precision:
         bytes_per_sample //= 2
-    return bytes_per_sample / (1024**3)
+    return bytes_per_sample / _BYTES_PER_GB
 
 
 def _max_fitting_batch_size(
@@ -265,7 +263,7 @@ def _embedder_dim(meta: ModelMeta | None) -> int:
 def _largest_embedder(seen_models: dict[str, ModelMeta]) -> ModelMeta | None:
     if not seen_models:
         return None
-    return max(seen_models.values(), key=lambda m: m.params_millions)
+    return max(seen_models.values(), key=lambda m: m.total_params)
 
 
 def _ram_for_linear(*, stats: DatasetStats, embedder_dim: int) -> float:
@@ -273,7 +271,7 @@ def _ram_for_linear(*, stats: DatasetStats, embedder_dim: int) -> float:
     data_bytes = 8.0 * stats.n_samples * embedder_dim
     coef_bytes = 8.0 * max(1, stats.n_classes) * embedder_dim
     lbfgs_bytes = 10.0 * 8.0 * embedder_dim
-    return (data_bytes + coef_bytes + lbfgs_bytes) / (1024**3)
+    return (data_bytes + coef_bytes + lbfgs_bytes) / _BYTES_PER_GB
 
 
 def _time_for_linear(
@@ -301,7 +299,7 @@ def _ram_for_catboost(*, stats: DatasetStats, n_features: int, iterations: int, 
     data_bytes = 4.0 * stats.n_samples * n_features
     histograms_bytes = 4.0 * n_features * _CATBOOST_DEFAULT_BINS
     trees_bytes = iterations * (2**depth) * _CATBOOST_BYTES_PER_TREE_NODE
-    return float((data_bytes + histograms_bytes + trees_bytes) / (1024**3))
+    return float((data_bytes + histograms_bytes + trees_bytes) / _BYTES_PER_GB)
 
 
 def _time_for_catboost(
@@ -323,16 +321,20 @@ def _time_for_catboost(
 
 def _time_for_transformer(
     *,
-    meta: ModelMeta,
     n_trials: int,
     epochs: int,
     batch_size: int,
     n_samples: int,
-    device_class: str,
 ) -> float:
-    per_step = _PER_STEP_BASELINE_S[device_class] * (meta.params_millions / 100.0)
+    """Transformer training time in hours, assuming a flat 1 second per step.
+
+    The advisor has no real wall-time calibration across hardware tiers / model
+    sizes, so the report uses ``time_hours`` as a step-count proxy rather than
+    pretending to estimate seconds. Users should treat the number as ordering /
+    ballpark information, not a budget.
+    """
     steps = max(1, (n_samples // max(1, batch_size))) * epochs
-    return (n_trials * steps * per_step) / 3600.0
+    return (n_trials * steps) / 3600.0
 
 
 def _classify_severity(estimate: float, budget: float) -> Severity:
@@ -341,7 +343,7 @@ def _classify_severity(estimate: float, budget: float) -> Severity:
     if budget <= 0:
         return Severity.TIGHT
     ratio = estimate / budget
-    if ratio >= _OVER_RATIO:
+    if ratio >= 1:
         return Severity.OVER
     if ratio >= _TIGHT_RATIO:
         return Severity.TIGHT
@@ -368,7 +370,8 @@ def _split_entries(
     search_space: list[dict[str, Any]],
 ) -> tuple[list[tuple[int, str, dict[str, Any]]], list[tuple[int, str, dict[str, Any]]]]:
     """Partition search-space entries into (transformer-bearing, classic)."""
-    transformer, classic = [], []
+    transformer: list[tuple[int, str, dict[str, Any]]] = []
+    classic: list[tuple[int, str, dict[str, Any]]] = []
     for node_idx, node_type, entry in _walk_modules_indexed(search_space):
         bucket = classic if entry.get("module_name") in {"linear", "catboost"} else transformer
         bucket.append((node_idx, node_type, entry))
@@ -408,12 +411,10 @@ def _estimate_transformer_model(
         )
 
     time_h = _time_for_transformer(
-        meta=meta,
         n_trials=n_trials,
         epochs=epochs,
         batch_size=batch_size,
         n_samples=stats.n_samples,
-        device_class=hardware.device_class,
     )
     if mode != "inference":
         time_h *= _refit_factor(refit_after=refit_after, n_trials=n_trials)
@@ -593,17 +594,16 @@ def _resource_phase(
     stats: DatasetStats,
     hardware: HardwareProfile,
     report: PreflightReport,
+    *,
+    refit_after: bool = False,
 ) -> None:
     cfg = _validated_config(config)
-    n_trials = max(1, cfg.hpo_config.n_trials)
-    n_jobs = max(1, cfg.hpo_config.n_jobs)
-
-    if not hub_reachable():
-        report.low_confidence = True
-        report.notes.append("HF Hub unreachable — all model sizes are name-pattern heuristics.")
+    n_trials = cfg.hpo_config.n_trials
+    n_jobs = cfg.hpo_config.n_jobs
+    dump_modules = cfg.logging_config.dump_modules
 
     seen_models: dict[str, ModelMeta] = {}
-    global_embedder = (cfg.embedder_config or {}).get("model_name")
+    global_embedder = _embedder_model_name(cfg.embedder_config)
     if global_embedder:
         seen_models[global_embedder] = resolve_model(global_embedder)
 
@@ -628,7 +628,7 @@ def _resource_phase(
                 stats=stats,
                 hardware=hardware,
                 n_trials=n_trials,
-                refit_after=cfg.refit_after,
+                refit_after=refit_after,
             )
             module_estimates.append(me)
             # Track heaviest weight per node so dump_modules is bounded by one
@@ -639,7 +639,7 @@ def _resource_phase(
     embedder_meta = _largest_embedder(seen_models)
     embedder_dim = _embedder_dim(embedder_meta)
     for _, node_type, entry in classic_entries:
-        me = _estimate_classic_entry(
+        classic_estimate = _estimate_classic_entry(
             entry=entry,
             node_type=node_type,
             embedder_meta=embedder_meta,
@@ -647,10 +647,10 @@ def _resource_phase(
             stats=stats,
             hardware=hardware,
             n_trials=n_trials,
-            refit_after=cfg.refit_after,
+            refit_after=refit_after,
         )
-        if me is not None:
-            module_estimates.append(me)
+        if classic_estimate is not None:
+            module_estimates.append(classic_estimate)
 
     estimate = ResourceEstimate(parallel_factor=n_jobs)
     for me in module_estimates:
@@ -659,7 +659,17 @@ def _resource_phase(
         estimate.time_hours += me.time_hours
         estimate.drivers.append(me.driver)
 
-    _aggregate_disk(estimate, seen_models, node_max_weights, dump_modules=cfg.dump_modules, n_trials=n_trials)
+    _aggregate_disk(estimate, seen_models, node_max_weights, dump_modules=dump_modules, n_trials=n_trials)
+
+    # Flip low_confidence if any model fell back to the heuristic path (Hub
+    # unreachable, repo missing safetensors metadata, local-path checkpoint).
+    heuristic_models = [m.name for m in seen_models.values() if m.confidence == "heuristic"]
+    if heuristic_models:
+        report.low_confidence = True
+        report.notes.append(
+            f"Heuristic fallback used for {len(heuristic_models)} model(s) — sizes are BERT-base "
+            f"defaults: {', '.join(heuristic_models[:3])}{'...' if len(heuristic_models) > 3 else ''}",  # noqa: PLR2004
+        )
 
     report.resource = estimate
     _emit_resource_findings(report, estimate, hardware, n_jobs=n_jobs)
@@ -743,15 +753,19 @@ def run_preflight(
     hardware: HardwareProfile,
     *,
     preset_name: str | None = None,
+    refit_after: bool = False,
 ) -> PreflightReport:
     """Run all three phases and return one report.
 
     Args:
         config: parsed preset / OptimizationConfig dict (top-level keys:
-            ``search_space``, ``hpo_config``, optional ``embedder_config``).
+            ``search_space``, ``hpo_config``, optional ``embedder_config``,
+            optional ``logging_config.dump_modules``).
         stats: dataset statistics (real or placeholder).
         hardware: detected hardware profile.
         preset_name: optional friendly name for the report header.
+        refit_after: matches the ``Pipeline.fit(refit_after=...)`` argument.
+            When True, time estimates include the extra refit-on-full-data pass.
 
     Returns:
         PreflightReport with findings across resource/data/config phases.
@@ -777,7 +791,7 @@ def run_preflight(
     )
     report.notes.extend(hardware.notes)
 
-    _resource_phase(config, stats, hardware, report)
+    _resource_phase(config, stats, hardware, report, refit_after=refit_after)
     _data_phase(config, stats, report)
     _config_phase(config, hardware, report)
 

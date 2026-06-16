@@ -19,15 +19,41 @@ from autointent._advisor._hardware import HardwareProfile
 from autointent._advisor._hub import ModelMeta
 from autointent._advisor._report import DatasetStats, Severity
 
+# Per-name ModelMeta fixtures used by the offline tests. Production resolution
+# (HF Hub config.json + safetensors metadata) is mocked away so the batch-fit
+# math doesn't depend on whatever fallback the heuristic path returns.
+_FAKE_SHAPES: dict[str, tuple[int, int, int]] = {
+    # (total_params, hidden_size, n_layers)
+    "microsoft/deberta-v3-large": (350_000_000, 1024, 24),
+    "microsoft/deberta-v3-small": (140_000_000, 768, 6),
+    "sentence-transformers/all-MiniLM-L6-v2": (33_000_000, 384, 6),
+    "intfloat/multilingual-e5-large-instruct": (560_000_000, 1024, 24),
+}
+
+
+def _fake_resolve(model_name: str) -> ModelMeta:
+    known = _FAKE_SHAPES.get(model_name)
+    params, hidden, layers = known or (110_000_000, 768, 12)
+    return ModelMeta(
+        name=model_name,
+        total_params=params,
+        weight_bytes_per_param=4,
+        total_file_bytes=params * 4,
+        cached_locally=False,
+        confidence="hub" if known else "heuristic",
+        hidden_size=hidden,
+        n_layers=layers,
+    )
+
 
 @pytest.fixture(autouse=True)
 def _offline(monkeypatch: pytest.MonkeyPatch) -> None:
-    _hub.hub_reachable.cache_clear()
     _hub.resolve_model.cache_clear()
-    offline = lambda *_a, **_kw: False  # noqa: E731
-    monkeypatch.setattr(_hub, "hub_reachable", offline)
-    monkeypatch.setattr(_estimates, "hub_reachable", offline)
     monkeypatch.setattr(_hub, "_is_warm_cached", lambda _name: False)
+    # Inject deterministic ModelMeta per name; both the _hub re-export and the
+    # _estimates rebinding need to be replaced for run_preflight to pick it up.
+    monkeypatch.setattr(_hub, "resolve_model", _fake_resolve)
+    monkeypatch.setattr(_estimates, "resolve_model", _fake_resolve)
 
 
 def _profile(vram_gb: float = 16.0, accelerator: str = "cuda") -> HardwareProfile:
@@ -89,7 +115,7 @@ class TestClassifySeverity:
         assert _classify_severity(estimate=1.0, budget=10.0) == Severity.AMPLE
 
     def test_above_yellow_threshold(self) -> None:
-        assert _classify_severity(estimate=8.0, budget=10.0) == Severity.TIGHT
+        assert _classify_severity(estimate=9.5, budget=10.0) == Severity.TIGHT
 
     def test_at_or_above_red_threshold(self) -> None:
         assert _classify_severity(estimate=10.0, budget=10.0) == Severity.OVER
@@ -104,7 +130,7 @@ class TestVramForTransformer:
     def meta(self) -> ModelMeta:
         return ModelMeta(
             name="x",
-            params_millions=100.0,
+            total_params=100_000_000,
             weight_bytes_per_param=4,
             total_file_bytes=0,
             cached_locally=False,
@@ -146,10 +172,11 @@ class TestVramForTransformer:
         amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True, batch_size=64, seq_len=128)
         assert amp < fp32
 
+
 def test_ram_scales_with_dataset_size() -> None:
     meta = ModelMeta(
         name="x",
-        params_millions=100.0,
+        total_params=100_000_000,
         weight_bytes_per_param=4,
         total_file_bytes=0,
         cached_locally=False,
@@ -177,7 +204,7 @@ class TestRunPreflightFeatures:
                 }
             ],
             "hpo_config": {"n_trials": 5},
-            "dump_modules": True,
+            "logging_config": {"dump_modules": True},
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
         assert report.resource.disk_dump_gb > 0
@@ -201,8 +228,7 @@ class TestRunPreflightFeatures:
             "hpo_config": {"n_trials": 10},
         }
         baseline = run_preflight(cfg, DatasetStats.placeholder(), _profile())
-        cfg_refit = {**cfg, "refit_after": True}
-        bumped = run_preflight(cfg_refit, DatasetStats.placeholder(), _profile())
+        bumped = run_preflight(cfg, DatasetStats.placeholder(), _profile(), refit_after=True)
         assert bumped.resource.time_hours > baseline.resource.time_hours
 
     def test_catboost_gpu_without_cuda_flags_config(self) -> None:
@@ -249,7 +275,7 @@ class TestRunPreflightFeatures:
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
         assert report.low_confidence is True
-        assert any("HF Hub unreachable" in n for n in report.notes)
+        assert any("Heuristic fallback" in n for n in report.notes)
 
     def test_rare_classes_with_linear_scorer_flag_red(self) -> None:
         cfg = {
@@ -471,13 +497,13 @@ class TestPerDriverBatchHint:
         report = run_preflight(
             self._bert_cfg("microsoft/deberta-v3-large", batch_size=64),
             DatasetStats.placeholder(),
-            _profile(vram_gb=8.0),
+            _profile(vram_gb=6.5),
         )
         drivers = [d for d in report.resource.drivers if d["module"] == "bert"]
         assert drivers
         d = drivers[0]
         assert d["batch_size"] == 64
-        # vram_gb=8 with ~5 GB weights leaves little room for activations → max < 64.
+        # vram_gb=6.5 against ~5 GB weights x 0.9 tight ratio -> little activation room, max < 64.
         assert d["max_batch_size"] is not None
         assert 0 < d["max_batch_size"] < 64
 
@@ -523,7 +549,7 @@ class TestPerDriverBatchHint:
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile(vram_gb=10.0))
         small = next(d for d in report.resource.drivers if "small" in d["model"])
         large = next(d for d in report.resource.drivers if "large" in d["model"])
-        # The smaller model has more headroom → larger max batch (or equal-cap when both saturate).
+        # The smaller model has more headroom -> larger max batch (or equal-cap when both saturate).
         assert small["max_batch_size"] >= large["max_batch_size"]
 
 
@@ -551,7 +577,7 @@ class TestDumpModulesBounding:
                 }
             ],
             "hpo_config": {"n_trials": 4},
-            "dump_modules": True,
+            "logging_config": {"dump_modules": True},
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
         # Per-node max ~ deberta-v3-large weights (~350M x 4 ~ 1.3 GB). Two-candidate
@@ -588,7 +614,7 @@ class TestDumpModulesBounding:
                 },
             ],
             "hpo_config": {"n_trials": 2},
-            "dump_modules": True,
+            "logging_config": {"dump_modules": True},
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
         embedder = _hub.resolve_model("sentence-transformers/all-MiniLM-L6-v2")
