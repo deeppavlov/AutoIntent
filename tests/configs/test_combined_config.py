@@ -49,7 +49,9 @@ def test_valid_optimizer_config(valid_optimizer_config: list[dict[str, Any]]) ->
 
 @pytest.mark.parametrize(
     "task_type",
-    get_args(TaskType),
+    # full_training.yaml is a top-level OptimizationConfig dict, not a node list,
+    # so it doesn't fit this test's iteration contract (see test_full_config.py).
+    [t for t in get_args(TaskType) if t != "full_training"],
 )
 def test_optimizer_config(task_type: TaskType) -> None:
     for node_dict_config in get_search_space(task_type):
