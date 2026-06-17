@@ -1,0 +1,11 @@
+autointent.utils.load_preset
+============================
+
+.. py:function:: autointent.utils.load_preset(name)
+
+   Load one of preset search spaces.
+
+   :param name: Name of the preset search space.
+
+   :returns: Dictionary representing the preset search space.
+

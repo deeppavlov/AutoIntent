@@ -1,0 +1,9 @@
+autointent.server.http.health_check
+===================================
+
+.. py:function:: autointent.server.http.health_check()
+   :async:
+
+
+   Health check endpoint.
+

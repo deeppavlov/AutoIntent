@@ -1,0 +1,26 @@
+autointent.exceptions
+=====================
+
+.. py:module:: autointent.exceptions
+
+.. autoapi-nested-parse::
+
+   Custom exceptions that are raised by AutoIntent.
+
+
+
+Exceptions
+----------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/exceptions/WrongClassificationError
+   /autoapi/autointent/exceptions/MismatchNumClassesError
+
+.. autoapisummary::
+
+   autointent.exceptions.WrongClassificationError
+   autointent.exceptions.MismatchNumClassesError
+
+

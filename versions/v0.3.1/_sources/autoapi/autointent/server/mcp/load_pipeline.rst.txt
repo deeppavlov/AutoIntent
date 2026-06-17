@@ -1,0 +1,7 @@
+autointent.server.mcp.load_pipeline
+===================================
+
+.. py:function:: autointent.server.mcp.load_pipeline()
+
+   Load the optimized pipeline from disk.
+

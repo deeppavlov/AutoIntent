@@ -1,0 +1,63 @@
+autointent.configs.DataConfig
+=============================
+
+.. py:class:: autointent.configs.DataConfig(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for the data used in the optimization process.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: scheme
+      :type:  autointent.custom_types.ValidationScheme
+      :value: None
+
+
+      Hold-out or cross-validation.
+
+
+   .. py:attribute:: n_folds
+      :type:  pydantic.PositiveInt
+      :value: None
+
+
+      Number of folds in cross-validation.
+
+
+   .. py:attribute:: validation_size
+      :type:  autointent.custom_types.FloatFromZeroToOne
+      :value: None
+
+
+      Fraction of train samples to allocate for validation (if input dataset doesn't contain validation split).
+
+
+   .. py:attribute:: separation_ratio
+      :type:  autointent.custom_types.FloatFromZeroToOne | None
+      :value: None
+
+
+      Set to float to prevent data leak between scoring and decision nodes.
+
+
+   .. py:attribute:: is_few_shot_train
+      :type:  bool
+      :value: None
+
+
+      Whether to use few-shot training.
+
+
+   .. py:attribute:: examples_per_intent
+      :type:  pydantic.PositiveInt
+      :value: None
+
+
+      Number of examples per intent for few-shot validation. If None, all examples will be used.
+

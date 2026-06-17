@@ -78,7 +78,9 @@ The search space for the entire pipeline looks approximately like this:
 """
 
 # %%
-search_space = [
+from typing import Any
+
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "embedding",
         "target_metric": "retrieval_hit_rate",

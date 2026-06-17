@@ -1,0 +1,16 @@
+autointent.server.http.PredictResponse
+======================================
+
+.. py:class:: autointent.server.http.PredictResponse(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Response model for the predict endpoint.
+
+
+   .. py:attribute:: predictions
+      :type:  autointent.custom_types.ListOfLabelsWithOOS
+      :value: None
+
+

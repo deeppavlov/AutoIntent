@@ -1,0 +1,10 @@
+autointent.schemas.node_validation.unwrap_annotated
+===================================================
+
+.. py:function:: autointent.schemas.node_validation.unwrap_annotated(tp)
+
+   Unwrap the Annotated type to get the actual type.
+
+   :param tp: Type to unwrap
+   :return: Unwrapped type
+

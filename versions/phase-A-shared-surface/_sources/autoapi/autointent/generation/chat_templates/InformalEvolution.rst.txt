@@ -1,0 +1,16 @@
+autointent.generation.chat_templates.InformalEvolution
+======================================================
+
+.. py:class:: autointent.generation.chat_templates.InformalEvolution
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_evolver.EvolutionChatTemplate`
+
+
+   Chat template for informal tone augmentation.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: 'informal'
+
+

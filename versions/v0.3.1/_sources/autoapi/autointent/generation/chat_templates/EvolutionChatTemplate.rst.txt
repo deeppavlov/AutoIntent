@@ -1,0 +1,22 @@
+autointent.generation.chat_templates.EvolutionChatTemplate
+==========================================================
+
+.. py:class:: autointent.generation.chat_templates.EvolutionChatTemplate
+
+   Base class for chat templates for evolution augmentation.
+
+
+   .. py:attribute:: name
+      :type:  str
+
+
+   .. py:method:: __call__(utterance, intent_data)
+
+      Generate a list of messages to request additional examples for the given intent.
+
+      :param utterance: Utterance to be used for generation.
+      :param intent_data: Intent data for which to generate examples.
+
+      :returns: List of messages for the chat template.
+
+

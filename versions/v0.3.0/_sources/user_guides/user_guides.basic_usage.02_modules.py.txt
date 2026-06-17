@@ -199,7 +199,7 @@ model_path = Path("my_dumps/knnscorer_clinc150")
 model_path.mkdir(parents=True, exist_ok=True)
 
 print(f"💾 Saving model to: {model_path}")
-scorer.dump(model_path)
+scorer.dump(str(model_path))
 print("✅ Model saved successfully!")
 
 # Let's see what files were created
@@ -218,7 +218,7 @@ Loading is just as easy - you can restore the exact same model state without ret
 # %%
 # Load the model from disk
 print("📁 Loading saved model...")
-loaded_scorer = KNNScorer.load(model_path)
+loaded_scorer = KNNScorer.load(str(model_path))
 print("✅ Model loaded successfully!")
 
 # Verify it works the same as the original
@@ -248,7 +248,8 @@ print("  Input: 'hello world!'")
 print(f"  Prediction: {scores[0]}")
 
 # Display additional metadata if available
-print(f"  Similar examples found: {len(meta[0]['neighbors'])}")
+if meta is not None:
+    print(f"  Similar examples found: {len(meta[0]['neighbors'])}")
 
 # %% [markdown]
 """

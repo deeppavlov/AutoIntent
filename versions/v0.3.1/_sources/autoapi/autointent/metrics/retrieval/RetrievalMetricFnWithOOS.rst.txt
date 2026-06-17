@@ -1,0 +1,20 @@
+autointent.metrics.retrieval.RetrievalMetricFnWithOOS
+=====================================================
+
+.. py:class:: autointent.metrics.retrieval.RetrievalMetricFnWithOOS
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol for retrieval metrics that accept OOS-bearing query labels.
+
+   Returned by `ignore_oos`: the decorator filters out `None` entries from
+   `query_labels` (and their paired candidate lists) before delegating to
+   the underlying `RetrievalMetricFn`.
+
+
+   .. py:method:: __call__(query_labels, candidates_labels, k = None)
+
+      Calculate retrieval metric, dropping OOS-flagged queries first.
+
+

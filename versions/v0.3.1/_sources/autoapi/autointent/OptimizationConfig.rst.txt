@@ -1,0 +1,66 @@
+autointent.OptimizationConfig
+=============================
+
+.. py:class:: autointent.OptimizationConfig(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Configuration for the optimization process.
+
+   One can use it to customize optimization beyond choosing different preset.
+   Instantiate it and pass to :py:meth:`autointent.Pipeline.from_optimization_config`.
+
+
+   .. py:attribute:: data_config
+      :type:  autointent.configs.DataConfig
+
+
+   .. py:attribute:: search_space
+      :type:  list[dict[str, Any]]
+
+      See tutorial on search space customization.
+
+
+   .. py:attribute:: logging_config
+      :type:  autointent.configs.LoggingConfig
+
+      See tutorial on logging configuration.
+
+
+   .. py:attribute:: embedder_config
+      :type:  autointent.configs.EmbedderConfig
+      :value: None
+
+
+
+   .. py:method:: validate_embedder_config(v)
+      :classmethod:
+
+
+      Validate and convert embedder config to proper type.
+
+
+
+   .. py:attribute:: cross_encoder_config
+      :type:  autointent.configs.CrossEncoderConfig
+
+
+   .. py:attribute:: transformer_config
+      :type:  autointent.configs.HFModelConfig
+
+
+   .. py:attribute:: hpo_config
+      :type:  autointent.configs.HPOConfig
+
+
+   .. py:attribute:: seed
+      :type:  pydantic.PositiveInt
+      :value: 42
+
+
+
+   .. py:method:: from_preset(preset)
+      :classmethod:
+
+

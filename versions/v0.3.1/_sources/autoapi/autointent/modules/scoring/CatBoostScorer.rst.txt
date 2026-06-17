@@ -1,0 +1,174 @@
+autointent.modules.scoring.CatBoostScorer
+=========================================
+
+.. py:class:: autointent.modules.scoring.CatBoostScorer(embedder_config = None, features_type = FeaturesType.BOTH, use_embedding_features = True, loss_function = None, verbose = False, val_fraction = 0.2, early_stopping_rounds = 100, iterations = 1000, depth = 6, **catboost_kwargs)
+
+   Bases: :py:obj:`autointent.modules.base.BaseScorer`
+
+
+   CatBoost scorer using either external embeddings or CatBoost's own BoW encoding.
+
+   :param embedder_config: Config of the base transformer model (HFModelConfig, str, or dict)
+                           If None (default) the scorer relies on CatBoost's own Bag-of-Words encoding,
+                           otherwise the provided embedder is used.
+   :param features_type: Type of features used in CatBoost. Can be one of:
+                         - "text": Use only text features (CatBoost's BoW encoding).
+                         - "embedding": Use only embedding features.
+                         - "both": Use both text and embedding features.
+   :param use_embedding_features: If True, the model uses CatBoost `embedding_features` otherwise
+                                  each number will be in separate column.
+   :param loss_function: CatBoost loss function.  If None, an appropriate loss is
+                         chosen automatically from the task type.
+   :param verbose: If True, CatBoost prints training progress.
+   :param val_fraction: fraction of training data used for early stopping. Set to None to disaple early stopping.
+                        Note: early stopping is not supported with multilabel classification.
+   :param early_stopping_rounds: number of iterations without metric increasing waiting for early stopping.
+                                 Ignored when ``val_fraction`` is ``None``.
+   :param \*\*catboost_kwargs: Any additional keyword arguments forwarded to
+                               :class:`catboost.CatBoostClassifier`. Please refer to
+                               `catboost's documentation <https://catboost.ai/docs/en/concepts/python-reference_catboostclassifier>`_
+
+   Example:
+   --------
+
+   .. testcode::
+
+       from autointent.modules import CatBoostScorer
+
+       scorer = CatBoostScorer(
+           iterations=50,
+           learning_rate=0.05,
+           depth=6,
+           l2_leaf_reg=3,
+           eval_metric="Accuracy",
+           random_seed=42,
+           verbose=False,
+           features_type="embedding",  # or "text" or "both"
+       )
+       utterances = ["hello", "goodbye", "allo", "sayonara"]
+       labels = [0, 1, 0, 1]
+       scorer.fit(utterances, labels)
+       test_utterances = ["hi", "bye"]
+       probabilities = scorer.predict(test_utterances)
+
+
+
+   .. py:attribute:: name
+      :value: 'catboost'
+
+
+      Name of the module to reference in search space configuration.
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: encoder_features_types
+
+
+   .. py:attribute:: val_fraction
+      :value: 0.2
+
+
+
+   .. py:attribute:: early_stopping_rounds
+      :value: 100
+
+
+
+   .. py:attribute:: iterations
+      :value: 1000
+
+
+
+   .. py:attribute:: depth
+      :value: 6
+
+
+
+   .. py:attribute:: features_type
+
+
+   .. py:attribute:: use_embedding_features
+      :value: True
+
+
+
+   .. py:attribute:: embedder_config
+
+
+   .. py:attribute:: loss_function
+      :value: None
+
+
+
+   .. py:attribute:: verbose
+      :value: False
+
+
+
+   .. py:attribute:: catboost_kwargs
+
+
+   .. py:method:: from_context(context, embedder_config = None, features_type = FeaturesType.BOTH, use_embedding_features = True, loss_function = None, verbose = False, val_fraction = 0.2, early_stopping_rounds = 100, iterations = 1000, depth = 6, **catboost_kwargs)
+      :classmethod:
+
+
+      Initialize self from context.
+
+      :param context: Context to init from
+      :param \*\*kwargs: Additional kwargs
+
+      :returns: Initialized module
+
+
+
+   .. py:method:: get_implicit_initialization_params()
+
+      Return default params used in ``__init__`` method.
+
+      Some parameters of the module may be inferred using context rather from ``__init__`` method.
+      But they need to be logged for reproducibility during loading from disk.
+
+      :returns: Dictionary of default params
+
+
+
+   .. py:method:: get_extra_params()
+
+
+   .. py:method:: fit(utterances, labels)
+
+      Fit the scoring module to the training data.
+
+      :param utterances: List of training utterances.
+      :param labels: List of training labels.
+
+
+
+   .. py:method:: predict(utterances)
+
+      Predict scores for a list of utterances.
+
+      :param utterances: List of utterances to score.
+
+      :returns: Array of predicted scores.
+
+
+
+   .. py:method:: clear_cache()
+
+      Clear cache.
+
+

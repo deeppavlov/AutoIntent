@@ -24,10 +24,12 @@ Classes
    :hidden:
 
    /autoapi/autointent/metrics/scoring/ScoringMetricFn
+   /autoapi/autointent/metrics/scoring/ScoringMetricFnWithOOS
 
 .. autoapisummary::
 
    autointent.metrics.scoring.ScoringMetricFn
+   autointent.metrics.scoring.ScoringMetricFnWithOOS
 
 
 Functions

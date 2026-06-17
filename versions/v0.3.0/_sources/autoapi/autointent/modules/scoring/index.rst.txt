@@ -12,6 +12,7 @@ Classes
 
    /autoapi/autointent/modules/scoring/BertScorer
    /autoapi/autointent/modules/scoring/CatBoostScorer
+   /autoapi/autointent/modules/scoring/FeaturesType
    /autoapi/autointent/modules/scoring/BiEncoderDescriptionScorer
    /autoapi/autointent/modules/scoring/CrossEncoderDescriptionScorer
    /autoapi/autointent/modules/scoring/LLMDescriptionScorer
@@ -31,6 +32,7 @@ Classes
 
    autointent.modules.scoring.BertScorer
    autointent.modules.scoring.CatBoostScorer
+   autointent.modules.scoring.FeaturesType
    autointent.modules.scoring.BiEncoderDescriptionScorer
    autointent.modules.scoring.CrossEncoderDescriptionScorer
    autointent.modules.scoring.LLMDescriptionScorer

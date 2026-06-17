@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -36,10 +36,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
     <script src="../_static/documentation_options.js?v=d45e8c67"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -51,9 +51,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guides/user_guides.basic_usage.02_modules';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -664,7 +664,7 @@ Total unique intents: 4
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 🚀 Starting training...
-✅ Training completed in 0.10 seconds!
+✅ Training completed in 0.03 seconds!
 </pre></div></div>
 </div>
 <section id="What-Happens-During-Training">
@@ -773,7 +773,7 @@ Batch predictions: [[0.         1.         0.         0.        ]
 <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 Saving model to: </span><span class="si">{</span><span class="n">model_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="n">scorer</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+<span class="n">scorer</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Model saved successfully!&quot;</span><span class="p">)</span>
 
 <span class="c1"># Let&#39;s see what files were created</span>
@@ -794,19 +794,19 @@ Batch predictions: [[0.         1.         0.         0.        ]
 
 Saved files:
   - simple_attrs.json
-  - class_info.json
   - model_dump.json
   - class_info.json
-  - model_dump.json
-  - class_info.json
-  - model_dump.json
   - index.bin
-  - config.json
-  - vector_size.txt
   - documents.json
+  - vector_size.txt
+  - config.json
+  - model_dump.json
+  - class_info.json
+  - config.json
+  - model_dump.json
   - class_info.json
   - model_dump.json
-  - config.json
+  - class_info.json
 </pre></div></div>
 </div>
 </section>
@@ -819,7 +819,7 @@ Saved files:
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the model from disk</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📁 Loading saved model...&quot;</span><span class="p">)</span>
-<span class="n">loaded_scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span>
+<span class="n">loaded_scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Model loaded successfully!&quot;</span><span class="p">)</span>
 
 <span class="c1"># Verify it works the same as the original</span>
@@ -866,7 +866,8 @@ Verification:
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Prediction: </span><span class="si">{</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Display additional metadata if available</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Similar examples found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;neighbors&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Similar examples found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;neighbors&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1055,8 +1056,8 @@ Detailed prediction analysis:
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1090,7 +1091,7 @@ Detailed prediction analysis:
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.18.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
 </p></div>
       
     </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Run reporting &#8212; AutoIntent 0.3.0 documentation</title>
+    <title>Run reporting &#8212; AutoIntent 0.3.1 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=0790524f97105ba85085" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
@@ -36,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=e259d695"></script>
+    <script src="../_static/documentation_options.js?v=4621528c"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,9 +51,9 @@
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'user_guides/user_guides.advanced.04_reporting';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.18.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="AutoML Customization" href="user_guides.advanced.03_automl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.0" />
+  <meta name="docsearch:version" content="0.3.1" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -547,7 +547,9 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_space</span> <span class="o">=</span> <span class="p">[</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">search_space</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">&quot;node_type&quot;</span><span class="p">:</span> <span class="s2">&quot;embedding&quot;</span><span class="p">,</span>
         <span class="s2">&quot;target_metric&quot;</span><span class="p">:</span> <span class="s2">&quot;retrieval_hit_rate&quot;</span><span class="p">,</span>
@@ -652,16 +654,26 @@
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Memory storage is not compatible with resuming optimization. Modules from previous runs won&#39;t be available. Set dump_modules=True in LoggingConfig to enable proper resuming.
+/home/runner/work/AutoIntent/AutoIntent/src/autointent/nodes/_node_optimizer.py:82: FutureWarning: `consider_prior` has been deprecated in v4.3.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.3.0.
+  sampler_instance = optuna.samplers.TPESampler(
+/home/runner/work/AutoIntent/AutoIntent/src/autointent/nodes/_node_optimizer.py:82: FutureWarning: `prior_weight` has been deprecated in v4.9.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.9.0.
+  sampler_instance = optuna.samplers.TPESampler(
 Storage directory must be provided for study persistence.
-<span class="ansi-green-fg">[I 2026-05-20 09:48:52,678]</span> A new study created in memory with name: NodeType.embedding
+<span class="ansi-green-fg">[I 2026-06-17 19:15:35,197]</span> A new study created in memory with name: NodeType.embedding
 Storage directory must be provided for study persistence.
-/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:1780: FutureWarning: The default value for l1_ratios will change from None to (0.0,) in version 1.10. From version 1.10 onwards, only array-like with values in [0, 1] will be allowed, None will be forbidden. To avoid this warning, explicitly set a value, e.g. l1_ratios=(0,).
+/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:2092: FutureWarning: The default value for l1_ratios will change from None to (0.0,) in version 1.10. From version 1.10 onwards, only array-like with values in [0, 1] will be allowed, None will be forbidden. To avoid this warning, explicitly set a value, e.g. l1_ratios=(0,).
   warnings.warn(
-/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:1823: FutureWarning: The fitted attributes of LogisticRegressionCV will be simplified in scikit-learn 1.10 to remove redundancy. Set`use_legacy_attributes=False` to enable the new behavior now, or set it to `True` to silence this warning during the transition period while keeping the deprecated behavior for the time being. The default value of use_legacy_attributes will change from True to False in scikit-learn 1.10. See the docstring of LogisticRegressionCV for more details.
+/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:2137: FutureWarning: The default value of the parameter &#39;scoring&#39; will change from None, i.e. accuracy, to &#39;neg_log_loss&#39; in version 1.11. To silence this warning, explicitly set the scoring parameter: scoring=&#39;neg_log_loss&#39; for the new, scoring=&#39;accuracy&#39; or scoring=None for the old default.
   warnings.warn(
+/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:2150: FutureWarning: The fitted attributes of LogisticRegressionCV will be simplified in scikit-learn 1.10 to remove redundancy. Set`use_legacy_attributes=False` to enable the new behavior now, or set it to `True` to silence this warning during the transition period while keeping the deprecated behavior for the time being. The default value of use_legacy_attributes will change from True to False in scikit-learn 1.10. See the docstring of LogisticRegressionCV for more details.
+  warnings.warn(
+/home/runner/work/AutoIntent/AutoIntent/src/autointent/nodes/_node_optimizer.py:82: FutureWarning: `consider_prior` has been deprecated in v4.3.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.3.0.
+  sampler_instance = optuna.samplers.TPESampler(
+/home/runner/work/AutoIntent/AutoIntent/src/autointent/nodes/_node_optimizer.py:82: FutureWarning: `prior_weight` has been deprecated in v4.9.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.9.0.
+  sampler_instance = optuna.samplers.TPESampler(
 Storage directory must be provided for study persistence.
 &#34;argmax&#34; is NOT designed to handle OOS samples, but your data contains it. So, using this method reduces the power of classification.
-/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/metrics/_classification.py:1833: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+/home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/metrics/_classification.py:1879: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
   _warn_prf(average, modifier, f&#34;{metric.capitalize()} is&#34;, result.shape[0])
 </pre></div></div>
 </div>
@@ -671,7 +683,7 @@ Storage directory must be provided for study persistence.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;autointent.context._context.Context at 0x7fc37ca27fe0&gt;
+&lt;autointent.context._context.Context at 0x7f7a054f3890&gt;
 </pre></div></div>
 </div>
 <p>Now results of the optimization process can be viewed in the tensorboard.</p>
@@ -750,8 +762,8 @@ Storage directory must be provided for study persistence.
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -785,7 +797,7 @@ Storage directory must be provided for study persistence.
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.18.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
 </p></div>
       
     </div>

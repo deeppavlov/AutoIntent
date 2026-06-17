@@ -32,7 +32,7 @@ The simplest way is to pass a model name as a string:
 from autointent.modules.scoring import KNNScorer, LinearScorer
 
 # Using just the model name - sentence-transformers handles device detection
-scorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
+scorer: KNNScorer | LinearScorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
 
 # %% [markdown]
 """
@@ -261,9 +261,7 @@ ft_cfg = EmbedderFineTuningConfig(
 )
 
 # Example (does not run training here): construct an embedder and call train when you have data.
-_embedder_for_ft = Embedder(
-    SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2")
-)
+_embedder_for_ft = Embedder(SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2"))
 # _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)
 
 # %%

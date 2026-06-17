@@ -1224,7 +1224,7 @@ The simplest way is to pass a model name as a string:
 from autointent.modules.scoring import KNNScorer, LinearScorer
 
 # Using just the model name - sentence-transformers handles device detection
-scorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
+scorer: KNNScorer | LinearScorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
 
 # %% [markdown]
 """
@@ -1453,9 +1453,7 @@ ft_cfg = EmbedderFineTuningConfig(
 )
 
 # Example (does not run training here): construct an embedder and call train when you have data.
-_embedder_for_ft = Embedder(
-    SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2")
-)
+_embedder_for_ft = Embedder(SentenceTransformerEmbeddingConfig(model_name="sentence-transformers/all-MiniLM-L6-v2"))
 # _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)
 
 # %%
@@ -1602,7 +1600,9 @@ The search space for the entire pipeline looks approximately like this:
 """
 
 # %%
-search_space = [
+from typing import Any
+
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "embedding",
         "target_metric": "retrieval_hit_rate",
@@ -1688,7 +1688,9 @@ This script demonstrates how to report the optimization process using the AutoIn
 """
 
 # %%
-search_space = [
+from typing import Any
+
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "embedding",
         "target_metric": "retrieval_hit_rate",
@@ -1785,11 +1787,12 @@ It will be demonstrated on toy search_space example:
 
 # %%
 from pathlib import Path
+from typing import Any
 
 from autointent import Dataset, Pipeline
 from autointent.configs import LoggingConfig
 
-search_space = [
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",
@@ -2054,7 +2057,7 @@ model_path = Path("my_dumps/knnscorer_clinc150")
 model_path.mkdir(parents=True, exist_ok=True)
 
 print(f"💾 Saving model to: {model_path}")
-scorer.dump(model_path)
+scorer.dump(str(model_path))
 print("✅ Model saved successfully!")
 
 # Let's see what files were created
@@ -2073,7 +2076,7 @@ Loading is just as easy - you can restore the exact same model state without ret
 # %%
 # Load the model from disk
 print("📁 Loading saved model...")
-loaded_scorer = KNNScorer.load(model_path)
+loaded_scorer = KNNScorer.load(str(model_path))
 print("✅ Model loaded successfully!")
 
 # Verify it works the same as the original
@@ -2103,7 +2106,8 @@ print("  Input: 'hello world!'")
 print(f"  Prediction: {scores[0]}")
 
 # Display additional metadata if available
-print(f"  Similar examples found: {len(meta[0]['neighbors'])}")
+if meta is not None:
+    print(f"  Similar examples found: {len(meta[0]['neighbors'])}")
 
 # %% [markdown]
 """
@@ -2408,9 +2412,11 @@ Here's the basic example:
 """
 
 # %%
+from typing import Any
+
 from autointent import Dataset, Pipeline
 
-search_space = [
+search_space: list[dict[str, Any]] = [
     {
         "node_type": "scoring",
         "target_metric": "scoring_roc_auc",

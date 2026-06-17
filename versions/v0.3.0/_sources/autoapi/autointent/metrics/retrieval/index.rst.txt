@@ -16,10 +16,12 @@ Classes
    :hidden:
 
    /autoapi/autointent/metrics/retrieval/RetrievalMetricFn
+   /autoapi/autointent/metrics/retrieval/RetrievalMetricFnWithOOS
 
 .. autoapisummary::
 
    autointent.metrics.retrieval.RetrievalMetricFn
+   autointent.metrics.retrieval.RetrievalMetricFnWithOOS
 
 
 Functions

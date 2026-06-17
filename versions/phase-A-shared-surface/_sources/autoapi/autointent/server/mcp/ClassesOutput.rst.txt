@@ -1,0 +1,20 @@
+autointent.server.mcp.ClassesOutput
+===================================
+
+.. py:class:: autointent.server.mcp.ClassesOutput(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Output model for the classes tool.
+
+
+   .. py:attribute:: classes
+      :type:  list[autointent.schemas.Intent]
+      :value: None
+
+
+
+   .. py:attribute:: pagination_info
+      :type:  PaginationInfo
+

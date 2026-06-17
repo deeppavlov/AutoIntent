@@ -1,0 +1,25 @@
+autointent.modules.scoring.FeaturesType
+=======================================
+
+.. py:class:: autointent.modules.scoring.FeaturesType
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   Type of features used in CatBoostScorer.
+
+
+   .. py:attribute:: TEXT
+      :value: 'text'
+
+
+
+   .. py:attribute:: EMBEDDING
+      :value: 'embedding'
+
+
+
+   .. py:attribute:: BOTH
+      :value: 'both'
+
+

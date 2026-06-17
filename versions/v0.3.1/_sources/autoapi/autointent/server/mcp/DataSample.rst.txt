@@ -1,0 +1,22 @@
+autointent.server.mcp.DataSample
+================================
+
+.. py:class:: autointent.server.mcp.DataSample(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Single training sample.
+
+
+   .. py:attribute:: id
+      :type:  int
+
+
+   .. py:attribute:: text
+      :type:  str
+
+
+   .. py:attribute:: label
+      :type:  autointent.custom_types.LabelWithOOS
+

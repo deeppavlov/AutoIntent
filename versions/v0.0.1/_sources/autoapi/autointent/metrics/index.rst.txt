@@ -39,14 +39,18 @@ Classes
    /autoapi/autointent/metrics/DecisionMetricFn
    /autoapi/autointent/metrics/RegexMetricFn
    /autoapi/autointent/metrics/RetrievalMetricFn
+   /autoapi/autointent/metrics/RetrievalMetricFnWithOOS
    /autoapi/autointent/metrics/ScoringMetricFn
+   /autoapi/autointent/metrics/ScoringMetricFnWithOOS
 
 .. autoapisummary::
 
    autointent.metrics.DecisionMetricFn
    autointent.metrics.RegexMetricFn
    autointent.metrics.RetrievalMetricFn
+   autointent.metrics.RetrievalMetricFnWithOOS
    autointent.metrics.ScoringMetricFn
+   autointent.metrics.ScoringMetricFnWithOOS
 
 
 Functions
