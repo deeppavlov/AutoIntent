@@ -236,7 +236,7 @@ jobs:
       # workspace root so the `.coverage.<group>` files sit next to pyproject
       # for `coverage combine`.
       - name: Download coverage data
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -245,7 +245,7 @@ jobs:
         run: uv run --no-project --with 'coverage[toml]>=7.6,<8' python .ci/coverage_report.py
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: |

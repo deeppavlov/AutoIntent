@@ -94,10 +94,10 @@ jobs:
         fi
 
     # Hidden-file upload (the data file is `.coverage.*`) is required since
-    # actions/upload-artifact v4 excludes dotfiles by default.
+    # actions/upload-artifact excludes dotfiles by default.
     - name: Upload coverage data
       if: inputs.coverage_artifact != ''
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-data-${{ inputs.coverage_artifact }}
         path: .coverage.${{ inputs.coverage_artifact }}
