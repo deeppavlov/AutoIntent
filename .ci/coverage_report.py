@@ -13,6 +13,13 @@ the Actions UI without opening the logs.
 
 Run via ``uv run --no-project --with 'coverage[toml]' python .ci/coverage_report.py``;
 coverage settings are read from ``[tool.coverage.*]`` in ``pyproject.toml``.
+
+The script also enforces a regression floor on the *combined* total
+(``MIN_TOTAL_COVERAGE``): a dispatch whose total drops below it fails this job.
+The threshold lives here rather than in ``[tool.coverage.report] fail_under``
+on purpose — pytest-cov reads that key, and each per-job ``--cov`` run measures
+only a slice of the package, so a config-level ``fail_under`` would fail every
+partial run. Enforcing here gates the combined total only.
 """
 
 from __future__ import annotations
@@ -27,9 +34,14 @@ import coverage
 
 logger = logging.getLogger("coverage_report")
 
+# Minimum acceptable combined coverage (%). Bump this as coverage improves to
+# ratchet the floor up; keep it a few points below the current total so normal
+# churn doesn't trip it.
+MIN_TOTAL_COVERAGE = 85.0
+
 
 def main() -> int:
-    """Combine coverage data, emit reports, and write the GitHub step summary."""
+    """Combine coverage data, emit reports, write the GitHub step summary, gate the total."""
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
 
     cov = coverage.Coverage()
@@ -41,14 +53,21 @@ def main() -> int:
     cov.html_report()
 
     logger.info("Total coverage: %.2f%%", total)
+    passed = total >= MIN_TOTAL_COVERAGE
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
         compact = io.StringIO()
         cov.report(file=compact, show_missing=False)
-        body = f"### Test coverage: {total:.2f}%\n\n```\n{compact.getvalue()}```\n"
+        gate_icon = "✅" if passed else "❌"
+        gate_line = f"{gate_icon} Gate: {total:.2f}% vs {MIN_TOTAL_COVERAGE:.2f}% minimum\n"
+        body = f"### Test coverage: {total:.2f}%\n\n{gate_line}\n```\n{compact.getvalue()}```\n"
         with Path(summary_path).open("a", encoding="utf-8") as fh:
             fh.write(body)
+
+    if not passed:
+        logger.error("Coverage %.2f%% is below the required minimum of %.2f%%", total, MIN_TOTAL_COVERAGE)
+        return 1
 
     return 0
 
