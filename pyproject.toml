@@ -142,8 +142,8 @@ Repository = "https://github.com/deeppavlov/AutoIntent"
 Documentation = "https://deeppavlov.github.io/AutoIntent/"
 
 [project.scripts]
-"basic-aug" = "autointent.generation.utterances.basic.cli:main"
-"evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
+"basic-aug" = "autointent.generation.utterances._basic.cli:main"
+"evolution-aug" = "autointent.generation.utterances._evolution.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.7,<0.9.0"]
