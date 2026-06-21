@@ -5,12 +5,19 @@
 
 Full matrix runs on push to ``dev`` and on PRs labeled ``full-ci``.
 Otherwise (default PR commits) only ubuntu-latest + Python 3.14 runs.
+On ``workflow_dispatch`` (the manual coverage run) a single
+ubuntu-latest + ``DISPATCH_PYTHON`` combo runs: coverage is the union of
+lines exercised, so it is OS/Python-independent and one combo keeps the
+manual job cheap.
 
 Inputs come from environment variables:
 
-* ``EVENT_NAME`` - the GitHub event name (``push`` / ``pull_request``).
+* ``EVENT_NAME`` - the GitHub event name (``push`` / ``pull_request`` /
+  ``workflow_dispatch``).
 * ``LABELS_JSON`` - ``toJSON(github.event.pull_request.labels.*.name)``
   from the workflow; ``null`` / missing on non-PR events.
+* ``DISPATCH_PYTHON`` - Python version for the ``workflow_dispatch`` combo;
+  falls back to ``DISPATCH_DEFAULT_PYTHON`` when unset/empty.
 * ``GITHUB_OUTPUT`` - file the runner reads to pick up step outputs.
 
 The script writes ``matrix``, ``warm_os`` and ``full`` to that output
@@ -37,6 +44,15 @@ MINIMAL_MATRIX = {
 }
 
 FULL_CI_LABEL = "full-ci"
+
+DISPATCH_EVENT = "workflow_dispatch"
+DISPATCH_DEFAULT_PYTHON = "3.12"
+
+
+def dispatch_matrix(python_version: str) -> dict:
+    """Return the single-combo matrix for the manual coverage run."""
+    return {"os": ["ubuntu-latest"], "python-version": [python_version or DISPATCH_DEFAULT_PYTHON]}
+
 
 logger = logging.getLogger("compute_matrix")
 
@@ -89,8 +105,12 @@ def main() -> int:
     event_name = os.environ.get("EVENT_NAME", "")
     labels = parse_labels(os.environ.get("LABELS_JSON", ""))
 
-    full = is_full(event_name, labels)
-    matrix = FULL_MATRIX if full else MINIMAL_MATRIX
+    if event_name == DISPATCH_EVENT:
+        full = False
+        matrix = dispatch_matrix(os.environ.get("DISPATCH_PYTHON", ""))
+    else:
+        full = is_full(event_name, labels)
+        matrix = FULL_MATRIX if full else MINIMAL_MATRIX
     warm_os = collect_os_list(matrix)
 
     payload = {

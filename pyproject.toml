@@ -232,27 +232,33 @@ markers = [
 # FileNotFoundError -> HF Cache is broken
 # --reruns-delay 10 -> Delay between reruns in seconds to avoid running into the same issue again
 
+# Measure only the package. Without `source` the bare `--cov` records every
+# imported module (e.g. torch's temp `_remote_module_non_scriptable.py`),
+# which makes `coverage report` crash with "No source for code".
+# `relative_files` stores paths relative to the repo root so per-job data
+# files produced by the coverage CI workflow can be `coverage combine`d.
 [tool.coverage.run]
 branch = true
+source = ["autointent"]
+relative_files = true
 omit = [
-    "__init__.py",
-    "*/site-packages/*",
-    "*/dist-packages/*",
-    "*/venv/*",
-    "*/.env/*",
-    "*/.venv/*",
-    "*/virtualenv/*",
+    "*/__init__.py",
     "*/tests/*",
-    "*/tmp/*",
 ]
 
+# Map the locations the package can be imported from (editable src checkout vs
+# an installed copy) onto one canonical path, so combining data collected on
+# different runners/installs resolves to the same files.
 [tool.coverage.paths]
 source = [
-    "src/autointent/",
+    "src/autointent",
+    "*/src/autointent",
+    "*/site-packages/autointent",
 ]
 
 [tool.coverage.report]
 skip_empty = true
+show_missing = true
 
 
 [tool.mypy]

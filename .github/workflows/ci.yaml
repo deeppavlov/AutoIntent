@@ -8,9 +8,24 @@ on:
     # `labeled` is required so adding the `full-ci` label re-triggers CI
     # with the full OS/Python matrix on an open PR.
     types: [opened, synchronize, reopened, labeled]
+  # Manual coverage run. Never fired by push/PR, so coverage stays off the
+  # per-commit hot path; on this event the test jobs toggle `--cov` and the
+  # `coverage-report` job combines and publishes the total.
+  workflow_dispatch:
+    inputs:
+      coverage:
+        description: 'Measure test coverage and publish a combined report'
+        type: boolean
+        default: true
+      python-version:
+        description: 'Python version to measure coverage on'
+        type: string
+        default: '3.12'
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # Include the event name so a manual coverage dispatch and a push on the
+  # same ref land in separate groups instead of cancelling each other.
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -41,6 +56,7 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          DISPATCH_PYTHON: ${{ inputs.python-version }}
         run: python .ci/compute_matrix.py
 
   warm-cache:
@@ -99,6 +115,7 @@ jobs:
       test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
       extras: --extra openai
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && 'unit' || '' }}
 
   test-embedder:
     name: test-embedder
@@ -109,6 +126,7 @@ jobs:
       test_command: pytest -n auto tests/embedder/ tests/callback/
       extras: --extra sentence-transformers --extra transformers
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && 'embedder' || '' }}
 
   test-scorers:
     name: test-scorers
@@ -123,6 +141,7 @@ jobs:
       test_command: pytest -n auto tests/modules/scoring/
       extras: ${{ matrix.dependency-group != 'base' && format('--extra {0}', matrix.dependency-group) || '' }}
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && format('scorers-{0}', matrix.dependency-group) || '' }}
 
   test-presets:
     name: test-presets
@@ -133,6 +152,7 @@ jobs:
       test_command: pytest -n auto tests/pipeline/test_presets.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && 'presets' || '' }}
 
   test-optimization:
     name: test-optimization
@@ -143,6 +163,7 @@ jobs:
       test_command: pytest -n auto tests/pipeline/test_optimization.py tests/pipeline/test_pipeline_interruption.py tests/pipeline/test_validation.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && 'optimization' || '' }}
 
   test-inference:
     name: test-inference
@@ -153,6 +174,7 @@ jobs:
       test_command: pytest -n auto tests/pipeline/test_inference.py
       extras: --extra catboost --extra peft --extra transformers --extra sentence-transformers
       matrix: ${{ needs.setup.outputs.matrix }}
+      coverage_artifact: ${{ inputs.coverage && 'inference' || '' }}
 
   # Single aggregator over every test fan-out so the GitHub ruleset only
   # needs one required check ("all-tests") instead of 54 matrix entries.
@@ -185,3 +207,48 @@ jobs:
           echo "One or more test jobs did not succeed:"
           echo '${{ toJson(needs) }}'
           exit 1
+
+  # Combine the per-group `.coverage.<group>` artifacts uploaded by the test
+  # jobs into a single report. Only runs on the manual coverage dispatch.
+  # `always()` lets it still combine the groups that succeeded if one fails,
+  # so a single flaky group doesn't sink the whole measurement.
+  coverage-report:
+    name: coverage-report
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.coverage
+    needs:
+      - unit-tests
+      - test-embedder
+      - test-presets
+      - test-optimization
+      - test-inference
+      - test-scorers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.10.0"
+
+      # merge-multiple flattens every `coverage-data-*` artifact into the
+      # workspace root so the `.coverage.<group>` files sit next to pyproject
+      # for `coverage combine`.
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          merge-multiple: true
+
+      - name: Combine and report coverage
+        run: uv run --no-project --with 'coverage[toml]>=7.6,<8' python .ci/coverage_report.py
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage.xml
+            htmlcov/
+          if-no-files-found: error
