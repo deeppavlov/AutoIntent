@@ -247,9 +247,11 @@ omit = [
     # Optional integrations whose extras are outside the coverage matrix, so
     # they are imported but never exercised; measuring them reports 0% and
     # understates real coverage. `server/*` needs fastapi/fastmcp;
-    # `dspy_evolver.py` is the only dspy-dependent module.
+    # `dspy_evolver.py` is the only dspy-dependent module; `vllm.py` needs a
+    # CUDA GPU that CI runners don't have.
     "*/server/*",
     "*/dspy_evolver.py",
+    "*/vllm.py",
 ]
 
 # Map the locations the package can be imported from (editable src checkout vs
