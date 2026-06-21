@@ -113,7 +113,9 @@ jobs:
     secrets: inherit
     with:
       test_command: pytest -n auto --ignore=tests/modules/scoring/ --ignore=tests/pipeline --ignore=tests/embedder
-      extras: --extra openai
+      # wandb + codecarbon so the real WandbCallback / EmissionsTrackerCallback
+      # tests in tests/callback/ run here instead of being skipped.
+      extras: --extra openai --extra wandb --extra codecarbon
       matrix: ${{ needs.setup.outputs.matrix }}
       coverage_artifact: ${{ inputs.coverage && 'unit' || '' }}
 
@@ -123,8 +125,10 @@ jobs:
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
-      test_command: pytest -n auto tests/embedder/ tests/callback/
-      extras: --extra sentence-transformers --extra transformers
+      # --extra openai so the real OpenaiEmbeddingBackend tests (respx-mocked,
+      # importorskip'd) actually run here instead of being skipped.
+      test_command: pytest -n auto tests/embedder/
+      extras: --extra sentence-transformers --extra transformers --extra openai
       matrix: ${{ needs.setup.outputs.matrix }}
       coverage_artifact: ${{ inputs.coverage && 'embedder' || '' }}
 
