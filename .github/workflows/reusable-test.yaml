@@ -84,14 +84,14 @@ jobs:
         # offline mode as a backstop.
         HF_HUB_DOWNLOAD_TIMEOUT: "60"
         # Unique per group so the combine job can merge them; only consulted
-        # by pytest-cov on the coverage branch below.
+        # by pytest-cov when `--cov` is appended below.
         COVERAGE_FILE: .coverage.${{ inputs.coverage_artifact }}
-      run: |
-        if [ -n "${{ inputs.coverage_artifact }}" ]; then
-          uv run ${{ inputs.test_command }} --cov --cov-report=
-        else
-          uv run ${{ inputs.test_command }}
-        fi
+      # Append `--cov` via a GitHub expression rather than a shell `if`: the
+      # default shell on windows-latest is PowerShell, where the previous
+      # bash `if [ -n ... ]; then ... fi` is a syntax error that failed every
+      # Windows test job. coverage_artifact is empty on normal push/PR runs,
+      # so the appended flags collapse to nothing and behavior is unchanged.
+      run: uv run ${{ inputs.test_command }} ${{ inputs.coverage_artifact != '' && '--cov --cov-report=' || '' }}
 
     # Hidden-file upload (the data file is `.coverage.*`) is required since
     # actions/upload-artifact excludes dotfiles by default.
