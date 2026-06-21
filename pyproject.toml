@@ -244,6 +244,12 @@ relative_files = true
 omit = [
     "*/__init__.py",
     "*/tests/*",
+    # Optional integrations whose extras are outside the coverage matrix, so
+    # they are imported but never exercised; measuring them reports 0% and
+    # understates real coverage. `server/*` needs fastapi/fastmcp;
+    # `dspy_evolver.py` is the only dspy-dependent module.
+    "*/server/*",
+    "*/dspy_evolver.py",
 ]
 
 # Map the locations the package can be imported from (editable src checkout vs
