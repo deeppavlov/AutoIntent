@@ -16,6 +16,15 @@ on:
         required: true
         type: string
         description: 'JSON-encoded strategy.matrix payload (os / python-version / include)'
+      coverage_artifact:
+        required: false
+        type: string
+        default: ''
+        # When non-empty the test run is measured with coverage: the command
+        # is appended with `--cov` and the data is written to `.coverage.<value>`,
+        # then uploaded as artifact `coverage-data-<value>` for the combine job.
+        # Empty (the default for every normal push/PR run) keeps the plain run.
+        description: 'Coverage data-file/artifact suffix; empty disables coverage'
 
 # No concurrency block here. The parent workflow (ci.yaml) owns the
 # concurrency group for the whole run; if reusable-test sets its own group
@@ -74,5 +83,23 @@ jobs:
         # call into a deterministic AssertionError, so we don't need
         # offline mode as a backstop.
         HF_HUB_DOWNLOAD_TIMEOUT: "60"
+        # Unique per group so the combine job can merge them; only consulted
+        # by pytest-cov on the coverage branch below.
+        COVERAGE_FILE: .coverage.${{ inputs.coverage_artifact }}
       run: |
-        uv run ${{ inputs.test_command }}
+        if [ -n "${{ inputs.coverage_artifact }}" ]; then
+          uv run ${{ inputs.test_command }} --cov --cov-report=
+        else
+          uv run ${{ inputs.test_command }}
+        fi
+
+    # Hidden-file upload (the data file is `.coverage.*`) is required since
+    # actions/upload-artifact excludes dotfiles by default.
+    - name: Upload coverage data
+      if: inputs.coverage_artifact != ''
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-data-${{ inputs.coverage_artifact }}
+        path: .coverage.${{ inputs.coverage_artifact }}
+        include-hidden-files: true
+        if-no-files-found: error
