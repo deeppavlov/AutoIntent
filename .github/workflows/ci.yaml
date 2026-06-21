@@ -16,7 +16,7 @@ on:
       coverage:
         description: 'Measure test coverage and publish a combined report'
         type: boolean
-        default: true
+        default: false
       python-version:
         description: 'Python version to measure coverage on'
         type: string
