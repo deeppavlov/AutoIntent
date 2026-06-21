@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -43,6 +44,17 @@ def _get_structured_output_cache_path(dirname: str) -> Path:
     return Path(user_cache_dir("autointent")) / "structured_outputs" / dirname
 
 
+def _remove_cache_entry(path: Path) -> None:
+    """Remove a single on-disk cache entry.
+
+    Each entry is a *directory* (``PydanticModelDumper.dump`` writes
+    ``class_info.json`` + ``model_dump.json`` inside it), so eviction must use
+    ``rmtree`` rather than ``unlink``. ``ignore_errors`` keeps a missing or
+    partially removed entry from raising during cleanup.
+    """
+    shutil.rmtree(path, ignore_errors=True)
+
+
 class StructuredOutputCache:
     """Cache for structured output results."""
 
@@ -70,8 +82,10 @@ class StructuredOutputCache:
         if not cache_dir.exists():
             return
 
-        # Get all cache files to process
-        cache_files = [f for f in cache_dir.iterdir() if f.is_file()]
+        # Each cache entry is a directory written by PydanticModelDumper, so
+        # collect directories (filtering on is_file() here matched nothing and
+        # silently disabled eager loading entirely).
+        cache_files = [f for f in cache_dir.iterdir() if f.is_dir()]
 
         if not cache_files:
             return
@@ -118,7 +132,7 @@ class StructuredOutputCache:
             cached_data = PydanticModelDumper.load(cache_file)
         except (ValidationError, ImportError) as e:
             logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
-            cache_file.unlink(missing_ok=True)
+            _remove_cache_entry(cache_file)
         else:
             return cache_file.name, cached_data
 
@@ -184,10 +198,10 @@ class StructuredOutputCache:
                     return cached_data
 
                 logger.warning("Cached data type mismatch on disk, removing invalid cache")
-                cache_path.unlink()
+                _remove_cache_entry(cache_path)
             except (ValidationError, ImportError) as e:
                 logger.warning("Failed to load cached structured output from disk: %s", e)
-                cache_path.unlink(missing_ok=True)
+                _remove_cache_entry(cache_path)
 
         return None
 
@@ -271,10 +285,10 @@ class StructuredOutputCache:
                     return cached_data
 
                 logger.warning("Cached data type mismatch on disk, removing invalid cache")
-                cache_path.unlink()
+                _remove_cache_entry(cache_path)
             except (ValidationError, ImportError) as e:
                 logger.warning("Failed to load cached structured output from disk: %s", e)
-                cache_path.unlink(missing_ok=True)
+                _remove_cache_entry(cache_path)
 
         return None
 

@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Any
 
 import pytest
 from pydantic import BaseModel
 
-from autointent.generation._cache import StructuredOutputCache
+from autointent.generation._cache import StructuredOutputCache, _get_structured_output_cache_path
 from autointent.generation.chat_templates import Role
 
 if TYPE_CHECKING:
@@ -98,3 +99,59 @@ async def test_async_disabled_cache_is_noop() -> None:
     cache = StructuredOutputCache(use_cache=False)
     await cache.set_async(MESSAGES, CacheModel, PARAMS, CacheModel(name="a", value=1))
     assert await cache.get_async(MESSAGES, CacheModel, PARAMS) is None
+
+
+# --- Regression tests for the on-disk-cache bugs (#326 eager load, #327 eviction) ---
+# Disk entries are directories (PydanticModelDumper writes class_info.json +
+# model_dump.json), so eager load must collect directories and eviction must
+# rmtree rather than unlink.
+
+
+def test_eager_load_populates_memory_from_disk() -> None:
+    """A fresh instance eagerly batch-loads existing on-disk entries into memory (#326)."""
+    StructuredOutputCache(use_cache=True).set(MESSAGES, CacheModel, PARAMS, CacheModel(name="x", value=9))
+
+    fresh = StructuredOutputCache(use_cache=True)
+    key = fresh._get_cache_key(MESSAGES, CacheModel, PARAMS)
+
+    # populated at construction by the eager load, before any get() call
+    assert key in fresh._memory_cache
+    assert isinstance(fresh._memory_cache[key], CacheModel)
+
+
+def test_eager_load_removes_corrupted_entry() -> None:
+    """A cache directory whose payload fails to load is skipped and cleaned up, not raised."""
+    entry = _get_structured_output_cache_path("corrupted-entry")
+    entry.mkdir(parents=True)
+    (entry / "class_info.json").write_text(json.dumps({"name": CacheModel.__name__, "module": CacheModel.__module__}))
+    # missing the required "value" field -> ValidationError on load
+    (entry / "model_dump.json").write_text(json.dumps({"name": "x"}))
+
+    cache = StructuredOutputCache(use_cache=True)  # eager load must not raise
+
+    assert not cache._memory_cache
+    assert not entry.exists()
+
+
+def test_disk_type_mismatch_evicts_entry() -> None:
+    """A type-mismatched disk entry is evicted (rmtree) instead of crashing on unlink (#327)."""
+    cache = StructuredOutputCache(use_cache=True)
+    # plant a CacheModel at the key the cache derives for OtherModel inputs
+    key = cache._get_cache_key(MESSAGES, OtherModel, PARAMS)
+    cache._save_to_disk(key, CacheModel(name="x", value=1))
+    cache._memory_cache.clear()
+
+    assert cache._load_from_disk(key, OtherModel) is None
+    assert not _get_structured_output_cache_path(key).exists()
+
+
+@pytest.mark.asyncio
+async def test_async_disk_type_mismatch_evicts_entry() -> None:
+    """Async type-mismatched disk entry is evicted (rmtree) instead of crashing on unlink (#327)."""
+    cache = StructuredOutputCache(use_cache=True)
+    key = cache._get_cache_key(MESSAGES, OtherModel, PARAMS)
+    await cache._save_to_disk_async(key, CacheModel(name="x", value=1))
+    cache._memory_cache.clear()
+
+    assert await cache._load_from_disk_async(key, OtherModel) is None
+    assert not _get_structured_output_cache_path(key).exists()
