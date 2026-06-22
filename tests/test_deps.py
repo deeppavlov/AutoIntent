@@ -59,3 +59,18 @@ def test_check_reports_outdated(monkeypatch):
     problem = deps._check(Requirement("catboost>=1.2.8,<2.0.0"))
     assert problem is not None
     assert "installed: 1.0.0" in problem
+
+
+def test_iter_extra_reqs_selects_only_extra_members(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": [
+            "numpy>=1.0 ; python_version >= '3.0'",          # base dep w/ env marker -> excluded
+            "torch>=2.0",                                     # base dep, no marker -> excluded
+            "catboost>=1.2.8,<2.0.0 ; extra == 'catboost'",  # extra member -> included
+            "peft>=0.10.0 ; extra == 'peft'",                # different extra -> excluded
+        ]},
+        {},
+    )
+    reqs = deps._iter_extra_reqs("autointent", "catboost")
+    assert {r.name for r in reqs} == {"catboost"}
