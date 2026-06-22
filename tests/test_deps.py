@@ -185,3 +185,8 @@ def test_require_rejects_unknown_extra(monkeypatch):
     )
     with pytest.raises(ValueError, match="no extra 'transfomers'"):
         deps.require("transfomers")  # typo
+
+
+def test_resolve_reads_real_autointent_metadata():
+    reqs = deps._resolve_cached("autointent", "catboost")
+    assert any(r.name == "catboost" for r in reqs)
