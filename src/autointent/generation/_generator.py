@@ -263,7 +263,9 @@ class Generator:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = await self.cache.get_async(messages, output_model, self.generation_params)
+        cached_result = await self.cache.get_async(
+            messages, output_model, self.generation_params, self.model_name, self.base_url
+        )
         if cached_result is not None:
             return cached_result
 
@@ -292,7 +294,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        await self.cache.set_async(messages, output_model, self.generation_params, res)
+        await self.cache.set_async(messages, output_model, self.generation_params, res, self.model_name, self.base_url)
 
         return res
 
@@ -350,7 +352,7 @@ class Generator:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = self.cache.get(messages, output_model, self.generation_params)
+        cached_result = self.cache.get(messages, output_model, self.generation_params, self.model_name, self.base_url)
         if cached_result is not None:
             return cached_result
 
@@ -376,7 +378,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        self.cache.set(messages, output_model, self.generation_params, res)
+        self.cache.set(messages, output_model, self.generation_params, res, self.model_name, self.base_url)
 
         return res
 

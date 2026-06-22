@@ -138,13 +138,22 @@ class StructuredOutputCache:
 
         return None
 
-    def _get_cache_key(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> str:
+    def _get_cache_key(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
+    ) -> str:
         """Generate a cache key for the given parameters.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cache key as a hexadecimal string.
@@ -153,6 +162,8 @@ class StructuredOutputCache:
         hasher.update(json.dumps(messages))
         hasher.update(json.dumps(output_model.model_json_schema()))
         hasher.update(json.dumps(generation_params))
+        hasher.update(model_name)
+        hasher.update(base_url)
         return hasher.hexdigest()
 
     def _check_memory_cache(self, cache_key: str, output_model: type[T]) -> T | None:
@@ -216,13 +227,22 @@ class StructuredOutputCache:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         PydanticModelDumper.dump(result, cache_path, exists_ok=True)
 
-    def get(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> T | None:
+    def get(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
+    ) -> T | None:
         """Get cached result if available.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cached result if available, None otherwise.
@@ -230,7 +250,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return None
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # First check in-memory cache
         memory_result = self._check_memory_cache(cache_key, output_model)
@@ -240,20 +260,29 @@ class StructuredOutputCache:
         # Fallback to disk cache
         return self._load_from_disk(cache_key, output_model)
 
-    def set(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T) -> None:
+    def set(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        result: T,
+        model_name: str,
+        base_url: str | None,
+    ) -> None:
         """Cache the result.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
             result: The result to cache.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
         """
         if not self.use_cache:
             return
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # Store in memory cache
         self._memory_cache[cache_key] = result
@@ -304,7 +333,12 @@ class StructuredOutputCache:
         await PydanticModelDumper.dump_async(result, cache_path, exists_ok=True)
 
     async def get_async(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
     ) -> T | None:
         """Get cached result if available (async version).
 
@@ -312,6 +346,8 @@ class StructuredOutputCache:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cached result if available, None otherwise.
@@ -319,7 +355,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return None
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # First check in-memory cache
         memory_result = self._check_memory_cache(cache_key, output_model)
@@ -330,21 +366,28 @@ class StructuredOutputCache:
         return await self._load_from_disk_async(cache_key, output_model)
 
     async def set_async(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        result: T,
+        model_name: str,
+        base_url: str | None,
     ) -> None:
         """Cache the result (async version).
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
             result: The result to cache.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
         """
         if not self.use_cache:
             return
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # Store in memory cache
         self._memory_cache[cache_key] = result
