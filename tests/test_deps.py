@@ -2,54 +2,62 @@ from __future__ import annotations
 
 import re
 from importlib import metadata
+from typing import TYPE_CHECKING
 
 import pytest
 from packaging.requirements import Requirement
 
 import autointent._deps as deps
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 _EXTRA_RE = re.compile(r"""extra\s*==\s*['"]([^'"]+)['"]""")
 
 
 class _FakeMeta:
-    def __init__(self, extras):
+    def __init__(self, extras: list[str]) -> None:
         self._extras = extras
 
-    def get_all(self, name, failobj=None):
+    def get_all(self, name: str, failobj: list[str] | None = None) -> list[str] | None:
         if name == "Provides-Extra":
             return list(self._extras)
         return failobj
 
 
-def _patch_metadata(monkeypatch, requires_map, versions):
+def _patch_metadata(
+    monkeypatch: pytest.MonkeyPatch,
+    requires_map: dict[str, list[str]],
+    versions: dict[str, str],
+) -> None:
     """Patch importlib.metadata so deps.* sees a synthetic dependency graph.
 
     requires_map: {dist_name: [PEP 508 requirement string, ...]}
     versions:     {dist_name: installed_version_string}  (absent key => not installed)
     """
-    def fake_requires(dist):
+    def fake_requires(dist: str) -> list[str]:
         return requires_map.get(dist, [])
 
-    def fake_version(name):
+    def fake_version(name: str) -> str:
         if name not in versions:
             raise metadata.PackageNotFoundError(name)
         return versions[name]
 
-    def fake_metadata(dist):
+    def fake_metadata(dist: str) -> _FakeMeta:
         extras = sorted({e for s in requires_map.get(dist, []) for e in _EXTRA_RE.findall(s)})
         return _FakeMeta(extras)
 
-    monkeypatch.setattr(deps.metadata, "requires", fake_requires)
-    monkeypatch.setattr(deps.metadata, "version", fake_version)
-    monkeypatch.setattr(deps.metadata, "metadata", fake_metadata)
+    monkeypatch.setattr(metadata, "requires", fake_requires)
+    monkeypatch.setattr(metadata, "version", fake_version)
+    monkeypatch.setattr(metadata, "metadata", fake_metadata)
 
 
-def test_check_returns_none_when_satisfied(monkeypatch):
+def test_check_returns_none_when_satisfied(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(monkeypatch, {}, {"catboost": "1.5.0"})
     assert deps._check(Requirement("catboost>=1.2.8,<2.0.0")) is None
 
 
-def test_check_reports_missing(monkeypatch):
+def test_check_reports_missing(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(monkeypatch, {}, {})
     problem = deps._check(Requirement("catboost>=1.2.8"))
     assert problem is not None
@@ -57,14 +65,14 @@ def test_check_reports_missing(monkeypatch):
     assert "not installed" in problem
 
 
-def test_check_reports_outdated(monkeypatch):
+def test_check_reports_outdated(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(monkeypatch, {}, {"catboost": "1.0.0"})
     problem = deps._check(Requirement("catboost>=1.2.8,<2.0.0"))
     assert problem is not None
     assert "installed: 1.0.0" in problem
 
 
-def test_iter_extra_reqs_selects_only_extra_members(monkeypatch):
+def test_iter_extra_reqs_selects_only_extra_members(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": [
@@ -80,13 +88,13 @@ def test_iter_extra_reqs_selects_only_extra_members(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def _clear_resolve_cache():
+def _clear_resolve_cache() -> Iterator[None]:
     deps._resolve_cached.cache_clear()
     yield
     deps._resolve_cached.cache_clear()
 
 
-def test_resolve_recurses_into_nested_extra(monkeypatch):
+def test_resolve_recurses_into_nested_extra(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {
@@ -102,7 +110,7 @@ def test_resolve_recurses_into_nested_extra(monkeypatch):
     assert {r.name for r in reqs} == {"transformers", "torch", "accelerate"}
 
 
-def test_resolve_terminates_on_cycle(monkeypatch):
+def test_resolve_terminates_on_cycle(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"pkg": [
@@ -115,7 +123,7 @@ def test_resolve_terminates_on_cycle(monkeypatch):
     assert {r.name for r in reqs} == {"pkg"}
 
 
-def test_resolve_cached_returns_tuple(monkeypatch):
+def test_resolve_cached_returns_tuple(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": ["catboost>=1.2.8 ; extra == 'catboost'"]},
@@ -126,7 +134,7 @@ def test_resolve_cached_returns_tuple(monkeypatch):
     assert {r.name for r in result} == {"catboost"}
 
 
-def test_require_passes_when_all_present(monkeypatch):
+def test_require_passes_when_all_present(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
@@ -135,7 +143,7 @@ def test_require_passes_when_all_present(monkeypatch):
     deps.require("catboost")  # must not raise
 
 
-def test_require_raises_for_missing_leaf(monkeypatch):
+def test_require_raises_for_missing_leaf(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
@@ -149,7 +157,7 @@ def test_require_raises_for_missing_leaf(monkeypatch):
     assert "pip install 'autointent[catboost]'" in text
 
 
-def test_require_raises_for_outdated_version(monkeypatch):
+def test_require_raises_for_outdated_version(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
@@ -160,7 +168,7 @@ def test_require_raises_for_outdated_version(monkeypatch):
     assert "installed: 1.0.0" in str(exc.value)
 
 
-def test_require_detects_missing_nested_accelerate(monkeypatch):
+def test_require_detects_missing_nested_accelerate(monkeypatch: pytest.MonkeyPatch) -> None:
     # Regression for #322: accelerate lives in transformers' own [torch] extra,
     # so a transformers-present-but-accelerate-absent env must still be flagged.
     _patch_metadata(
@@ -179,7 +187,7 @@ def test_require_detects_missing_nested_accelerate(monkeypatch):
     assert "accelerate" in str(exc.value)
 
 
-def test_require_rejects_unknown_extra(monkeypatch):
+def test_require_rejects_unknown_extra(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
         {"autointent": ["catboost>=1.2.8 ; extra == 'catboost'"]},
@@ -189,6 +197,6 @@ def test_require_rejects_unknown_extra(monkeypatch):
         deps.require("transfomers")  # typo
 
 
-def test_resolve_reads_real_autointent_metadata():
+def test_resolve_reads_real_autointent_metadata() -> None:
     reqs = deps._resolve_cached("autointent", "catboost")
     assert any(r.name == "catboost" for r in reqs)
