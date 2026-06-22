@@ -14,8 +14,8 @@ import torch
 from datasets import Dataset
 from sklearn.model_selection import train_test_split
 
+from autointent._deps import require
 from autointent._hash import Hasher
-from autointent._utils import require
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
@@ -42,7 +42,7 @@ def _set_training_seed(seed: int) -> None:
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
-    require("transformers", extra="transformers")
+    require("transformers")
     from transformers import set_seed
 
     set_seed(seed)
@@ -130,7 +130,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         """Load sentence transformers model to device."""
         if self._model is None:
             # Lazy import sentence-transformers
-            require("sentence_transformers", extra="sentence-transformers")
+            require("sentence-transformers")
             from sentence_transformers import SentenceTransformer
 
             res = SentenceTransformer(
@@ -294,9 +294,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         _set_training_seed(config.seed)
 
         # Lazy import sentence-transformers training components (only needed for fine-tuning)
-        require("sentence_transformers", extra="sentence-transformers")
-        require("transformers", extra="transformers")
-        require("accelerate", extra="transformers")
+        require("sentence-transformers")
+        require("transformers")
         from sentence_transformers import (
             SentenceTransformerTrainer,
             SentenceTransformerTrainingArguments,

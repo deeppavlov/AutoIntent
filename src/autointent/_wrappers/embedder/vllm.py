@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 import torch
 
+from autointent._deps import require
 from autointent._hash import Hasher
-from autointent._utils import require
 from autointent.configs._embedder import VllmEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
@@ -44,7 +44,7 @@ class VllmEmbeddingBackend(BaseEmbeddingBackend):
     def _load_model(self) -> LLM:
         """Lazy-load the vLLM LLM engine on first use."""
         if self._model is None:
-            require("vllm", extra="vllm")
+            require("vllm")
             from vllm import LLM
 
             kwargs = {

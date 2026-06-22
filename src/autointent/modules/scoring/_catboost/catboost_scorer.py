@@ -11,7 +11,7 @@ import pandas as pd
 from pydantic import PositiveInt
 
 from autointent import Context, Embedder
-from autointent._utils import require
+from autointent._deps import require
 from autointent.configs import EmbedderConfig, TaskTypeEnum, initialize_embedder_config
 from autointent.custom_types import FloatFromZeroToOne, ListOfLabels
 from autointent.modules.base import BaseScorer
@@ -110,7 +110,7 @@ class CatBoostScorer(BaseScorer):
         **catboost_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import catboost
-        require("catboost", extra="catboost")
+        require("catboost")
 
         self.val_fraction = val_fraction
         self.early_stopping_rounds = early_stopping_rounds
