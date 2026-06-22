@@ -2,14 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import huggingface_hub
+import huggingface_hub.constants
 import pytest
 
 from autointent import Embedder
+from autointent._wrappers.embedder.sentence_transformers import _get_latest_commit_hash
 from autointent.configs import SentenceTransformerEmbeddingConfig, TokenizerConfig
 
 from .conftest import backend_configs
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from autointent.configs import EmbedderConfig
 
 
@@ -68,3 +73,80 @@ class TestSentenceTransformerHashSpecific:
 
         # Different models should produce different hashes
         assert embedder1._get_hash() != embedder2._get_hash()
+
+
+class TestOfflineEmbedderCacheKey:
+    """Regression tests for offline embedding cache key correctness (issue #321)."""
+
+    def test_no_cross_model_collision_offline(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+        """Two different models with the same non-SHA revision must not collide when offline.
+
+        Pre-fix: both fall back to the same revision string ("main") -> identical hashes.
+        Post-fix: model_name is included in the hash -> distinct hashes.
+        """
+        # Isolate the HF cache to an empty tmp dir so neither model resolves a local
+        # ref file (both degrade to the "main" revision string), keeping the test hermetic.
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_CACHE", str(tmp_path))
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_OFFLINE", True)
+        _get_latest_commit_hash.cache_clear()
+
+        config1 = SentenceTransformerEmbeddingConfig(model_name="org-a/model-alpha", revision="main", use_cache=False)
+        config2 = SentenceTransformerEmbeddingConfig(model_name="org-b/model-beta", revision="main", use_cache=False)
+
+        from autointent._wrappers.embedder.sentence_transformers import SentenceTransformerEmbeddingBackend
+
+        backend1 = SentenceTransformerEmbeddingBackend(config1)
+        backend2 = SentenceTransformerEmbeddingBackend(config2)
+
+        assert backend1.get_hash() != backend2.get_hash()
+
+        _get_latest_commit_hash.cache_clear()
+
+    def test_offline_local_ref_resolution(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+        """When offline and the HF cache contains refs/main, return the cached SHA without network.
+
+        Verifies that _get_latest_commit_hash reads from the local ref file instead of
+        calling model_info (which would raise under offline mode).
+        """
+        fake_sha = "a" * 40
+        model_name = "some-org/some-model"
+
+        from huggingface_hub.file_download import repo_folder_name
+
+        repo_folder = repo_folder_name(repo_id=model_name, repo_type="model")
+        ref_file = tmp_path / repo_folder / "refs" / "main"
+        ref_file.parent.mkdir(parents=True)
+        ref_file.write_text(fake_sha)
+
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_CACHE", str(tmp_path))
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_OFFLINE", True)
+
+        # model_info must NOT be called — raise if it is
+        def _no_network(*args: object, **kwargs: object) -> None:
+            msg = "model_info called despite HF_HUB_OFFLINE=True"
+            raise AssertionError(msg)
+
+        monkeypatch.setattr(huggingface_hub, "model_info", _no_network)
+        _get_latest_commit_hash.cache_clear()
+
+        result = _get_latest_commit_hash(model_name, "main")
+        assert result == fake_sha
+
+        _get_latest_commit_hash.cache_clear()
+
+    def test_offline_missing_ref_returns_revision(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+        """When offline and no cached ref file exists, return the revision string without raising."""
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_CACHE", str(tmp_path))
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_OFFLINE", True)
+
+        def _no_network(*args: object, **kwargs: object) -> None:
+            msg = "model_info called despite HF_HUB_OFFLINE=True"
+            raise AssertionError(msg)
+
+        monkeypatch.setattr(huggingface_hub, "model_info", _no_network)
+        _get_latest_commit_hash.cache_clear()
+
+        result = _get_latest_commit_hash("no-org/no-model", "main")
+        assert result == "main"
+
+        _get_latest_commit_hash.cache_clear()
