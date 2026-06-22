@@ -62,9 +62,29 @@ def _get_latest_commit_hash(model_name: str, revision: str | None = None) -> str
     fallback so callers can proceed; the cache key won't auto-invalidate on
     upstream changes in that case.
     """
+    from huggingface_hub import constants
+    from huggingface_hub.file_download import repo_folder_name
+
     rev = revision or "main"
     if len(rev) == _HF_COMMIT_SHA_LENGTH and all(c in "0123456789abcdef" for c in rev.lower()):
         return rev
+
+    # When offline, skip the network call entirely and read the SHA from the
+    # local HF cache ref file ($HF_HUB_CACHE/<repo_folder>/refs/<rev>).
+    # This file is written by huggingface_hub on every successful download and
+    # contains exactly the remote commit SHA, so the key stays stable and
+    # identical to what the online path would return.
+    if constants.HF_HUB_OFFLINE:
+        ref_path = Path(constants.HF_HUB_CACHE) / repo_folder_name(repo_id=model_name, repo_type="model") / "refs" / rev
+        if ref_path.is_file():
+            return ref_path.read_text().strip()
+        logger.debug(
+            "Offline: no cached ref file for %s@%s; using revision string for cache key.",
+            model_name,
+            rev,
+        )
+        return rev
+
     try:
         commit_hash = huggingface_hub.model_info(model_name, revision=rev).sha
     except Exception as exc:  # noqa: BLE001
@@ -133,6 +153,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         hasher = Hasher()
         if not Path(self.config.model_name).exists():
             commit_hash = _get_latest_commit_hash(self.config.model_name, self.config.revision)
+            hasher.update(self.config.model_name)
             hasher.update(commit_hash)
         else:
             model = self._load_model()
