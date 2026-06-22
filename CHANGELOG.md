@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file. Release notes are grouped by theme rather than listing every commit.
 
+## [0.3.2] — 2026-06-22
+
+Compared to [0.3.1](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.1). A maintenance release focused on caching correctness and CI/test coverage. No breaking changes.
+
+### Bug fixes
+
+- **Structured-output cache** now keys entries by **model identity** — the model name and API `base_url` are folded into the cache key alongside the messages, schema, and generation params, so switching models or endpoints no longer returns another model's cached completion (#336).
+- **Structured-output cache** eager loading and eviction now treat each on-disk entry as a **directory** (the layout `PydanticModelDumper` actually writes). The previous `is_file()` filter matched nothing and silently disabled eager cache loading; eviction now uses `rmtree` instead of `unlink` (#331).
+- **Offline embedding cache key** is now stable: when `HF_HUB_OFFLINE` is set, the commit SHA is read from the local Hugging Face ref file (`$HF_HUB_CACHE/<repo>/refs/<rev>`) so the key matches the online path instead of falling back to the bare revision string. The embedding cache key now also incorporates the **model name**, preventing cross-model cache collisions for non-local models (#337).
+- **Augmentation console scripts** `basic-aug` and `evolution-aug` now resolve to the correct module paths (`autointent.generation.utterances._basic.cli` / `._evolution.cli`); the entry points were left dangling by an earlier module rename (#330).
+
+### Tooling, CI, and tests
+
+- **Coverage regression floor**: the combined coverage total is now gated against an **85%** floor, so a drop below it fails CI (#333).
+- **Manual coverage dispatch** workflow added and the broken coverage configuration fixed (#325).
+- **Windows test jobs** restored — a bash-only shell step had been breaking them on Windows runners (#328).
+- Added test coverage for the **`Generator`** `dump`/`load` round-trip and the async empty-response guard (#332), the **basic/evolution augmentation CLIs** (#330), and the **`JSONFormatter`** plus **macro retrieval metrics** (#329).
+
+---
+
 ## [0.3.1] — 2026-06-16
 
 Compared to [0.3.0](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.0). A maintenance release focused on bug fixes, reproducibility of default Hugging Face downloads, and CI/test stability. No breaking changes.
