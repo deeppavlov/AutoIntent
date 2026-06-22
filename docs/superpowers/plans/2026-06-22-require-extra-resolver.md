@@ -88,10 +88,9 @@ Create `tests/test_deps.py`:
 import re
 from importlib import metadata
 
-import pytest
+from packaging.requirements import Requirement
 
 import autointent._deps as deps
-from packaging.requirements import Requirement
 
 _EXTRA_RE = re.compile(r"""extra\s*==\s*['"]([^'"]+)['"]""")
 
@@ -267,7 +266,7 @@ git commit -m "feat(deps): resolve a dist's requirements for a single extra"
 
 - [ ] **Step 1: Write the failing tests + cache-clear fixture**
 
-Add to `tests/test_deps.py` (the autouse fixture keeps the lru_cache from leaking synthetic graphs across tests):
+First add `import pytest` to the **third-party** import group of `tests/test_deps.py` — it must come *before* `from packaging.requirements import Requirement` (ruff's isort sorts straight `import` statements before `from` imports within a section). Then add the fixture and tests (the autouse fixture keeps the cache from leaking synthetic graphs across tests):
 
 ```python
 @pytest.fixture(autouse=True)
@@ -324,7 +323,7 @@ Expected: FAIL with `AttributeError: module 'autointent._deps' has no attribute 
 
 - [ ] **Step 3: Implement `_resolve` and `_resolve_cached`**
 
-In `src/autointent/_deps.py`, add `from functools import lru_cache` to the imports (above `from importlib import metadata`), and append:
+In `src/autointent/_deps.py`, add `from functools import cache` to the imports (above `from importlib import metadata`), and append (use `@cache`, not `@lru_cache(maxsize=None)` — ruff `ALL` raises `UP033` for the latter; `functools.cache` exists on py3.10 and still exposes `.cache_clear()`):
 
 ```python
 def _resolve(dist: str, extra: str, seen: set[tuple[str, str]]) -> list[Requirement]:
@@ -354,7 +353,7 @@ def _resolve(dist: str, extra: str, seen: set[tuple[str, str]]) -> list[Requirem
     return leaves
 
 
-@lru_cache(maxsize=None)
+@cache
 def _resolve_cached(dist: str, extra: str) -> tuple[Requirement, ...]:
     """Memoized :func:`_resolve`; the metadata graph shape is stable per process.
 
@@ -544,6 +543,7 @@ git commit -m "feat(deps): add require(extra) guard with aggregated, versioned e
 
 **Files:**
 - Modify: `src/autointent/_utils.py` (remove old `require` + now-unused `import importlib`)
+- Modify: `user_guides/advanced/02_embedder_configuration.py` (stale prose reference to `autointent._utils.require`)
 - Modify (import line `from autointent._utils import require` → `from autointent._deps import require`, and each `require(...)` call):
   - `src/autointent/modules/scoring/_bert.py`
   - `src/autointent/modules/scoring/_ptuning/ptuning.py`
@@ -608,6 +608,8 @@ Apply these exact replacements:
   - `require("peft", extra="peft")` → `require("peft")`
   - `require("transformers", extra="transformers")` → `require("transformers")`
   - `require("catboost", extra="catboost")` → `require("catboost")`
+
+Then fix the stale prose reference in `user_guides/advanced/02_embedder_configuration.py` (line ~22): change `autointent._utils.require` to `autointent._deps.require` (it is documentation prose, not an import — no lint impact, just keeping the docs accurate).
 
 - [ ] **Step 4: Verify no stale call shape or import remains**
 
@@ -677,6 +679,8 @@ Push the working branch and open a PR (or trigger the coverage dispatch) so the 
 ## Notes / deviations from the spec
 
 - **No re-export from `_utils`.** The spec proposed re-exporting `require` from `autointent._utils` to keep import lines untouched. Under `ruff select = ["ALL"]` a bare re-export trips `F401`, and the redundant-alias workaround trips `PLC0414`. Since every call-site file is edited for the signature change anyway, updating its import line to `from autointent._deps import require` is cleaner and lint-clean. The dependency logic now has a single home (`_deps.py`).
+- **Cycle-guard key type.** The spec sketched `seen: set[tuple[str, frozenset[str]]]`. The plan uses `set[tuple[str, str]]` because `_resolve` recurses one nested-extra name at a time (it iterates `req.extras` and recurses per name), so the key is `(dist, single-extra-name)`. Behaviourally equivalent for cycle-breaking; simpler.
+- **Error-bullet ordering.** Problems are listed in resolution order (e.g. `transformers` before its nested `accelerate`), which is the reverse of the illustrative example in the spec. Cosmetic — no test asserts bullet order.
 
 ## Self-review
 
