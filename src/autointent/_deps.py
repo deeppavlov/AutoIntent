@@ -103,3 +103,49 @@ def _resolve_cached(dist: str, extra: str) -> tuple[Requirement, ...]:
         The resolved requirements as an immutable tuple.
     """
     return tuple(_resolve(dist, extra, set()))
+
+
+def _provides_extras(dist: str) -> set[str]:
+    """Return the normalized set of extras declared by ``dist``.
+
+    Args:
+        dist: Distribution name whose metadata is read.
+
+    Returns:
+        Normalized extra names from the distribution's ``Provides-Extra`` metadata.
+    """
+    md = metadata.metadata(dist)
+    return {str(canonicalize_name(e)) for e in (md.get_all("Provides-Extra") or [])}
+
+
+def require(extra: str, *, dist: str = _DIST) -> None:
+    """Ensure every dependency of an ``autointent`` extra is installed and current.
+
+    Args:
+        extra: The extra to validate, e.g. ``"transformers"``.
+        dist: Distribution that declares the extra. Defaults to ``"autointent"``.
+
+    Raises:
+        ValueError: If ``dist`` declares no such ``extra`` (typically a typo).
+        ImportError: If any required dependency is missing or its installed version
+            does not satisfy the constraint declared in the metadata.
+    """
+    known = _provides_extras(dist)
+    if str(canonicalize_name(extra)) not in known:
+        msg = f"'{dist}' declares no extra '{extra}'. Known extras: {', '.join(sorted(known))}."
+        raise ValueError(msg)
+
+    problems: list[str] = []
+    for req in _resolve_cached(dist, extra):
+        problem = _check(req)
+        if problem is not None and problem not in problems:
+            problems.append(problem)
+
+    if problems:
+        bullets = "\n".join(f"  - {p}" for p in problems)
+        msg = (
+            f"Feature requires extra '{extra}', but dependencies are missing or outdated:\n"
+            f"{bullets}\n"
+            f"Install with: pip install '{dist}[{extra}]'"
+        )
+        raise ImportError(msg)

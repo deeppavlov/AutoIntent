@@ -122,3 +122,66 @@ def test_resolve_cached_returns_tuple(monkeypatch):
     result = deps._resolve_cached("autointent", "catboost")
     assert isinstance(result, tuple)
     assert {r.name for r in result} == {"catboost"}
+
+
+def test_require_passes_when_all_present(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
+        {"catboost": "1.5.0"},
+    )
+    deps.require("catboost")  # must not raise
+
+
+def test_require_raises_for_missing_leaf(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
+        {},
+    )
+    with pytest.raises(ImportError) as exc:
+        deps.require("catboost")
+    text = str(exc.value)
+    assert "catboost" in text
+    assert "not installed" in text
+    assert "pip install 'autointent[catboost]'" in text
+
+
+def test_require_raises_for_outdated_version(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["catboost>=1.2.8,<2.0.0 ; extra == 'catboost'"]},
+        {"catboost": "1.0.0"},
+    )
+    with pytest.raises(ImportError) as exc:
+        deps.require("catboost")
+    assert "installed: 1.0.0" in str(exc.value)
+
+
+def test_require_detects_missing_nested_accelerate(monkeypatch):
+    # Regression for #322: accelerate lives in transformers' own [torch] extra,
+    # so a transformers-present-but-accelerate-absent env must still be flagged.
+    _patch_metadata(
+        monkeypatch,
+        {
+            "autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"],
+            "transformers": [
+                "torch>=2.2 ; extra == 'torch'",
+                "accelerate>=0.26.0 ; extra == 'torch'",
+            ],
+        },
+        {"transformers": "4.49.0", "torch": "2.2.0"},  # accelerate absent
+    )
+    with pytest.raises(ImportError) as exc:
+        deps.require("transformers")
+    assert "accelerate" in str(exc.value)
+
+
+def test_require_rejects_unknown_extra(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["catboost>=1.2.8 ; extra == 'catboost'"]},
+        {"catboost": "1.5.0"},
+    )
+    with pytest.raises(ValueError, match="no extra 'transfomers'"):
+        deps.require("transfomers")  # typo
