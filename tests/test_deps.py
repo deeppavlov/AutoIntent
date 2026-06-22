@@ -1,6 +1,7 @@
 import re
 from importlib import metadata
 
+import pytest
 from packaging.requirements import Requirement
 
 import autointent._deps as deps
@@ -74,3 +75,50 @@ def test_iter_extra_reqs_selects_only_extra_members(monkeypatch):
     )
     reqs = deps._iter_extra_reqs("autointent", "catboost")
     assert {r.name for r in reqs} == {"catboost"}
+
+
+@pytest.fixture(autouse=True)
+def _clear_resolve_cache():
+    deps._resolve_cached.cache_clear()
+    yield
+    deps._resolve_cached.cache_clear()
+
+
+def test_resolve_recurses_into_nested_extra(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {
+            "autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"],
+            "transformers": [
+                "torch>=2.2 ; extra == 'torch'",
+                "accelerate>=0.26.0 ; extra == 'torch'",
+            ],
+        },
+        {},
+    )
+    reqs = deps._resolve("autointent", "transformers", set())
+    assert {r.name for r in reqs} == {"transformers", "torch", "accelerate"}
+
+
+def test_resolve_terminates_on_cycle(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"pkg": [
+            "pkg[b]>=1.0 ; extra == 'a'",
+            "pkg[a]>=1.0 ; extra == 'b'",
+        ]},
+        {},
+    )
+    reqs = deps._resolve("pkg", "a", set())
+    assert {r.name for r in reqs} == {"pkg"}
+
+
+def test_resolve_cached_returns_tuple(monkeypatch):
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["catboost>=1.2.8 ; extra == 'catboost'"]},
+        {},
+    )
+    result = deps._resolve_cached("autointent", "catboost")
+    assert isinstance(result, tuple)
+    assert {r.name for r in result} == {"catboost"}

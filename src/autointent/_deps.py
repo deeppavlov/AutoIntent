@@ -10,6 +10,7 @@ transitively requires ``accelerate`` and that is checked too.
 
 from __future__ import annotations
 
+from functools import cache
 from importlib import metadata
 
 from packaging.requirements import Requirement
@@ -61,3 +62,44 @@ def _iter_extra_reqs(dist: str, extra: str) -> list[Requirement]:
         if marker.evaluate({"extra": target}) and not marker.evaluate({"extra": ""}):
             result.append(req)
     return result
+
+
+def _resolve(dist: str, extra: str, seen: set[tuple[str, str]]) -> list[Requirement]:
+    """Recursively collect every leaf requirement activated by ``dist[extra]``.
+
+    Each activated requirement is returned for version checking, and any nested
+    extras it declares (e.g. ``transformers[torch]``) are resolved in turn.
+
+    Args:
+        dist: Distribution name to start from.
+        extra: Extra name to resolve.
+        seen: Visited ``(dist, extra)`` pairs, used to break dependency cycles.
+
+    Returns:
+        The flattened list of requirements to validate.
+    """
+    key = (str(canonicalize_name(dist)), str(canonicalize_name(extra)))
+    if key in seen:
+        return []
+    seen.add(key)
+
+    leaves: list[Requirement] = []
+    for req in _iter_extra_reqs(dist, extra):
+        leaves.append(req)
+        for nested in req.extras:
+            leaves.extend(_resolve(req.name, nested, seen))
+    return leaves
+
+
+@cache
+def _resolve_cached(dist: str, extra: str) -> tuple[Requirement, ...]:
+    """Memoized :func:`_resolve`; the metadata graph shape is stable per process.
+
+    Args:
+        dist: Distribution name to start from.
+        extra: Extra name to resolve.
+
+    Returns:
+        The resolved requirements as an immutable tuple.
+    """
+    return tuple(_resolve(dist, extra, set()))
