@@ -78,12 +78,15 @@ class TestSentenceTransformerHashSpecific:
 class TestOfflineEmbedderCacheKey:
     """Regression tests for offline embedding cache key correctness (issue #321)."""
 
-    def test_no_cross_model_collision_offline(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_no_cross_model_collision_offline(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         """Two different models with the same non-SHA revision must not collide when offline.
 
         Pre-fix: both fall back to the same revision string ("main") -> identical hashes.
         Post-fix: model_name is included in the hash -> distinct hashes.
         """
+        # Isolate the HF cache to an empty tmp dir so neither model resolves a local
+        # ref file (both degrade to the "main" revision string), keeping the test hermetic.
+        monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_CACHE", str(tmp_path))
         monkeypatch.setattr(huggingface_hub.constants, "HF_HUB_OFFLINE", True)
         _get_latest_commit_hash.cache_clear()
 
