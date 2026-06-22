@@ -1,0 +1,10 @@
+autointent.generation.RetriesExceededError
+==========================================
+
+.. py:exception:: autointent.generation.RetriesExceededError(max_retries, messages)
+
+   Bases: :py:obj:`RuntimeError`
+
+
+   Exception raised when LLM call fails after all retry attempts.
+

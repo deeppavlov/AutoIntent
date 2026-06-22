@@ -1,0 +1,77 @@
+autointent.nodes.NodeOptimizer
+==============================
+
+.. py:class:: autointent.nodes.NodeOptimizer(node_type, search_space, target_metric, metrics = None)
+
+   Class for optimizing nodes in a computational pipeline.
+
+   This class is responsible for optimizing different modules within a node
+   using various search strategies and logging the results.
+
+
+   .. py:attribute:: node_type
+
+
+   .. py:attribute:: node_info
+
+
+   .. py:attribute:: target_metric
+
+
+   .. py:attribute:: metrics
+
+
+   .. py:attribute:: modules_search_spaces
+
+
+   .. py:method:: fit(context)
+
+      Performs the optimization process for the node.
+
+      :param context: The optimization context containing relevant data.
+
+      :raises AssertionError: If an invalid sampler type is provided.
+
+
+
+   .. py:method:: objective(trial, search_space, context)
+
+      Defines the objective function for optimization.
+
+      :param trial: The Optuna trial instance.
+      :param module_name: The name of the module being optimized.
+      :param search_space: The parameter search space.
+      :param context: The execution context.
+
+      :returns: The value of the target metric for the given trial.
+
+
+
+   .. py:method:: get_module_dump_dir(context, module_name, j_combination)
+
+      Creates and returns the path to the module dump directory.
+
+      :param context: The context object.
+      :param module_name: The name of the module being optimized.
+      :param j_combination: The combination index for the parameters.
+
+      :returns: The path to the module dump directory.
+
+
+
+   .. py:method:: validate_nodes_with_dataset(dataset, mode)
+
+      Validates nodes against the dataset.
+
+      :param dataset: The dataset used for validation.
+      :param mode: The validation mode ("raise" or "warning").
+
+      :raises ValueError: If validation fails and `mode` is set to "raise".
+
+
+
+   .. py:method:: validate_search_space(search_space)
+
+      Check if search space is configured correctly.
+
+

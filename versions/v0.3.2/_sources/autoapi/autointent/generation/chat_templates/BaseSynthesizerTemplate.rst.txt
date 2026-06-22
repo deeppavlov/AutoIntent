@@ -1,0 +1,34 @@
+autointent.generation.chat_templates.BaseSynthesizerTemplate
+============================================================
+
+.. py:class:: autointent.generation.chat_templates.BaseSynthesizerTemplate(dataset, split = Split.TRAIN, extra_instructions = None, max_sample_utterances = None)
+
+   Bases: :py:obj:`BaseChatTemplate`
+
+
+   Base chat template for generating additional examples for a given intent.
+
+
+   .. py:attribute:: dataset
+
+
+   .. py:attribute:: split
+      :value: 'train'
+
+
+
+   .. py:attribute:: max_sample_utterances
+      :value: None
+
+
+
+   .. py:method:: __call__(intent_data, n_examples)
+
+      Generate a list of messages to request additional examples for the given intent.
+
+      :param intent_data: Intent data for which to generate examples.
+      :param n_examples: Number of examples to generate.
+
+      :returns: List of messages for the chat template.
+
+

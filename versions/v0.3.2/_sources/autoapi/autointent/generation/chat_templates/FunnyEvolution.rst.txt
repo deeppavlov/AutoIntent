@@ -1,0 +1,16 @@
+autointent.generation.chat_templates.FunnyEvolution
+===================================================
+
+.. py:class:: autointent.generation.chat_templates.FunnyEvolution
+
+   Bases: :py:obj:`autointent.generation.chat_templates._base_evolver.EvolutionChatTemplate`
+
+
+   Chat template for humorous tone augmentation.
+
+
+   .. py:attribute:: name
+      :type:  str
+      :value: 'funny'
+
+

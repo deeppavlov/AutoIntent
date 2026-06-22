@@ -1,0 +1,39 @@
+autointent.schemas
+==================
+
+.. py:module:: autointent.schemas
+
+.. autoapi-nested-parse::
+
+   Data models related to :class:`autointent.Dataset`.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/autointent/schemas/node_validation/index
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/schemas/Intent
+   /autoapi/autointent/schemas/Sample
+   /autoapi/autointent/schemas/Tag
+   /autoapi/autointent/schemas/TagsList
+
+.. autoapisummary::
+
+   autointent.schemas.Intent
+   autointent.schemas.Sample
+   autointent.schemas.Tag
+   autointent.schemas.TagsList
+
+

@@ -1,0 +1,51 @@
+autointent.modules.scoring
+==========================
+
+.. py:module:: autointent.modules.scoring
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/modules/scoring/BertScorer
+   /autoapi/autointent/modules/scoring/CatBoostScorer
+   /autoapi/autointent/modules/scoring/FeaturesType
+   /autoapi/autointent/modules/scoring/BiEncoderDescriptionScorer
+   /autoapi/autointent/modules/scoring/CrossEncoderDescriptionScorer
+   /autoapi/autointent/modules/scoring/LLMDescriptionScorer
+   /autoapi/autointent/modules/scoring/DNNCScorer
+   /autoapi/autointent/modules/scoring/GCNScorer
+   /autoapi/autointent/modules/scoring/KNNScorer
+   /autoapi/autointent/modules/scoring/RerankScorer
+   /autoapi/autointent/modules/scoring/LinearScorer
+   /autoapi/autointent/modules/scoring/BERTLoRAScorer
+   /autoapi/autointent/modules/scoring/MLKnnScorer
+   /autoapi/autointent/modules/scoring/PTuningScorer
+   /autoapi/autointent/modules/scoring/SklearnScorer
+   /autoapi/autointent/modules/scoring/CNNScorer
+   /autoapi/autointent/modules/scoring/RNNScorer
+
+.. autoapisummary::
+
+   autointent.modules.scoring.BertScorer
+   autointent.modules.scoring.CatBoostScorer
+   autointent.modules.scoring.FeaturesType
+   autointent.modules.scoring.BiEncoderDescriptionScorer
+   autointent.modules.scoring.CrossEncoderDescriptionScorer
+   autointent.modules.scoring.LLMDescriptionScorer
+   autointent.modules.scoring.DNNCScorer
+   autointent.modules.scoring.GCNScorer
+   autointent.modules.scoring.KNNScorer
+   autointent.modules.scoring.RerankScorer
+   autointent.modules.scoring.LinearScorer
+   autointent.modules.scoring.BERTLoRAScorer
+   autointent.modules.scoring.MLKnnScorer
+   autointent.modules.scoring.PTuningScorer
+   autointent.modules.scoring.SklearnScorer
+   autointent.modules.scoring.CNNScorer
+   autointent.modules.scoring.RNNScorer
+
+
