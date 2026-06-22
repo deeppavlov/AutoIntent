@@ -96,6 +96,8 @@ async def test_cache_hit(
         messages=messages,
         output_model=SimpleModel,
         generation_params=generator_with_cache.generation_params,
+        model_name=generator_with_cache.model_name,
+        base_url=generator_with_cache.base_url,
     )
     assert isinstance(cached_res, SimpleModel)
     assert cached_res.name == result1.name
