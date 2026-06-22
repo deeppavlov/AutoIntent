@@ -138,39 +138,24 @@ class TestVramForTransformer:
         )
 
     def test_full_finetune_is_larger_than_lora_is_larger_than_inference(self, meta: ModelMeta) -> None:
-        inference = _vram_for_transformer(meta, "inference", mixed_precision=False)
-        lora = _vram_for_transformer(meta, "lora", mixed_precision=False)
-        full = _vram_for_transformer(meta, "full-finetune", mixed_precision=False)
+        inference = _vram_for_transformer(meta, "inference")
+        lora = _vram_for_transformer(meta, "lora")
+        full = _vram_for_transformer(meta, "full-finetune")
         assert inference < lora < full
 
     def test_inference_activations_are_smaller_than_training(self, meta: ModelMeta) -> None:
         """Inference doesn't store per-layer outputs for backward — activation memory
         should be many times smaller than training at the same batch_size."""
-        train_total = _vram_for_transformer(meta, "full-finetune", False, batch_size=64, seq_len=128)
-        train_weights = _vram_for_transformer(meta, "full-finetune", False, batch_size=0)
-        inf_total = _vram_for_transformer(meta, "inference", False, batch_size=64, seq_len=128)
-        inf_weights = _vram_for_transformer(meta, "inference", False, batch_size=0)
+        train_total = _vram_for_transformer(meta, "full-finetune", batch_size=64, seq_len=128)
+        train_weights = _vram_for_transformer(meta, "full-finetune", batch_size=0)
+        inf_total = _vram_for_transformer(meta, "inference", batch_size=64, seq_len=128)
+        inf_weights = _vram_for_transformer(meta, "inference", batch_size=0)
         train_acts = train_total - train_weights
         inf_acts = inf_total - inf_weights
         assert inf_acts > 0
         assert train_acts > inf_acts
         # 12-layer model: training activations should be at least ~5x inference.
         assert train_acts / inf_acts > 5
-
-    def test_amp_does_not_reduce_weight_side_vram(self, meta: ModelMeta) -> None:
-        """Weight-side AMP accounting: fp16 weights+grads (W) + fp32 master copy (W)
-        + fp32 Adam moments (2W) = 4W, identical to pure fp32. AMP's savings live
-        in activations, not the optimizer."""
-        full_fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False, batch_size=0)
-        full_amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True, batch_size=0)
-        assert full_amp == pytest.approx(full_fp32)
-
-    def test_amp_does_reduce_activation_side_vram(self, meta: ModelMeta) -> None:
-        """When a batch is configured, AMP halves activation bytes — total VRAM
-        with batch should be strictly smaller under AMP than fp32."""
-        fp32 = _vram_for_transformer(meta, "full-finetune", mixed_precision=False, batch_size=64, seq_len=128)
-        amp = _vram_for_transformer(meta, "full-finetune", mixed_precision=True, batch_size=64, seq_len=128)
-        assert amp < fp32
 
 
 def test_ram_scales_with_dataset_size() -> None:
@@ -497,13 +482,13 @@ class TestPerDriverBatchHint:
         report = run_preflight(
             self._bert_cfg("microsoft/deberta-v3-large", batch_size=64),
             DatasetStats.placeholder(),
-            _profile(vram_gb=6.5),
+            _profile(vram_gb=7.5),
         )
         drivers = [d for d in report.resource.drivers if d["module"] == "bert"]
         assert drivers
         d = drivers[0]
         assert d["batch_size"] == 64
-        # vram_gb=6.5 against ~5 GB weights x 0.9 tight ratio -> little activation room, max < 64.
+        # vram_gb=7.5 against ~5.9 GB weights x 0.9 tight ratio -> little activation room, max < 64.
         assert d["max_batch_size"] is not None
         assert 0 < d["max_batch_size"] < 64
 

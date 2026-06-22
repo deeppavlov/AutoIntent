@@ -128,10 +128,14 @@ SearchSpacePreset = Literal[
     "zero-shot-encoders",
     "classic-light",
 ]
-"""Bundled search-space presets, listed in descending quality order.
+"""Bundled search-space presets, listed in descending resource-cost order.
 
-The order is consumed by ``autointent._advisor.recommend`` to pick the
-highest-quality feasible preset (lower index = higher quality)."""
+Heavier presets explore more / larger models and take longer to run. The order
+is a cost ranking, **not** a quality ranking: a heavier preset is not strictly
+better — e.g. ``transformers-heavy`` will overfit on tiny datasets where a
+classic-* preset wins on accuracy. ``autointent._advisor.recommend`` uses this
+ordering to pick the heaviest preset that still fits the hardware budget,
+which is a reasonable default but not always the right choice for the data."""
 
 
 class Document(BaseModel):

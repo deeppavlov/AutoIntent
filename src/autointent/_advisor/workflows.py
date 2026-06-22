@@ -20,9 +20,9 @@ from datasets import ClassLabel, Sequence, load_dataset
 from autointent.custom_types import SearchSpacePreset
 from autointent.utils import load_preset
 
-from ._estimates import run_preflight
 from ._hardware import detect_hardware
 from ._report import DatasetStats, RecommendationResult, Severity
+from .runner import run_preflight
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -196,10 +196,11 @@ def recommend(
         ``RecommendationResult`` with the chosen preset name and full results list.
 
     Note:
-        Among feasible presets we pick the one with the largest estimated
-        ``time_hours`` (ties broken alphabetically). Higher-quality presets cost
-        more wall-time, so the slowest feasible preset is also the heaviest
-        preset that still fits the hardware — i.e. "use what you have".
+        Among feasible presets we pick the heaviest one that still fits the
+        hardware budget — "use what you have" semantics. This is a *cost*
+        ranking, not a quality ranking: a heavier preset is not strictly better
+        and may overfit on small datasets where a classic-* preset would win on
+        accuracy. Override ``presets=`` if you want a different ranking.
     """
     hardware = detect_hardware(vram_budget_gb=budget_vram_gb)
     stats = stats or DatasetStats.placeholder()
@@ -221,11 +222,9 @@ def recommend(
             )
         results.append((preset, report))
 
-    # Rank by Literal position (lower index = higher quality); presets the user
-    # passed via the ``presets`` override but not in BUNDLED_PRESETS sort last.
-    quality_rank = {name: i for i, name in enumerate(BUNDLED_PRESETS)}
+    cost_rank = {name: i for i, name in enumerate(BUNDLED_PRESETS)}
     feasible = [(name, r) for name, r in results if r.is_feasible]
-    feasible.sort(key=lambda pair: (quality_rank.get(pair[0], len(BUNDLED_PRESETS)), pair[0]))
+    feasible.sort(key=lambda pair: (cost_rank.get(pair[0], len(BUNDLED_PRESETS)), pair[0]))
     chosen = feasible[0][0] if feasible else None
 
     return RecommendationResult(chosen=chosen, results=results)

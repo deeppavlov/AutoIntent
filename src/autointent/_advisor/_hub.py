@@ -94,7 +94,7 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
         return None
     # Bytes-per-element for safetensors dtype strings. Used to convert the per-dtype
     # parameter counts (info.safetensors.parameters) into a weighted average
-    # bytes-per-param for mixed-precision repos.
+    # bytes-per-param when a checkpoint stores tensors in multiple dtypes.
     _dtype_bytes: dict[str, int] = {
         "F64": 8,
         "F32": 4,
