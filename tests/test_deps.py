@@ -228,5 +228,19 @@ def test_require_rejects_unknown_extra(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_resolve_reads_real_autointent_metadata() -> None:
+    # catboost is deliberately chosen: a flat, recursion-free extra, so this real-
+    # metadata wiring check is deterministic regardless of what CI installs.
     reqs = deps._resolve_cached("autointent", "catboost")
     assert any(r.name == "catboost" for r in reqs)
+    assert all(not r.extras for r in reqs)  # documents the "no nested extra" premise
+
+
+def test_resolve_every_real_extra_without_raising() -> None:
+    # Walk every extra autointent actually declares (incl. transformers[torch],
+    # which recurses into a nested extra) against real metadata. The resolver must
+    # never raise, regardless of which optional packages CI installed -- this is the
+    # real-metadata guard for the not-installed-nested-dist fix.
+    extras = deps._provides_extras("autointent")
+    assert extras  # sanity: metadata wiring returns *something*
+    for extra in extras:
+        deps._resolve_cached("autointent", extra)  # must not raise
