@@ -169,25 +169,24 @@ def _provides_extras(dist: str) -> set[str]:
     return {str(canonicalize_name(e)) for e in (md.get_all("Provides-Extra") or [])}
 
 
-def require(extra: Extra, *, dist: str = _DIST) -> None:
+def require(extra: Extra) -> None:
     """Ensure every dependency of an ``autointent`` extra is installed and current.
 
     Args:
         extra: The extra to validate, e.g. ``"transformers"``.
-        dist: Distribution that declares the extra. Defaults to ``"autointent"``.
 
     Raises:
-        ValueError: If ``dist`` declares no such ``extra`` (typically a typo).
+        ValueError: If ``autointent`` declares no such ``extra`` (typically a typo).
         ImportError: If any required dependency is missing or its installed version
             does not satisfy the constraint declared in the metadata.
     """
-    known = _provides_extras(dist)
+    known = _provides_extras(_DIST)
     if str(canonicalize_name(extra)) not in known:
-        msg = f"'{dist}' declares no extra '{extra}'. Known extras: {', '.join(sorted(known))}."
+        msg = f"'{_DIST}' declares no extra '{extra}'. Known extras: {', '.join(sorted(known))}."
         raise ValueError(msg)
 
     problems: list[str] = []
-    for req in _resolve_cached(dist, extra):
+    for req in _resolve_cached(_DIST, extra):
         problem = _check(req)
         if problem is not None and problem not in problems:
             problems.append(problem)
@@ -197,6 +196,6 @@ def require(extra: Extra, *, dist: str = _DIST) -> None:
         msg = (
             f"Feature requires extra '{extra}', but dependencies are missing or outdated:\n"
             f"{bullets}\n"
-            f"Install with: pip install '{dist}[{extra}]'"
+            f"Install with: pip install '{_DIST}[{extra}]'"
         )
         raise ImportError(msg)
