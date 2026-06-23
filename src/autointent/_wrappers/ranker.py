@@ -20,7 +20,7 @@ import torch
 from sklearn.linear_model import LogisticRegressionCV
 from torch import nn
 
-from autointent._utils import require
+from autointent._deps import require
 from autointent.configs import CrossEncoderConfig
 from autointent.custom_types import RerankedItem
 
@@ -118,7 +118,7 @@ class Ranker:
             output_range: Range of the output probabilities ([0, 1] for sigmoid, [-1, 1] for tanh)
         """
         # Lazy import sentence-transformers
-        require("sentence_transformers", extra="sentence-transformers")
+        require("sentence-transformers")
         from sentence_transformers import CrossEncoder
 
         self.config = CrossEncoderConfig.from_search_config(cross_encoder_config)

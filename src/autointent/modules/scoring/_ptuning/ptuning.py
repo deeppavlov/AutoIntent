@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any, Literal
 from pydantic import PositiveInt
 
 from autointent import Context
+from autointent._deps import require
 from autointent._dump_tools import Dumper
-from autointent._utils import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.modules.scoring._bert import BertScorer
 
@@ -73,7 +73,7 @@ class PTuningScorer(BertScorer):
         **ptuning_kwargs: Any,  # noqa: ANN401
     ) -> None:
         # Lazy import peft
-        require("peft", extra="peft")
+        require("peft")
 
         from peft import PromptEncoderConfig, PromptEncoderReparameterizationType, TaskType
 

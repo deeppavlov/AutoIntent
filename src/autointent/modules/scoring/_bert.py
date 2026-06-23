@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 
 from autointent import Context
 from autointent._callbacks import REPORTERS_NAMES
-from autointent._utils import require
+from autointent._deps import require
 from autointent.configs import EarlyStoppingConfig, HFModelConfig
 from autointent.metrics import SCORING_METRICS_MULTICLASS, SCORING_METRICS_MULTILABEL
 from autointent.modules.base import BaseScorer
@@ -88,7 +88,7 @@ class BertScorer(BaseScorer):
         early_stopping_config: EarlyStoppingConfig | dict[str, Any] | None = None,
         print_progress: bool = False,
     ) -> None:
-        require("transformers", "transformers")
+        require("transformers")
         self.classification_model_config = HFModelConfig.from_search_config(classification_model_config)
         self.num_train_epochs = num_train_epochs
         self.batch_size = batch_size

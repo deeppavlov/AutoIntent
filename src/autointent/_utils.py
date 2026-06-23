@@ -1,6 +1,5 @@
 """Utils."""
 
-import importlib
 from typing import TypeVar
 
 import torch
@@ -28,22 +27,3 @@ def detect_device() -> str:
     return "cpu"
 
 
-def require(dependency: str, extra: str | None = None) -> None:
-    """Try to import dependency, raise informative ImportError if missing.
-
-    Args:
-        dependency: The name of the module to import
-        extra: Optional extra package name for pip install instructions
-
-    Returns:
-        The imported module
-
-    Raises:
-        ImportError: If the dependency is not installed
-    """
-    try:
-        importlib.import_module(dependency)
-    except ImportError as e:
-        extra_info = f" Install with `pip install autointent[{extra}]`." if extra else ""
-        msg = f"Missing dependency '{dependency}' required for this feature.{extra_info}"
-        raise ImportError(msg) from e

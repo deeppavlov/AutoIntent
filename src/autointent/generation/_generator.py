@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
-from autointent._utils import require
+from autointent._deps import require
 from autointent.generation.chat_templates import Message, Role
 
 from ._cache import StructuredOutputCache
@@ -139,7 +139,7 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
-        require("openai", "openai")
+        require("openai")
         import openai
 
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
