@@ -41,24 +41,52 @@ def _check(req: Requirement) -> str | None:
 def _iter_extra_reqs(dist: str, extra: str) -> list[Requirement]:
     """Return the requirements of ``dist`` activated by ``extra``.
 
-    A requirement is included only when its marker is satisfied *because* of the
-    extra: it must evaluate true with the extra set and false with no extra. This
-    excludes base dependencies that merely carry an environment marker.
-
     Args:
         dist: Distribution name whose metadata is read.
         extra: Extra name whose dependencies are wanted.
 
     Returns:
-        The parsed requirements activated by ``extra`` in the current environment.
+        The parsed requirements activated by ``extra`` in the current environment,
+        or an empty list if ``dist`` is not installed (its metadata is unavailable).
     """
     target = str(canonicalize_name(extra))
     result: list[Requirement] = []
-    for spec in metadata.requires(dist) or []:
+    try:
+        reqs = metadata.requires(dist)
+    except metadata.PackageNotFoundError:
+        # `dist` itself isn't installed, so we can't read its nested-extra
+        # requirements. That's fine: the parent requirement that led us to recurse
+        # here (e.g. `transformers[torch]`) was already collected by the caller and
+        # `_check` will flag it as "not installed", producing the proper aggregated
+        # ImportError with the install hint -- rather than letting a raw
+        # PackageNotFoundError leak out of the resolver.
+        return []
+    for spec in reqs or []:
         req = Requirement(spec)
+        # `req.marker` is the parsed `;` clause of the PEP 508 requirement (a
+        # packaging Marker), or None when the requirement has no `;` clause. There
+        # are three cases:
+        # (1) no marker -> an unconditional base dependency;
+        # (2) a marker that references `extra` -> belongs to an extra;
+        # (3) a marker with only environment conditions (e.g. `python_version < "3.9"`)
+        # -> still a base dependency, just platform-conditional.
+        # So "has a marker" does NOT mean "belongs to an extra";
         marker = req.marker
+        # Here we cancel out case (1)
         if marker is None:
             continue
+        # `marker.evaluate(env)` resolves the whole boolean expression to a bool,
+        # filling any keys we omit (python_version, sys_platform, ...) from the
+        # running interpreter. A single `evaluate({"extra": target})` is not enough
+        # to prove membership: an env-conditional base dep also passes it, because
+        # its truth comes from the environment and the `extra` key is ignored.
+        # The discriminator is the second evaluation: a *true* extra dependency
+        # flips active -> inactive when the extra is removed, whereas a base dep is
+        # unaffected. So "active with the extra AND inactive with no extra" means
+        # "active *because of* this extra", which keeps extra members and drops
+        # base deps. We always pass `extra` explicitly (`""` = base install, no
+        # extras) since a marker that references `extra` can't be evaluated without it.
+        # So here we cancel out case (3)
         if marker.evaluate({"extra": target}) and not marker.evaluate({"extra": ""}):
             result.append(req)
     return result

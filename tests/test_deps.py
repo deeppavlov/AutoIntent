@@ -36,7 +36,13 @@ def _patch_metadata(
     versions:     {dist_name: installed_version_string}  (absent key => not installed)
     """
     def fake_requires(dist: str) -> list[str]:
-        return requires_map.get(dist, [])
+        # Mirror the real importlib.metadata.requires: a dist with no metadata
+        # (i.e. not installed) raises PackageNotFoundError rather than returning [].
+        # A dist that is installed but has no requirements is modelled by an empty
+        # list in requires_map.
+        if dist not in requires_map:
+            raise metadata.PackageNotFoundError(dist)
+        return requires_map[dist]
 
     def fake_version(name: str) -> str:
         if name not in versions:
@@ -185,6 +191,30 @@ def test_require_detects_missing_nested_accelerate(monkeypatch: pytest.MonkeyPat
     with pytest.raises(ImportError) as exc:
         deps.require("transformers")
     assert "accelerate" in str(exc.value)
+
+
+def test_require_reports_extra_package_entirely_missing(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Bare-install path: the extra's top-level package isn't installed at all, so
+    # recursing into its nested [torch] extra would read missing metadata. The
+    # resolver must NOT leak a raw PackageNotFoundError; instead the parent
+    # `transformers[torch]` requirement is flagged as missing with the install hint.
+    _patch_metadata(
+        monkeypatch,
+        {"autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"]},
+        {},  # transformers (and everything else) absent
+    )
+    with pytest.raises(ImportError) as exc:
+        deps.require("transformers")
+    text = str(exc.value)
+    assert "transformers" in text
+    assert "not installed" in text
+    assert "pip install 'autointent[transformers]'" in text
+
+
+def test_iter_extra_reqs_returns_empty_for_uninstalled_dist(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The metadata read for a not-installed dist must be swallowed and yield [].
+    _patch_metadata(monkeypatch, {}, {})
+    assert deps._iter_extra_reqs("not-installed", "torch") == []
 
 
 def test_require_rejects_unknown_extra(monkeypatch: pytest.MonkeyPatch) -> None:
