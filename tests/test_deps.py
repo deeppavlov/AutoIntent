@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from importlib import metadata
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, get_args
 
 import pytest
 from packaging.requirements import Requirement
@@ -223,8 +223,10 @@ def test_require_rejects_unknown_extra(monkeypatch: pytest.MonkeyPatch) -> None:
         {"autointent": ["catboost>=1.2.8 ; extra == 'catboost'"]},
         {"catboost": "1.5.0"},
     )
+    # "transfomers" is intentionally invalid (typo) to exercise the runtime guard;
+    # the type: ignore is required because `Extra` now rejects it at type-check time.
     with pytest.raises(ValueError, match="no extra 'transfomers'"):
-        deps.require("transfomers")  # typo
+        deps.require("transfomers")  # type: ignore[arg-type]
 
 
 def test_resolve_reads_real_autointent_metadata() -> None:
@@ -233,6 +235,14 @@ def test_resolve_reads_real_autointent_metadata() -> None:
     reqs = deps._resolve_cached("autointent", "catboost")
     assert any(r.name == "catboost" for r in reqs)
     assert all(not r.extras for r in reqs)  # documents the "no nested extra" premise
+
+
+def test_extra_literal_matches_real_metadata() -> None:
+    # The `Extra` Literal is a hand-maintained mirror of the real Provides-Extra
+    # metadata. This fails if pyproject gains/loses an extra without the Literal being
+    # updated (or vice versa), keeping the static type honest and preventing the
+    # manual-sync drift the metadata-driven design otherwise removes.
+    assert set(get_args(deps.Extra)) == deps._provides_extras("autointent")
 
 
 def test_resolve_every_real_extra_without_raising() -> None:

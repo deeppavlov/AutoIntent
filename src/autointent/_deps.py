@@ -12,11 +12,34 @@ from __future__ import annotations
 
 from functools import cache
 from importlib import metadata
+from typing import Literal
 
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
 _DIST = "autointent"
+
+# Names of the optional-dependency extras autointent declares, mirrored from the
+# installed ``Provides-Extra`` metadata (and thus pyproject's
+# [project.optional-dependencies]). Typing ``require``'s parameter with this makes
+# mypy reject misspelled extra names at call sites; the runtime check in ``require``
+# stays the source of truth (mypy isn't run at runtime, and ``dist`` overrides or
+# dynamic calls bypass static typing). Kept in sync with the real metadata by
+# tests/test_deps.py::test_extra_literal_matches_real_metadata.
+Extra = Literal[
+    "catboost",
+    "codecarbon",
+    "dspy",
+    "fastapi",
+    "fastmcp",
+    "openai",
+    "opensearch",
+    "peft",
+    "sentence-transformers",
+    "transformers",
+    "vllm",
+    "wandb",
+]
 
 
 def _check(req: Requirement) -> str | None:
@@ -146,7 +169,7 @@ def _provides_extras(dist: str) -> set[str]:
     return {str(canonicalize_name(e)) for e in (md.get_all("Provides-Extra") or [])}
 
 
-def require(extra: str, *, dist: str = _DIST) -> None:
+def require(extra: Extra, *, dist: str = _DIST) -> None:
     """Ensure every dependency of an ``autointent`` extra is installed and current.
 
     Args:
