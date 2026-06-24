@@ -17,7 +17,8 @@ import sys
 import pytest
 
 from autointent._advisor import DatasetStats, HardwareProfile, run_preflight
-from autointent._advisor._cli import BUNDLED_PRESETS, main
+from autointent._advisor._cli import main
+from autointent._advisor.workflows import BUNDLED_PRESETS
 from autointent.utils import load_preset
 
 
