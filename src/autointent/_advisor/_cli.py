@@ -22,11 +22,10 @@ import json
 import logging
 import sys
 
+from autointent._advisor import inspect, recommend, stats_from_dataset
+
 from ._render import render_json, render_recommendation, render_text
 from ._report import DatasetStats
-from ._workflows import BUNDLED_PRESETS, inspect, recommend, stats_from_dataset
-
-__all__ = ["BUNDLED_PRESETS", "build_parser", "cmd_inspect", "cmd_recommend", "main"]
 
 logger = logging.getLogger("autointent.advisor")
 

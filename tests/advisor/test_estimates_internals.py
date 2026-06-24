@@ -6,15 +6,9 @@ from typing import Any
 
 import pytest
 
-from autointent._advisor import _estimates, _hub
-from autointent._advisor._estimates import (
-    _classify_severity,
-    _extract_model_names,
-    _max_int,
-    _ram_for_module,
-    _vram_for_transformer,
-    run_preflight,
-)
+from autointent._advisor import _estimates, _hub, run_preflight
+from autointent._advisor._estimates._formulas import _classify_severity, _ram_for_module, _vram_for_transformer
+from autointent._advisor._estimates._search_space import _extract_model_names, _max_int
 from autointent._advisor._hardware import HardwareProfile
 from autointent._advisor._hub import ModelMeta
 from autointent._advisor._report import DatasetStats, Severity

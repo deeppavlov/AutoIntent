@@ -25,5 +25,3 @@ def detect_device() -> str:
     if torch.mps.is_available():
         return "mps"
     return "cpu"
-
-
