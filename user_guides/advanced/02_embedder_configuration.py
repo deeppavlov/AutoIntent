@@ -19,7 +19,7 @@ Optional dependencies are grouped as pip extras (see `pyproject.toml`). For the 
 pip install "autointent[sentence-transformers]"
 ```
 
-Other backends need their own extras, for example `autointent[openai]` or `autointent[vllm]`, as shown in the sections below. When a backend package is missing, code paths that need it typically call `autointent._utils.require`, which raises an `ImportError` that includes the matching `pip install autointent[<extra>]` hint.
+Other backends need their own extras, for example `autointent[openai]` or `autointent[vllm]`, as shown in the sections below. When a backend package is missing, code paths that need it typically call `autointent._deps.require`, which raises an `ImportError` that includes the matching `pip install autointent[<extra>]` hint.
 
 ## Configuration Approaches
 
@@ -32,7 +32,7 @@ The simplest way is to pass a model name as a string:
 from autointent.modules.scoring import KNNScorer, LinearScorer
 
 # Using just the model name - sentence-transformers handles device detection
-scorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
+scorer: KNNScorer | LinearScorer = LinearScorer(embedder_config="sentence-transformers/all-MiniLM-L6-v2")
 
 # %% [markdown]
 """

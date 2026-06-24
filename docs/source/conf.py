@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 import sys
-from importlib.metadata import version
+from importlib.metadata import version as get_version
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 project = "AutoIntent"
 copyright = "2026, DeepPavlov"
 author = "DeepPavlov"
-release = "0.3.0"
+release = "0.3.2"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -112,7 +112,7 @@ napoleon_attr_annotations = True
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["../_static"]
-version = version("autointent").replace("dev", "")  # may differ
+version = get_version("autointent").replace("dev", "")  # may differ
 
 BASE_URL = "https://deeppavlov.github.io/AutoIntent/versions"
 BASE_STATIC_URL = f"{BASE_URL}/dev/_static"

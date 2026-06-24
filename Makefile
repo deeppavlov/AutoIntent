@@ -20,7 +20,8 @@ test-html:
 
 .PHONY: typing
 typing:
-	$(sh) mypy src/autointent
+	$(sh) mypy src/autointent tests
+	$(sh) mypy --namespace-packages --explicit-package-bases user_guides docs/source/conf.py docs/source/docs_utils
 
 .PHONY: lint
 lint:

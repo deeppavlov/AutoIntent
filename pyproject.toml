@@ -1,6 +1,6 @@
 [project]
 name = "autointent"
-version = "0.3.0"
+version = "0.3.2"
 description = "A tool for automatically configuring a text classification pipeline for intent prediction."
 license = { text = "Apache 2.0" }
 authors = [
@@ -45,6 +45,7 @@ dependencies = [
     "aiometer (>=1.0.0,<2.0.0)",
     "aiofiles (>=24.1.0,<25.0.0)",
     "threadpoolctl (>=3.0.0,<4.0.0)",
+    "packaging (>=23.2)",
     "psutil (>=5.9.0,<8.0.0)",
 ]
 
@@ -111,6 +112,7 @@ test = [
     "pytest-xdist (>=3.6.1,<4.0.0)",
     "respx (>=0.21.0,<1.0.0)",
     "testcontainers[opensearch] (>=4.5.0,<5.0.0)",
+    "tensorboardx (>=2.6.2.2,<3.0.0)",  # backend for the TensorBoardCallback test
 ]
 typing = [
     "mypy (>=1,<2)",
@@ -143,9 +145,9 @@ Repository = "https://github.com/deeppavlov/AutoIntent"
 Documentation = "https://deeppavlov.github.io/AutoIntent/"
 
 [project.scripts]
-"basic-aug" = "autointent.generation.utterances.basic.cli:main"
-"evolution-aug" = "autointent.generation.utterances.evolution.cli:main"
-"autointent-advisor" = "autointent._advisor._cli:main"
+"basic-aug" = "autointent.generation.utterances._basic.cli:main"
+"evolution-aug" = "autointent.generation.utterances._evolution.cli:main"
+"advisor" = "autointent._advisor._cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.7,<0.9.0"]
@@ -235,27 +237,41 @@ markers = [
 # FileNotFoundError -> HF Cache is broken
 # --reruns-delay 10 -> Delay between reruns in seconds to avoid running into the same issue again
 
+# Measure only the package. Without `source` the bare `--cov` records every
+# imported module (e.g. torch's temp `_remote_module_non_scriptable.py`),
+# which makes `coverage report` crash with "No source for code".
+# `relative_files` stores paths relative to the repo root so per-job data
+# files produced by the coverage CI workflow can be `coverage combine`d.
 [tool.coverage.run]
 branch = true
+source = ["autointent"]
+relative_files = true
 omit = [
-    "__init__.py",
-    "*/site-packages/*",
-    "*/dist-packages/*",
-    "*/venv/*",
-    "*/.env/*",
-    "*/.venv/*",
-    "*/virtualenv/*",
+    "*/__init__.py",
     "*/tests/*",
-    "*/tmp/*",
+    # Optional integrations whose extras are outside the coverage matrix, so
+    # they are imported but never exercised; measuring them reports 0% and
+    # understates real coverage. `server/*` needs fastapi/fastmcp;
+    # `dspy_evolver.py` is the only dspy-dependent module; `vllm.py` needs a
+    # CUDA GPU that CI runners don't have.
+    "*/server/*",
+    "*/dspy_evolver.py",
+    "*/vllm.py",
 ]
 
+# Map the locations the package can be imported from (editable src checkout vs
+# an installed copy) onto one canonical path, so combining data collected on
+# different runners/installs resolves to the same files.
 [tool.coverage.paths]
 source = [
-    "src/autointent/",
+    "src/autointent",
+    "*/src/autointent",
+    "*/site-packages/autointent",
 ]
 
 [tool.coverage.report]
 skip_empty = true
+show_missing = true
 
 
 [tool.mypy]
@@ -295,10 +311,13 @@ module = [
     "testcontainers.opensearch",
     "wandb",
     "warm_hf_cache",
+    "compute_matrix",
     "dspy",
     "dspy.evaluate.auto_evaluation",
     "codecarbon",
     "catboost",
+    "jupytext",
+    "docs_utils.*",
 ]
 ignore_missing_imports = true
 
@@ -319,3 +338,22 @@ ignore_errors = true
 [[tool.mypy.overrides]]
 module = ["tests.server.*"]
 ignore_errors = true
+
+# Documentation code (user_guides narrative scripts and docs/ tooling) is checked
+# with a relaxed "soft" profile: real type errors (arg-type, assignment, ...) still
+# surface, but the strict-only annotation/generics noise inappropriate for teaching
+# code is disabled. Invoked with --namespace-packages --explicit-package-bases (see
+# the `typing` Makefile target) because the guide scripts are not importable packages.
+[[tool.mypy.overrides]]
+module = [
+    "user_guides.*",
+    "docs.*",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+disallow_any_generics = false
+warn_return_any = false
+warn_unreachable = false
+strict_equality = false

@@ -12,6 +12,19 @@ on:
         type: string
         default: ''
         description: 'Space-separated --extra flags (e.g., "--extra transformers --extra peft")'
+      matrix:
+        required: true
+        type: string
+        description: 'JSON-encoded strategy.matrix payload (os / python-version / include)'
+      coverage_artifact:
+        required: false
+        type: string
+        default: ''
+        # When non-empty the test run is measured with coverage: the command
+        # is appended with `--cov` and the data is written to `.coverage.<value>`,
+        # then uploaded as artifact `coverage-data-<value>` for the combine job.
+        # Empty (the default for every normal push/PR run) keeps the plain run.
+        description: 'Coverage data-file/artifact suffix; empty disables coverage'
 
 # No concurrency block here. The parent workflow (ci.yaml) owns the
 # concurrency group for the whole run; if reusable-test sets its own group
@@ -26,12 +39,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      matrix:
-        os: [ ubuntu-latest ]
-        python-version: [ "3.10", "3.11", "3.12", "3.13", "3.14", ]
-        include:
-          - os: windows-latest
-            python-version: "3.10"
+      matrix: ${{ fromJSON(inputs.matrix) }}
 
     steps:
     - name: Checkout code
@@ -75,5 +83,23 @@ jobs:
         # call into a deterministic AssertionError, so we don't need
         # offline mode as a backstop.
         HF_HUB_DOWNLOAD_TIMEOUT: "60"
-      run: |
-        uv run ${{ inputs.test_command }}
+        # Unique per group so the combine job can merge them; only consulted
+        # by pytest-cov when `--cov` is appended below.
+        COVERAGE_FILE: .coverage.${{ inputs.coverage_artifact }}
+      # Append `--cov` via a GitHub expression rather than a shell `if`: the
+      # default shell on windows-latest is PowerShell, where the previous
+      # bash `if [ -n ... ]; then ... fi` is a syntax error that failed every
+      # Windows test job. coverage_artifact is empty on normal push/PR runs,
+      # so the appended flags collapse to nothing and behavior is unchanged.
+      run: uv run ${{ inputs.test_command }} ${{ inputs.coverage_artifact != '' && '--cov --cov-report=' || '' }}
+
+    # Hidden-file upload (the data file is `.coverage.*`) is required since
+    # actions/upload-artifact excludes dotfiles by default.
+    - name: Upload coverage data
+      if: inputs.coverage_artifact != ''
+      uses: actions/upload-artifact@v7
+      with:
+        name: coverage-data-${{ inputs.coverage_artifact }}
+        path: .coverage.${{ inputs.coverage_artifact }}
+        include-hidden-files: true
+        if-no-files-found: error

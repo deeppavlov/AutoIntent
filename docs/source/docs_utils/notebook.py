@@ -16,17 +16,12 @@ class ReplacePattern(BaseModel, abc.ABC):
     An interface for replace patterns.
     """
 
-    @property
-    @abc.abstractmethod
-    def pattern(self) -> re.Pattern:
-        """
-        A regex pattern to replace in a text.
-        """
-        ...
+    # Regex pattern to replace in a text; defined by each concrete subclass.
+    pattern: ClassVar[re.Pattern[str]]
 
     @staticmethod
     @abc.abstractmethod
-    def replacement_string(matchobj: re.Match) -> str:
+    def replacement_string(matchobj: re.Match[str]) -> str:
         """
         Return a replacement string for a match object.
 
@@ -53,10 +48,10 @@ class InstallationCell(ReplacePattern):
     Uncomment `# %pip install {}`, add a "quiet" flag, add a comment explaining the cell.
     """
 
-    pattern: ClassVar[re.Pattern] = re.compile("\n# %pip install (.*)\n")
+    pattern: ClassVar[re.Pattern[str]] = re.compile("\n# %pip install (.*)\n")
 
     @staticmethod
-    def replacement_string(matchobj: re.Match) -> str:
+    def replacement_string(matchobj: re.Match[str]) -> str:
         return f"""
 # %%
 # installing dependencies
@@ -97,7 +92,7 @@ class DocumentationLink(ReplacePattern):
 
     """
 
-    pattern: ClassVar[re.Pattern] = re.compile(r"%doclink\((.+?)\)")
+    pattern: ClassVar[re.Pattern[str]] = re.compile(r"%doclink\((.+?)\)")
 
     @staticmethod
     def link_to_doc_page(
@@ -154,7 +149,7 @@ class DocumentationLink(ReplacePattern):
         raise ValueError(msg)
 
     @staticmethod
-    def replacement_string(matchobj: re.Match) -> str:
+    def replacement_string(matchobj: re.Match[str]) -> str:
         args = matchobj.group(1).split(",")
         return DocumentationLink.link_to_doc_page(*args)
 
@@ -200,10 +195,10 @@ class MarkdownDocumentationLink(DocumentationLink):
 
     """
 
-    pattern: ClassVar[re.Pattern] = re.compile(r"%mddoclink\((.+?)\)")
+    pattern: ClassVar[re.Pattern[str]] = re.compile(r"%mddoclink\((.+?)\)")
 
     @staticmethod
-    def replacement_string(matchobj: re.Match) -> str:
+    def replacement_string(matchobj: re.Match[str]) -> str:
         args = matchobj.group(1).split(",")
         link_text = args[-1].split(".")[-1]
         return f"[{link_text}]({DocumentationLink.link_to_doc_page(*args)})"

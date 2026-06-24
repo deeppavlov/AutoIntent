@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -43,6 +44,17 @@ def _get_structured_output_cache_path(dirname: str) -> Path:
     return Path(user_cache_dir("autointent")) / "structured_outputs" / dirname
 
 
+def _remove_cache_entry(path: Path) -> None:
+    """Remove a single on-disk cache entry.
+
+    Each entry is a *directory* (``PydanticModelDumper.dump`` writes
+    ``class_info.json`` + ``model_dump.json`` inside it), so eviction must use
+    ``rmtree`` rather than ``unlink``. ``ignore_errors`` keeps a missing or
+    partially removed entry from raising during cleanup.
+    """
+    shutil.rmtree(path, ignore_errors=True)
+
+
 class StructuredOutputCache:
     """Cache for structured output results."""
 
@@ -70,8 +82,10 @@ class StructuredOutputCache:
         if not cache_dir.exists():
             return
 
-        # Get all cache files to process
-        cache_files = [f for f in cache_dir.iterdir() if f.is_file()]
+        # Each cache entry is a directory written by PydanticModelDumper, so
+        # collect directories (filtering on is_file() here matched nothing and
+        # silently disabled eager loading entirely).
+        cache_files = [f for f in cache_dir.iterdir() if f.is_dir()]
 
         if not cache_files:
             return
@@ -118,19 +132,28 @@ class StructuredOutputCache:
             cached_data = PydanticModelDumper.load(cache_file)
         except (ValidationError, ImportError) as e:
             logger.warning("Failed to load cached item %s: %s", cache_file.name, e)
-            cache_file.unlink(missing_ok=True)
+            _remove_cache_entry(cache_file)
         else:
             return cache_file.name, cached_data
 
         return None
 
-    def _get_cache_key(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> str:
+    def _get_cache_key(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
+    ) -> str:
         """Generate a cache key for the given parameters.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cache key as a hexadecimal string.
@@ -139,6 +162,8 @@ class StructuredOutputCache:
         hasher.update(json.dumps(messages))
         hasher.update(json.dumps(output_model.model_json_schema()))
         hasher.update(json.dumps(generation_params))
+        hasher.update(model_name)
+        hasher.update(base_url)
         return hasher.hexdigest()
 
     def _check_memory_cache(self, cache_key: str, output_model: type[T]) -> T | None:
@@ -184,10 +209,10 @@ class StructuredOutputCache:
                     return cached_data
 
                 logger.warning("Cached data type mismatch on disk, removing invalid cache")
-                cache_path.unlink()
+                _remove_cache_entry(cache_path)
             except (ValidationError, ImportError) as e:
                 logger.warning("Failed to load cached structured output from disk: %s", e)
-                cache_path.unlink(missing_ok=True)
+                _remove_cache_entry(cache_path)
 
         return None
 
@@ -202,13 +227,22 @@ class StructuredOutputCache:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         PydanticModelDumper.dump(result, cache_path, exists_ok=True)
 
-    def get(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]) -> T | None:
+    def get(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
+    ) -> T | None:
         """Get cached result if available.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cached result if available, None otherwise.
@@ -216,7 +250,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return None
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # First check in-memory cache
         memory_result = self._check_memory_cache(cache_key, output_model)
@@ -226,20 +260,29 @@ class StructuredOutputCache:
         # Fallback to disk cache
         return self._load_from_disk(cache_key, output_model)
 
-    def set(self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T) -> None:
+    def set(
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        result: T,
+        model_name: str,
+        base_url: str | None,
+    ) -> None:
         """Cache the result.
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
             result: The result to cache.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
         """
         if not self.use_cache:
             return
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # Store in memory cache
         self._memory_cache[cache_key] = result
@@ -271,10 +314,10 @@ class StructuredOutputCache:
                     return cached_data
 
                 logger.warning("Cached data type mismatch on disk, removing invalid cache")
-                cache_path.unlink()
+                _remove_cache_entry(cache_path)
             except (ValidationError, ImportError) as e:
                 logger.warning("Failed to load cached structured output from disk: %s", e)
-                cache_path.unlink(missing_ok=True)
+                _remove_cache_entry(cache_path)
 
         return None
 
@@ -290,7 +333,12 @@ class StructuredOutputCache:
         await PydanticModelDumper.dump_async(result, cache_path, exists_ok=True)
 
     async def get_async(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any]
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        model_name: str,
+        base_url: str | None,
     ) -> T | None:
         """Get cached result if available (async version).
 
@@ -298,6 +346,8 @@ class StructuredOutputCache:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
             generation_params: Generation parameters.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
 
         Returns:
             Cached result if available, None otherwise.
@@ -305,7 +355,7 @@ class StructuredOutputCache:
         if not self.use_cache:
             return None
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # First check in-memory cache
         memory_result = self._check_memory_cache(cache_key, output_model)
@@ -316,21 +366,28 @@ class StructuredOutputCache:
         return await self._load_from_disk_async(cache_key, output_model)
 
     async def set_async(
-        self, messages: list[Message], output_model: type[T], generation_params: dict[str, Any], result: T
+        self,
+        messages: list[Message],
+        output_model: type[T],
+        generation_params: dict[str, Any],
+        result: T,
+        model_name: str,
+        base_url: str | None,
     ) -> None:
         """Cache the result (async version).
 
         Args:
             messages: List of messages to send to the model.
             output_model: Pydantic model class to parse the response into.
-            backend: Backend to use for structured output.
             generation_params: Generation parameters.
             result: The result to cache.
+            model_name: Name of the language model that will serve the request.
+            base_url: Base URL of the API endpoint, or None for the default.
         """
         if not self.use_cache:
             return
 
-        cache_key = self._get_cache_key(messages, output_model, generation_params)
+        cache_key = self._get_cache_key(messages, output_model, generation_params, model_name, base_url)
 
         # Store in memory cache
         self._memory_cache[cache_key] = result

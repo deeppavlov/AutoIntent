@@ -12,8 +12,8 @@ import numpy as np
 import numpy.typing as npt
 import torch
 
+from autointent._deps import require
 from autointent._hash import Hasher
-from autointent._utils import require
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
@@ -77,7 +77,7 @@ def _openai_api_error_message(exc: BaseException, *, batch_size: int) -> str:
 
 def _tiktoken_encoding_for_embedding_model(model_name: str) -> Encoding:
     """Resolve tiktoken encoding for batch sizing; fallback for unknown provider model ids."""
-    require("tiktoken", "openai")
+    require("openai")
     import tiktoken
 
     try:
@@ -110,7 +110,7 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         Args:
             config: Configuration for OpenAI embeddings.
         """
-        require("openai", "openai")
+        require("openai")
         self.config = config
         self._event_loop: asyncio.AbstractEventLoop | None = None
 

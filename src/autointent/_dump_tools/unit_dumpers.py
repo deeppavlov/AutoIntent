@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from sklearn.base import BaseEstimator
 
 from autointent import Embedder, Ranker, VectorIndex
-from autointent._utils import require
+from autointent._deps import require
 from autointent._wrappers import BaseTorchModule
 from autointent.schemas import TagsList
 
@@ -225,8 +225,8 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PeftModel:  # noqa: ANN401
-        require("peft", extra="peft")
-        require("transformers", extra="transformers")
+        require("peft")
+        require("transformers")
         import peft
         import transformers
 
@@ -245,7 +245,7 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            require("peft", extra="peft")
+            require("peft")
             import peft
 
             return isinstance(obj, peft.PeftModel)
@@ -263,7 +263,7 @@ class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedModel:  # noqa: ANN401
-        require("transformers", extra="transformers")
+        require("transformers")
         import transformers
 
         return transformers.AutoModelForSequenceClassification.from_pretrained(path)  # type: ignore[no-any-return]
@@ -271,7 +271,7 @@ class HFModelDumper(BaseObjectDumper["PreTrainedModel"]):
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            require("transformers", extra="transformers")
+            require("transformers")
             import transformers
 
             return isinstance(obj, transformers.PreTrainedModel)
@@ -289,7 +289,7 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> PreTrainedTokenizer | PreTrainedTokenizerFast:  # noqa: ANN401
-        require("transformers", extra="transformers")
+        require("transformers")
         import transformers
 
         return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
@@ -297,7 +297,7 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            require("transformers", extra="transformers")
+            require("transformers")
             import transformers
 
             return isinstance(obj, transformers.PreTrainedTokenizer | transformers.PreTrainedTokenizerFast)
@@ -342,7 +342,7 @@ class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
 
     @staticmethod
     def load(path: Path, **kwargs: Any) -> CatBoostClassifier:  # noqa: ANN401
-        require("catboost", extra="catboost")
+        require("catboost")
         from catboost import CatBoostClassifier
 
         model = CatBoostClassifier()
@@ -352,7 +352,7 @@ class CatBoostDumper(BaseObjectDumper["CatBoostClassifier"]):
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401
         try:
-            require("catboost", extra="catboost")
+            require("catboost")
             from catboost import CatBoostClassifier
 
             return isinstance(obj, CatBoostClassifier)

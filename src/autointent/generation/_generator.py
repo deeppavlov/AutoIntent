@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any, TypedDict, TypeVar
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
-from autointent._utils import require
+from autointent._deps import require
 from autointent.generation.chat_templates import Message, Role
 
 from ._cache import StructuredOutputCache
@@ -139,7 +139,7 @@ class Generator:
             client_params: Additional parameters for client.
             **generation_params: Additional generation parameters to override defaults passed to OpenAI completions API.
         """
-        require("openai", "openai")
+        require("openai")
         import openai
 
         base_url = base_url or os.getenv("OPENAI_BASE_URL")
@@ -263,7 +263,9 @@ class Generator:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = await self.cache.get_async(messages, output_model, self.generation_params)
+        cached_result = await self.cache.get_async(
+            messages, output_model, self.generation_params, self.model_name, self.base_url
+        )
         if cached_result is not None:
             return cached_result
 
@@ -292,7 +294,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        await self.cache.set_async(messages, output_model, self.generation_params, res)
+        await self.cache.set_async(messages, output_model, self.generation_params, res, self.model_name, self.base_url)
 
         return res
 
@@ -350,7 +352,7 @@ class Generator:
             Parsed response as an instance of the provided Pydantic model.
         """
         # Check cache first
-        cached_result = self.cache.get(messages, output_model, self.generation_params)
+        cached_result = self.cache.get(messages, output_model, self.generation_params, self.model_name, self.base_url)
         if cached_result is not None:
             return cached_result
 
@@ -376,7 +378,7 @@ class Generator:
             raise RetriesExceededError(max_retries=max_retries, messages=current_messages)
 
         # Cache the successful result
-        self.cache.set(messages, output_model, self.generation_params, res)
+        self.cache.set(messages, output_model, self.generation_params, res, self.model_name, self.base_url)
 
         return res
 
