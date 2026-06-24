@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from autointent._advisor import _estimates, _hub, run_preflight
+from autointent._advisor import _hub, run_preflight
 from autointent._advisor._estimates._formulas import _classify_severity, _ram_for_module, _vram_for_transformer
 from autointent._advisor._estimates._search_space import _extract_model_names, _max_int
 from autointent._advisor._hardware import HardwareProfile
@@ -44,10 +44,9 @@ def _fake_resolve(model_name: str) -> ModelMeta:
 def _offline(monkeypatch: pytest.MonkeyPatch) -> None:
     _hub.resolve_model.cache_clear()
     monkeypatch.setattr(_hub, "_is_warm_cached", lambda _name: False)
-    # Inject deterministic ModelMeta per name; both the _hub re-export and the
-    # _estimates rebinding need to be replaced for run_preflight to pick it up.
+    # Resource phase calls `_hub.resolve_model(...)` via module reference, so
+    # patching the symbol on `_hub` is enough.
     monkeypatch.setattr(_hub, "resolve_model", _fake_resolve)
-    monkeypatch.setattr(_estimates, "resolve_model", _fake_resolve)
 
 
 def _profile(vram_gb: float = 16.0, accelerator: str = "cuda") -> HardwareProfile:
