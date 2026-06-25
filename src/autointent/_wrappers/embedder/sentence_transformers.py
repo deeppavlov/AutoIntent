@@ -5,7 +5,7 @@ import logging
 import tempfile
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast, overload
+from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
 import huggingface_hub
@@ -19,14 +19,13 @@ from autointent._hash import Hasher
 from autointent.configs._embedder import SentenceTransformerEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
-from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
     import numpy.typing as npt
     from sentence_transformers import SentenceTransformer
     from transformers import TrainerCallback
 
-    from autointent.configs import EmbedderFineTuningConfig, TaskTypeEnum
+    from autointent.configs import EmbedderFineTuningConfig
     from autointent.custom_types import ListOfLabels
 
 
@@ -105,6 +104,7 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
     """SentenceTransformer-based embedding backend implementation."""
 
     supports_training: bool = True
+    config: SentenceTransformerEmbeddingConfig
     _model: SentenceTransformer | None
 
     def __init__(self, config: SentenceTransformerEmbeddingConfig) -> None:
@@ -162,52 +162,12 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         hasher.update(self.config.tokenizer_config.max_length)
         return hasher.intdigest()
 
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
-    ) -> torch.Tensor: ...
-
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
-    ) -> npt.NDArray[np.float32]: ...
-
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
-    ) -> npt.NDArray[np.float32] | torch.Tensor:
-        """Calculate embeddings for a list of utterances.
-
-        Args:
-            utterances: List of input texts to calculate embeddings for.
-            task_type: Type of task for which embeddings are calculated.
-            return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
-
-        Returns:
-            A numpy array or PyTorch tensor of embeddings.
-        """
+    def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
+        """Compute SentenceTransformer embeddings without caching."""
         if len(utterances) == 0:
             msg = "Empty input"
             logger.error(msg)
             raise ValueError(msg)
-
-        prompt = self.config.get_prompt(task_type)
-
-        if self.config.use_cache:
-            logger.debug("Using cached embeddings for %s", self.config.model_name)
-            hasher = Hasher()
-            hasher.update(self.get_hash())
-            hasher.update(utterances)
-            if prompt:
-                hasher.update(prompt)
-
-            embeddings_path = get_embeddings_path(hasher.hexdigest())
-            if embeddings_path.exists():
-                logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
-                if return_tensors:
-                    device = self.config.device or "cpu"
-                    return torch.from_numpy(embeddings_np).to(device)
-                return embeddings_np
 
         model = self._load_model()
 
@@ -223,35 +183,22 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         if self.config.tokenizer_config.max_length is not None:
             model.max_seq_length = self.config.tokenizer_config.max_length
 
-        embeddings: npt.NDArray[np.float32] | torch.Tensor
-        if return_tensors:
-            embeddings = model.encode(
+        embeddings = cast(
+            "npt.NDArray[np.float32]",
+            model.encode(
                 utterances,
-                convert_to_tensor=True,
+                convert_to_numpy=True,
                 batch_size=self.config.batch_size,
                 normalize_embeddings=True,
                 prompt=prompt,
-            )
-        else:
-            embeddings = cast(
-                "npt.NDArray[np.float32]",
-                model.encode(
-                    utterances,
-                    convert_to_numpy=True,
-                    batch_size=self.config.batch_size,
-                    normalize_embeddings=True,
-                    prompt=prompt,
-                ),
-            )
+            ),
+        )
+        return embeddings.astype(np.float32, copy=False)
 
-        if self.config.use_cache:
-            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-            if isinstance(embeddings, torch.Tensor):
-                np.save(embeddings_path, embeddings.cpu().numpy())
-            else:
-                np.save(embeddings_path, embeddings)
-
-        return embeddings
+    def _to_tensor(self, embeddings: npt.NDArray[np.float32]) -> torch.Tensor:
+        """Convert to a tensor on the configured device (preserves prior cache-hit behavior)."""
+        device = self.config.device or "cpu"
+        return torch.from_numpy(embeddings).to(device)
 
     def similarity(
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]

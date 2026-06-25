@@ -4,15 +4,13 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING
 
 import numpy as np
-import torch
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from autointent._hash import Hasher
-from autointent.configs import TaskTypeEnum
 from autointent.configs._embedder import HashingVectorizerEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
@@ -33,6 +31,8 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
     """
 
     supports_training: bool = False
+    supports_cache: bool = False
+    config: HashingVectorizerEmbeddingConfig
 
     def __init__(self, config: HashingVectorizerEmbeddingConfig) -> None:
         """Initialize the HashingVectorizer backend.
@@ -74,38 +74,10 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
         hasher.update(self.config.dtype)
         return int(hasher.hexdigest(), 16)
 
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True] = True
-    ) -> torch.Tensor: ...
-
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
-    ) -> npt.NDArray[np.float32]: ...
-
-    def embed(
-        self,
-        utterances: list[str],
-        task_type: TaskTypeEnum | None = None,  # noqa: ARG002
-        return_tensors: bool = False,
-    ) -> npt.NDArray[np.float32] | torch.Tensor:
-        """Calculate embeddings for a list of utterances.
-
-        Args:
-            utterances: List of input texts to calculate embeddings for.
-            task_type: Type of task for which embeddings are calculated (ignored for HashingVectorizer).
-            return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
-
-        Returns:
-            A numpy array or PyTorch tensor of embeddings.
-        """
-        # Transform texts to sparse matrix, then convert to dense
+    def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:  # noqa: ARG002
+        """Compute HashingVectorizer embeddings (prompt is ignored; never cached)."""
         embeddings_sparse = self._vectorizer.transform(utterances)
         embeddings: npt.NDArray[np.float32] = embeddings_sparse.toarray().astype(np.float32)
-
-        if return_tensors:
-            return torch.from_numpy(embeddings)
         return embeddings
 
     def similarity(

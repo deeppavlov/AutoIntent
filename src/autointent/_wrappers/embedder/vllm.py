@@ -14,15 +14,12 @@ from autointent._hash import Hasher
 from autointent.configs._embedder import VllmEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
-from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     import numpy.typing as npt
     from vllm import LLM  # type: ignore[import-not-found]
-
-    from autointent.configs import TaskTypeEnum
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +28,7 @@ class VllmEmbeddingBackend(BaseEmbeddingBackend):
     """vLLM-based embedding backend implementation."""
 
     supports_training: bool = False
+    config: VllmEmbeddingConfig
 
     def __init__(self, config: VllmEmbeddingConfig) -> None:
         """Initialize the vLLM backend.
@@ -77,45 +75,15 @@ class VllmEmbeddingBackend(BaseEmbeddingBackend):
         hasher.update(str(self.config.max_model_len))
         return hasher.intdigest()
 
-    def embed(
-        self,
-        utterances: list[str],
-        task_type: TaskTypeEnum | None = None,
-        return_tensors: bool = False,
-    ) -> npt.NDArray[np.float32] | torch.Tensor:
-        """Calculate embeddings for a list of utterances.
-
-        Args:
-            utterances: List of input texts to calculate embeddings for.
-            task_type: Type of task for which embeddings are calculated.
-            return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
-
-        Returns:
-            A numpy array or PyTorch tensor of embeddings.
-        """
+    def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
+        """Compute vLLM embeddings without caching."""
         if len(utterances) == 0:
             msg = "Empty input"
             logger.error(msg)
             raise ValueError(msg)
 
-        prompt = self.config.get_prompt(task_type)
         if prompt:
             utterances = [f"{prompt} {utterance}" for utterance in utterances]
-
-        if self.config.use_cache:
-            hasher = Hasher()
-            hasher.update(self.get_hash())
-            hasher.update(utterances)
-            if prompt:
-                hasher.update(prompt)
-
-            embeddings_path = get_embeddings_path(hasher.hexdigest())
-            if embeddings_path.exists():
-                logger.debug("Loading cached vLLM embeddings from %s", embeddings_path)
-                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
-                if return_tensors:
-                    return torch.from_numpy(embeddings_np)
-                return embeddings_np
 
         model = self._load_model()
 
@@ -127,16 +95,7 @@ class VllmEmbeddingBackend(BaseEmbeddingBackend):
 
         outputs = model.encode(utterances, pooling_task="embed", **self.config.extra_encode_kwargs)
         all_embeddings = [output.outputs.embedding for output in outputs]
-
-        embeddings_np = np.array(all_embeddings, dtype=np.float32)
-
-        if self.config.use_cache:
-            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(embeddings_path, embeddings_np)
-
-        if return_tensors:
-            return torch.from_numpy(embeddings_np)
-        return embeddings_np
+        return np.array(all_embeddings, dtype=np.float32)
 
     def similarity(
         self, embeddings1: npt.NDArray[np.float32], embeddings2: npt.NDArray[np.float32]
