@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import TYPE_CHECKING, Literal, overload
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
-import torch
 
 from autointent._wrappers.embedder.base import BaseEmbeddingBackend
 
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 
     import numpy.typing as npt
 
-    from autointent.configs import OpenaiEmbeddingConfig, TaskTypeEnum
+    from autointent.configs import OpenaiEmbeddingConfig
 
 
 def _seeded_vector(text: str, dim: int, *, seed_extra: str = "") -> npt.NDArray[np.float32]:
@@ -57,6 +56,7 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
     """
 
     supports_training = False
+    config: OpenaiEmbeddingConfig
 
     def __init__(self, config: OpenaiEmbeddingConfig) -> None:
         self.config = config
@@ -68,34 +68,18 @@ class FakeOpenaiEmbeddingBackend(BaseEmbeddingBackend):
         self._client = None
         self._async_client = None
 
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
-    ) -> torch.Tensor: ...
-
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
-    ) -> npt.NDArray[np.float32]: ...
-
-    def embed(
-        self,
-        utterances: list[str],
-        task_type: TaskTypeEnum | None = None,
-        return_tensors: bool = False,
-    ) -> npt.NDArray[np.float32] | torch.Tensor:
-        # Touch the lazy attributes so test_client_lazy_loading observes the transition.
+    def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
+        # Touch the lazy attribute so test_client_lazy_loading observes the transition.
         self._client = self._client or object()
-        dim = getattr(self.config, "dimensions", None) or 1536
+        dim = self.config.dimensions or 1536
 
-        # Prompt seed mirrors BaseEmbedderConfig.get_prompt() so that two task types
-        # sharing the same default_prompt produce identical vectors.
-        prompt = self.config.get_prompt(task_type)
+        # Prompt is already resolved by the base; seeding mirrors BaseEmbedderConfig.get_prompt()
+        # so two task types sharing the same default_prompt produce identical vectors.
         seed_extra = f"{self.config.model_name}|{prompt or ''}"
 
-        vectors = np.stack([_seeded_vector(text, dim, seed_extra=seed_extra) for text in utterances])
-        if return_tensors:
-            return torch.from_numpy(vectors)
+        vectors: npt.NDArray[np.float32] = np.stack(
+            [_seeded_vector(text, dim, seed_extra=seed_extra) for text in utterances]
+        )
         return vectors
 
     def similarity(

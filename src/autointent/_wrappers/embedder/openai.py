@@ -5,19 +5,17 @@ import json
 import logging
 import os
 from functools import partial
-from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
+from typing import TYPE_CHECKING, TypedDict, cast
 
 import aiometer
 import numpy as np
 import numpy.typing as npt
-import torch
 
 from autointent._deps import require
 from autointent._hash import Hasher
 from autointent.configs._embedder import OpenaiEmbeddingConfig
 
 from .base import BaseEmbeddingBackend
-from .utils import get_embeddings_path
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -26,8 +24,6 @@ if TYPE_CHECKING:
     import openai
     from tiktoken import Encoding
     from typing_extensions import NotRequired
-
-    from autointent.configs import TaskTypeEnum
 
 
 logger = logging.getLogger(__name__)
@@ -101,6 +97,7 @@ class EmbeddingsCreateKwargs(TypedDict):
 class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
     """OpenAI-based embedding backend implementation."""
 
+    config: OpenaiEmbeddingConfig
     _client: openai.OpenAI | None = None
     _async_client: openai.AsyncOpenAI | None = None
 
@@ -166,54 +163,16 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
         hasher.update(str(self.config.max_tokens_in_batch))
         return hasher.intdigest()
 
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[True]
-    ) -> torch.Tensor: ...
-
-    @overload
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, *, return_tensors: Literal[False] = False
-    ) -> npt.NDArray[np.float32]: ...
-
-    def embed(
-        self, utterances: list[str], task_type: TaskTypeEnum | None = None, return_tensors: bool = False
-    ) -> npt.NDArray[np.float32] | torch.Tensor:
-        """Calculate embeddings for a list of utterances.
-
-        Args:
-            utterances: List of input texts to calculate embeddings for.
-            task_type: Type of task for which embeddings are calculated.
-            return_tensors: If True, return a PyTorch tensor; otherwise, return a numpy array.
-
-        Returns:
-            A numpy array or PyTorch tensor of embeddings.
-        """
+    def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
+        """Compute OpenAI embeddings without caching."""
         if len(utterances) == 0:
             msg = "Empty input"
             logger.error(msg)
             raise ValueError(msg)
 
         # Apply task-specific prompt
-        prompt = self.config.get_prompt(task_type)
         if prompt:
             utterances = [f"{prompt} {utterance}" for utterance in utterances]
-
-        if self.config.use_cache:
-            logger.debug("Using cached embeddings for %s", self.config.model_name)
-            hasher = Hasher()
-            hasher.update(self.get_hash())
-            hasher.update(utterances)
-            if prompt:
-                hasher.update(prompt)
-
-            embeddings_path = get_embeddings_path(hasher.hexdigest())
-            if embeddings_path.exists():
-                logger.debug("loading embeddings from %s", str(embeddings_path))
-                embeddings_np = cast("npt.NDArray[np.float32]", np.load(embeddings_path))
-                if return_tensors:
-                    return torch.from_numpy(embeddings_np)
-                return embeddings_np
 
         logger.debug(
             "Calculating embeddings with OpenAI model %s, batch_size=%d, max_tokens_in_batch=%s, "
@@ -228,17 +187,8 @@ class OpenaiEmbeddingBackend(BaseEmbeddingBackend):
 
         # Use async processing if max_concurrent is specified
         if self.config.max_concurrent is not None:
-            embeddings_np = self._process_embeddings_async(utterances)
-        else:
-            embeddings_np = self._process_embeddings_sync(utterances)
-
-        if self.config.use_cache:
-            embeddings_path.parent.mkdir(parents=True, exist_ok=True)
-            np.save(embeddings_path, embeddings_np)
-
-        if return_tensors:
-            return torch.from_numpy(embeddings_np)
-        return embeddings_np
+            return self._process_embeddings_async(utterances)
+        return self._process_embeddings_sync(utterances)
 
     def _embedding_request_batches(self, utterances: list[str]) -> list[list[str]]:
         """Slice utterances into batches for each embeddings API call."""

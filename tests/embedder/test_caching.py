@@ -1,16 +1,21 @@
 from __future__ import annotations
 
+import os
+import sqlite3
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
 from autointent._wrappers.embedder import Embedder
-from autointent.configs import TaskTypeEnum
+from autointent.configs import HashingVectorizerEmbeddingConfig, TaskTypeEnum
 
 from .conftest import backend_configs, create_sentence_transformer_config
 
 if TYPE_CHECKING:
+    import numpy.typing as npt
+
     from autointent.configs import EmbedderConfig
 
 
@@ -109,3 +114,66 @@ class TestSentenceTransformerCachingSpecific:
 
         # Should produce different embeddings due to different prompts
         assert not np.allclose(query_emb, passage_emb, rtol=1e-3)
+
+
+def _embedding_row_count() -> int:
+    db_path = Path(os.environ["AUTOINTENT_CACHE_DIR"]) / "embeddings.db"
+    if not db_path.exists():
+        return 0
+    with sqlite3.connect(db_path) as conn:
+        return int(conn.execute("SELECT COUNT(*) FROM embeddings").fetchone()[0])
+
+
+class TestPerUtteranceCaching:
+    """Per-utterance keying: shared utterances are stored once and reused across calls."""
+
+    def test_overlapping_calls_store_each_utterance_once(self) -> None:
+        config = create_sentence_transformer_config(use_cache=True)
+        embedder = Embedder(config)
+
+        embedder.embed(["alpha", "beta"])
+        embedder.embed(["beta", "gamma"])  # 'beta' overlaps
+
+        # Whole-list keying would store 2 list blobs; per-utterance stores 3 rows.
+        assert _embedding_row_count() == 3
+
+    def test_duplicate_in_list_computed_once(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        config = create_sentence_transformer_config(use_cache=True)
+        embedder = Embedder(config)
+        backend = embedder._backend
+
+        computed: list[list[str]] = []
+        original = backend._embed_uncached
+
+        def spy(utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
+            computed.append(list(utterances))
+            return original(utterances, prompt)
+
+        monkeypatch.setattr(backend, "_embed_uncached", spy)
+
+        result = embedder.embed(["dup", "dup"])
+
+        assert result.shape[0] == 2
+        np.testing.assert_array_equal(result[0], result[1])
+        assert computed == [["dup"]]  # computed only once
+
+    def test_order_preserved_after_partial_hit(self) -> None:
+        config = create_sentence_transformer_config(use_cache=True)
+        embedder = Embedder(config)
+
+        first = embedder.embed(["one", "two", "three"])
+        second = embedder.embed(["three", "one", "two"])  # reordered, fully cached
+
+        np.testing.assert_allclose(second[0], first[2], rtol=1e-5)
+        np.testing.assert_allclose(second[1], first[0], rtol=1e-5)
+        np.testing.assert_allclose(second[2], first[1], rtol=1e-5)
+
+    def test_empty_input_hashing_vectorizer_returns_empty(self) -> None:
+        embedder = Embedder(HashingVectorizerEmbeddingConfig(n_features=512, use_cache=True))
+        result = embedder.embed([])
+        assert result.shape == (0, 512)
+
+    def test_empty_input_sentence_transformer_raises(self) -> None:
+        embedder = Embedder(create_sentence_transformer_config(use_cache=True))
+        with pytest.raises(ValueError, match="Empty input"):
+            embedder.embed([])

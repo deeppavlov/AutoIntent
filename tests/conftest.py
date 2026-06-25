@@ -352,3 +352,15 @@ from tests._fixtures.mock_generator import (  # noqa: E402, F401
 )
 from tests._fixtures.opensearch_container import opensearch_container  # noqa: E402, F401
 from tests._fixtures.respx_openai import respx_openai  # noqa: E402, F401
+
+
+@pytest.fixture(autouse=True)
+def _isolate_embedding_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Redirect the embedding SQLite cache to a per-test directory.
+
+    Because ``use_cache`` defaults to True, any test that builds a default-config
+    embedder could otherwise write the embedding DB to the real OS cache dir. A unique
+    per-test ``tmp_path`` also keeps the per-utterance reuse test in
+    tests/embedder/test_caching.py hermetic (its two embeds must share one DB file).
+    """
+    monkeypatch.setenv("AUTOINTENT_CACHE_DIR", str(tmp_path / "ai_cache"))
