@@ -56,11 +56,14 @@
 ```python
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
+from typing import TYPE_CHECKING
 
 from autointent._cache_dir import get_cache_dir
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    import pytest
 
 
 def test_get_cache_dir_honors_env_var(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -113,11 +116,11 @@ def get_cache_dir() -> Path:
 
 - [ ] **Step 4: Add the global autouse isolation fixture** to `tests/conftest.py`
 
-Append at the end of `tests/conftest.py` (it already imports `pytest`; `Path` is imported under `TYPE_CHECKING` there):
+Append at the end of `tests/conftest.py` (it already imports `pytest` at runtime and `Path` under `TYPE_CHECKING`; the annotation stays unquoted because `from __future__ import annotations` is at the top — a quoted `"Path"` would trip ruff `UP037`):
 
 ```python
 @pytest.fixture(autouse=True)
-def _isolate_embedding_cache(tmp_path: "Path", monkeypatch: pytest.MonkeyPatch) -> None:
+def _isolate_embedding_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Redirect the embedding SQLite cache to a per-test directory.
 
     Because ``use_cache`` defaults to True, any test that builds a default-config
@@ -167,10 +170,9 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 from __future__ import annotations
 
 import sqlite3
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
-import pytest
 
 from autointent._wrappers.embedder._sqlite_cache import (
     SCHEMA_VERSION,
@@ -179,8 +181,14 @@ from autointent._wrappers.embedder._sqlite_cache import (
     utterance_key,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
-def _vec(values: list[float]) -> np.ndarray:
+    import numpy.typing as npt
+    import pytest
+
+
+def _vec(values: list[float]) -> npt.NDArray[np.float32]:
     return np.asarray(values, dtype=np.float32)
 
 
@@ -203,6 +211,12 @@ def test_get_partial_hit(tmp_path: Path) -> None:
 def test_get_empty_keys_returns_empty(tmp_path: Path) -> None:
     cache = SQLiteEmbeddingCache(tmp_path / "e.db")
     assert cache.get_many(1, []) == {}
+
+
+def test_set_empty_entries_is_noop(tmp_path: Path) -> None:
+    cache = SQLiteEmbeddingCache(tmp_path / "e.db")
+    cache.set_many(1, {})  # must not create/raise
+    assert cache.get_many(1, ["anything"]) == {}
 
 
 def test_model_hash_filter(tmp_path: Path) -> None:
@@ -236,7 +250,13 @@ def test_schema_version_and_columns(tmp_path: Path) -> None:
     with sqlite3.connect(db) as conn:
         assert conn.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
         cols = {row[1] for row in conn.execute("PRAGMA table_info(embeddings)")}
+        indexes = {row[1] for row in conn.execute("PRAGMA index_list(embeddings)")}
     assert {"key", "model_hash", "dim", "vector", "size_bytes", "created_at", "last_accessed"} <= cols
+    assert {
+        "idx_embeddings_last_accessed",
+        "idx_embeddings_created_at",
+        "idx_embeddings_model_hash",
+    } <= indexes
 
 
 def test_version_mismatch_triggers_rebuild(tmp_path: Path) -> None:
@@ -397,26 +417,25 @@ class SQLiteEmbeddingCache:
         if self._initialized:
             return
         with self._init_lock:
-            if self._initialized:
-                return
-            self._db_path.parent.mkdir(parents=True, exist_ok=True)
-            conn = self._connect()
-            try:
-                mode = conn.execute("PRAGMA journal_mode = WAL").fetchone()
-                if mode is not None and str(mode[0]).lower() != "wal":
-                    logger.debug("SQLite embedding cache: WAL unavailable (journal_mode=%s)", mode[0])
-                conn.execute("BEGIN IMMEDIATE")
-                version = conn.execute("PRAGMA user_version").fetchone()[0]
-                if version != SCHEMA_VERSION:
-                    conn.execute("DROP TABLE IF EXISTS embeddings")
-                    conn.execute(_CREATE_TABLE)
-                    for index_sql in _CREATE_INDEXES:
-                        conn.execute(index_sql)
-                    conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
-                conn.execute("COMMIT")
-            finally:
-                conn.close()
-            self._initialized = True
+            if not self._initialized:  # another thread may have initialized while we waited
+                self._db_path.parent.mkdir(parents=True, exist_ok=True)
+                conn = self._connect()
+                try:
+                    mode = conn.execute("PRAGMA journal_mode = WAL").fetchone()
+                    if mode is not None and str(mode[0]).lower() != "wal":
+                        logger.debug("SQLite embedding cache: WAL unavailable (journal_mode=%s)", mode[0])
+                    conn.execute("BEGIN IMMEDIATE")
+                    version = conn.execute("PRAGMA user_version").fetchone()[0]
+                    if version != SCHEMA_VERSION:
+                        conn.execute("DROP TABLE IF EXISTS embeddings")
+                        conn.execute(_CREATE_TABLE)
+                        for index_sql in _CREATE_INDEXES:
+                            conn.execute(index_sql)
+                        conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
+                    conn.execute("COMMIT")
+                finally:
+                    conn.close()
+                self._initialized = True
 
     def get_many(self, model_hash: int, keys: list[str]) -> dict[str, npt.NDArray[np.float32]]:
         """Return cached vectors for ``keys`` under ``model_hash`` (missing keys omitted)."""
@@ -431,8 +450,8 @@ class SQLiteEmbeddingCache:
                 for start in range(0, len(keys), _KEY_CHUNK_SIZE):
                     chunk = keys[start : start + _KEY_CHUNK_SIZE]
                     placeholders = ",".join("?" * len(chunk))
-                    query = (  # noqa: S608 - placeholders are '?' only; all values are bound
-                        "SELECT key, vector, dim FROM embeddings "
+                    query = (
+                        "SELECT key, vector, dim FROM embeddings "  # noqa: S608 - only '?' is interpolated; values are bound
                         f"WHERE model_hash = ? AND key IN ({placeholders})"
                     )
                     for row_key, blob, dim in conn.execute(query, (model_hash_str, *chunk)):
@@ -452,7 +471,7 @@ class SQLiteEmbeddingCache:
             return
         model_hash_str = str(model_hash)
         now = time.time()
-        rows = []
+        rows: list[tuple[str, str, int, bytes, int, float, float]] = []
         for key, vector in entries.items():
             blob = np.ascontiguousarray(vector, dtype=np.float32).tobytes()
             rows.append((key, model_hash_str, int(vector.shape[-1]), blob, len(blob), now, now))
@@ -739,7 +758,7 @@ class BaseEmbeddingBackend(ABC):
          device = self.config.device or "cpu"
          return torch.from_numpy(embeddings).to(device)
      ```
-  Keep `Literal`/`overload` imports only if still used elsewhere in the file; if `overload`/`Literal` become unused after removing the stubs, drop them from the `typing` import (ruff F401). `torch` and `cast` are already imported at module top.
+  **Imports to remove (ruff F401):** drop `Literal, overload` from the `typing` import (keep `TYPE_CHECKING, cast`); drop `TaskTypeEnum` from the `if TYPE_CHECKING:` block (the old `embed` signature was its only user). **Keep** `cast` and `torch` (used by `_embed_uncached`/`_to_tensor`/`clear_ram`/`_set_training_seed`) and `npt`.
 
 - [ ] **Step 3: Migrate `openai.py`**
 
@@ -780,7 +799,7 @@ class BaseEmbeddingBackend(ABC):
              return self._process_embeddings_async(utterances)
          return self._process_embeddings_sync(utterances)
      ```
-  Drop `overload`/`Literal` from the `typing` import if now unused (ruff F401). Keep the `Hasher` import (used by `get_hash`).
+  **Imports to remove (ruff F401):** drop `Literal, overload` from the `typing` import (keep `cast`, used by `similarity`); remove `import torch` (line ~13 — only the old `embed` used it); drop `TaskTypeEnum` from the `if TYPE_CHECKING:` block. **Keep** `np`, `npt`, and `Hasher` (used by `get_hash`).
 
 - [ ] **Step 4: Migrate `vllm.py`**
 
@@ -815,7 +834,7 @@ class BaseEmbeddingBackend(ABC):
          all_embeddings = [output.outputs.embedding for output in outputs]
          return np.array(all_embeddings, dtype=np.float32)
      ```
-  Keep the `Hasher` import (used by `get_hash`); drop now-unused `cast` only if unused elsewhere.
+  **Imports to remove (ruff F401):** drop `TaskTypeEnum` from the `if TYPE_CHECKING:` block (the old `embed` signature was its only user). **Keep** `cast` (used by `similarity`), `torch` (used by `clear_ram`), `np`, `npt`, and `Hasher` (used by `get_hash`). (This file has no `embed` overloads to remove.)
 
 - [ ] **Step 5: Migrate `hashing_vectorizer.py`**
 
@@ -840,7 +859,7 @@ class BaseEmbeddingBackend(ABC):
          embeddings: npt.NDArray[np.float32] = embeddings_sparse.toarray().astype(np.float32)
          return embeddings
      ```
-  Drop `overload`/`Literal`/`TaskTypeEnum` from imports if they become unused after removing the stubs (ruff F401).
+  **Imports to remove (ruff F401):** drop `Literal, overload` from the `typing` import; remove `import torch` (only the old `embed` used it); remove `from autointent.configs import TaskTypeEnum` (a runtime import on line ~15, now unused). **Keep** `np`, `npt`, and `Hasher` (used by `get_hash`). `# noqa: ARG002` on `_embed_uncached` covers the unused `prompt` parameter.
 
 - [ ] **Step 6: Migrate `tests/_fixtures/fake_openai_embedding.py`**
 
@@ -866,7 +885,7 @@ class BaseEmbeddingBackend(ABC):
          )
          return vectors
      ```
-  Remove `overload`/`Literal` from imports if unused. The fake now inherits `embed`/`_to_tensor` from the base.
+  **Imports to remove (ruff F401):** drop `Literal, overload` from the `typing` import; remove `import torch` (only the old `embed` used it); drop `TaskTypeEnum` from the `if TYPE_CHECKING:` block. **Keep** `np`, `npt`, `pytest` (used by the `patch_openai_embedding_backend` fixture), `hashlib`, `json`, and `OpenaiEmbeddingConfig`. The fake now inherits `embed`/`_to_tensor` from the base.
 
 - [ ] **Step 7: Delete the obsolete util**
 
@@ -912,7 +931,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 - [ ] **Step 1: Append the new tests** to `tests/embedder/test_caching.py`
 
-Add these imports at the top (next to the existing ones):
+Add these runtime imports at the top (next to the existing ones — `os`, `sqlite3`, and `Path` are used at runtime here via `Path(os.environ[...])`):
 
 ```python
 import os
@@ -921,6 +940,8 @@ from pathlib import Path
 
 from autointent.configs import HashingVectorizerEmbeddingConfig
 ```
+
+And add `import numpy.typing as npt` to the file's existing `if TYPE_CHECKING:` block (used only in the `spy` annotation below).
 
 Append:
 
@@ -954,7 +975,7 @@ class TestPerUtteranceCaching:
         computed: list[list[str]] = []
         original = backend._embed_uncached
 
-        def spy(utterances: list[str], prompt: str | None) -> np.ndarray:
+        def spy(utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:
             computed.append(list(utterances))
             return original(utterances, prompt)
 
@@ -1050,7 +1071,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 - [ ] **Whole-tree static gate:** `ruff check .` and `mypy src/autointent tests` → both clean.
 - [ ] **Grep guards:** `grep -rn "get_embeddings_path" src tests` (empty); `grep -rn "from .utils import" src/autointent/_wrappers/embedder` (empty).
-- [ ] **Push branch + open draft PR**, then inspect CI (the only place pytest runs). Iterate on CI failures by pushing fixes. Key CI signals to watch: the `tests/embedder/*` suite (consistency + new behavior), the 85% coverage floor (new `_sqlite_cache.py` branches must be covered — Task 2 tests do this), and mypy on Python 3.10.
+- [ ] **Push branch + open draft PR**, then inspect CI (the only place pytest runs). Iterate on CI failures by pushing fixes. Key CI signals to watch: the `tests/embedder/*` suite (consistency + new behavior), the 85% **combined** coverage floor (Task 2 tests cover the main `_sqlite_cache.py` branches; a few defensive branches — the WAL-unavailable debug log, the double-checked-lock re-entry, the `_deserialize` `except` — are hard to hit single-threaded and may stay uncovered, which is fine against the combined total per the spec), and mypy on Python 3.10.
 
 ---
 
