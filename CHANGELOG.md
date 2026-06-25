@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file. Release notes are grouped by theme rather than listing every commit.
 
+## [Unreleased]
+
+### Features
+
+- **Embedding cache rewritten on SQLite with per-utterance keys.** Embeddings are now cached one row per `(model, utterance, prompt)` in a single SQLite database (`<cache_dir>/embeddings.db`) instead of one `.npy` file per call. Utterances shared across calls are embedded and stored once, so overlapping calls reuse the overlap — removing the old whole-list-or-nothing cache misses and the unbounded `.npy` inode growth. Writes are atomic and safe for concurrent processes/threads on one host (WAL).
+- **`AUTOINTENT_CACHE_DIR`** environment variable to relocate the on-disk cache (defaults to the OS cache dir). It currently governs the embedding cache only; the structured-output cache is unchanged.
+
+### Notes
+
+- The new cache uses a different key scheme, so existing `.npy` embedding caches are not reused (a one-time recompute on first run). The old `embeddings/` directory is left untouched and may be deleted manually.
+
+---
+
 ## [0.3.2] — 2026-06-22
 
 Compared to [0.3.1](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.1). A maintenance release focused on caching correctness and CI/test coverage. No breaking changes.
