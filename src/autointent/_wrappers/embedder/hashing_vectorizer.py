@@ -76,6 +76,10 @@ class HashingVectorizerEmbeddingBackend(BaseEmbeddingBackend):
 
     def _embed_uncached(self, utterances: list[str], prompt: str | None) -> npt.NDArray[np.float32]:  # noqa: ARG002
         """Compute HashingVectorizer embeddings (prompt is ignored; never cached)."""
+        if not utterances:
+            # sklearn's HashingVectorizer.transform([]) raises StopIteration; return an
+            # empty (0, n_features) matrix instead so empty input is handled gracefully.
+            return np.empty((0, self.config.n_features), dtype=np.float32)
         embeddings_sparse = self._vectorizer.transform(utterances)
         embeddings: npt.NDArray[np.float32] = embeddings_sparse.toarray().astype(np.float32)
         return embeddings

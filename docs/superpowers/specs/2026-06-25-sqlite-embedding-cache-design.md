@@ -378,9 +378,11 @@ def _to_tensor(self, arr: npt.NDArray[np.float32]) -> "torch.Tensor":
   - **OpenAI:** keep `ValueError` on empty; prepend prompt if present; run sync/async path; return float32.
   - **vLLM:** keep `ValueError` on empty; prepend prompt if present; `model.encode`; stack float32.
   - **HashingVectorizer:** ignore prompt (as today, so `_embed_uncached`'s `prompt` param is unused →
-    `# noqa: ARG002`); transform → dense float32; **keep returning `(0, dim)` for empty input** (no
-    behavior change). Sets `supports_cache = False` so it is never cached (preserving today's behavior and
-    avoiding ~1 MB BLOBs).
+    `# noqa: ARG002`); transform → dense float32. **Empty input returns a `(0, n_features)` array** via an
+    explicit guard — note sklearn's `HashingVectorizer.transform([])` actually raises `StopIteration`
+    (sklearn ≥1.5), which the old `embed` propagated; the guard makes empty input graceful (this is the
+    one small, deliberate behavior improvement, pinned by a regression test in §6.3). Sets
+    `supports_cache = False` so it is never cached (avoiding ~1 MB BLOBs).
 - **`FakeOpenaiEmbeddingBackend`** is migrated to implement `_embed_uncached(utterances, prompt)` and
   **inherit** the template `embed`. It also re-declares `config: OpenaiEmbeddingConfig` (the narrowing from
   the ABC change). Its body uses the **passed `prompt`** directly (it must NOT call `get_prompt(task_type)`
