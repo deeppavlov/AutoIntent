@@ -136,14 +136,21 @@ class BertScorer(BaseScorer):
         label2id = {str(i): i for i in range(self._n_classes)}
         id2label = {i: str(i) for i in range(self._n_classes)}
 
+        # transformers v5 + PEFT triggers find_adapter_config_file on every
+        # from_pretrained; it propagates _commit_hash for the cache lookup but
+        # NOT the outer `revision` to the fall-through hf_hub_download
+        # (auto_factory.py:308 only forwards adapter_kwargs). Set revision
+        # explicitly via adapter_kwargs so the adapter probe stays pinned.
+        revision = self.classification_model_config.revision
         return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
-            revision=self.classification_model_config.revision,
+            revision=revision,
             num_labels=self._n_classes,
             label2id=label2id,
             id2label=id2label,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+            adapter_kwargs={"revision": revision} if revision is not None else None,
         )
 
     def fit(
