@@ -43,7 +43,7 @@ class TestSentenceTransformerBackend:
         # cannot see the mutation inside `.embed()`. The post-call assert is
         # the whole point of this test (lazy load: None -> non-None).
         assert st_backend._model is not None
-        assert embeddings.shape == (1, st_backend._model.get_sentence_embedding_dimension())  # type: ignore[unreachable]
+        assert embeddings.shape == (1, st_backend._model.get_embedding_dimension())  # type: ignore[unreachable]
 
     def test_clear_ram(self, st_backend: SentenceTransformerEmbeddingBackend) -> None:
         """Test clearing model from RAM."""

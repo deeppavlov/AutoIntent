@@ -136,7 +136,13 @@ class Ranker:
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            self._hook_handler = self.cross_encoder.model.classifier.register_forward_hook(self._classifier_hook)
+            # sentence-transformers v5 restructured CrossEncoder into a nn.Sequential
+            # of modules: cross_encoder[0] is a Transformer wrapping the underlying
+            # AutoModelForSequenceClassification (exposed as .auto_model). The
+            # classifier head still lives on that HF model.
+            self._hook_handler = self.cross_encoder[0].auto_model.classifier.register_forward_hook(
+                self._classifier_hook
+            )
 
     def _classifier_hook(self, _module, input_tensor, _output_tensor) -> None:  # type: ignore[no-untyped-def] # noqa: ANN001
         """Hook to capture classifier activations.
@@ -163,7 +169,7 @@ class Ranker:
                 self.cross_encoder.predict(
                     pairs,
                     batch_size=self.config.batch_size,
-                    activation_fct=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),
+                    activation_fn=nn.Sigmoid() if self.output_range == "sigmoid" else nn.Tanh(),
                 )
             )
 
@@ -311,7 +317,10 @@ class Ranker:
 
     def clear_ram(self) -> None:
         """Clear model from RAM and GPU memory."""
-        self.cross_encoder.model.cpu()
+        # sentence-transformers v5 CrossEncoder is itself a nn.Sequential, so we
+        # call .cpu() on the wrapper directly instead of the (now-absent)
+        # underlying `.model` attribute.
+        self.cross_encoder.cpu()
         del self.cross_encoder
         gc.collect()
         torch.cuda.empty_cache()

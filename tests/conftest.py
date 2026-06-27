@@ -25,39 +25,6 @@ if TYPE_CHECKING:
     from autointent.nodes import NodeOptimizer
 
 
-def _disable_transformers_mistral_regex_patch() -> None:
-    # transformers.PreTrainedTokenizerBase._patch_mistral_regex calls
-    # huggingface_hub.model_info() for every tokenizer load with vocab > 100k
-    # (e.g. XLM-RoBERTa-based models like intfloat/multilingual-e5-*). On CI
-    # that uncacheable API call hammers the HF rate limit (429s). Tests never
-    # load mistralai tokenizers, so the correction is pure overhead — replace
-    # it with a no-op for the whole test session.
-    #
-    # Upstream bug & fix (merged for transformers 5.0.0+, NOT backported to 4.x):
-    #   https://github.com/huggingface/transformers/issues/44843
-    #   https://github.com/huggingface/transformers/pull/45444
-    # Drop this workaround when we upgrade to transformers>=5.0:
-    #   https://github.com/deeppavlov/AutoIntent/issues/295
-    try:
-        from transformers import tokenization_utils_base
-    except ImportError:
-        return
-
-    base = getattr(tokenization_utils_base, "PreTrainedTokenizerBase", None)
-    if base is None or not hasattr(base, "_patch_mistral_regex"):
-        return
-
-    def _noop_patch_mistral_regex(  # type: ignore[no-untyped-def]  # reason: monkey-patched into transformers internal classmethod; transformers is in ignore_missing_imports so signature types are unavailable
-        cls, tokenizer, *args, **kwargs
-    ):
-        return tokenizer
-
-    base._patch_mistral_regex = classmethod(_noop_patch_mistral_regex)
-
-
-_disable_transformers_mistral_regex_patch()
-
-
 def get_dataset_path() -> Path:
     return cast("Path", ires.files("tests.assets.data").joinpath("clinc_subset.json"))
 
