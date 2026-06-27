@@ -159,7 +159,7 @@ def tiny_sentence_transformer() -> SentenceTransformer:
 
     from autointent.configs._pinned_revisions import DEFAULT_REVISIONS
 
-    return SentenceTransformer(TINY_SENTENCE_TRANSFORMER, revision=DEFAULT_REVISIONS[TINY_SENTENCE_TRANSFORMER])
+    return SentenceTransformer(TINY_SENTENCE_TRANSFORMER, revision=DEFAULT_REVISIONS[TINY_SENTENCE_TRANSFORMER])  # type: ignore[no-any-return]
 
 
 def apply_test_models(pipeline: Pipeline) -> None:

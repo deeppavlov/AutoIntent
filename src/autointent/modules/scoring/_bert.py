@@ -130,8 +130,8 @@ class BertScorer(BaseScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         from transformers import AutoModelForSequenceClassification
 
-        label2id = {i: i for i in range(self._n_classes)}
-        id2label = {i: i for i in range(self._n_classes)}
+        label2id = {str(i): i for i in range(self._n_classes)}
+        id2label = {i: str(i) for i in range(self._n_classes)}
 
         return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
@@ -152,7 +152,7 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+        self._tokenizer = AutoTokenizer.from_pretrained(
             self.classification_model_config.model_name, revision=self.classification_model_config.revision
         )
         self._model = self._initialize_model()
