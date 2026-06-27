@@ -136,10 +136,8 @@ class Ranker:
         if classifier_head is not None or self.config.train_head:
             self._train_head = True
             self._activations_list: list[npt.NDArray[Any]] = []
-            # sentence-transformers v5 restructured CrossEncoder into a nn.Sequential
-            # of modules: cross_encoder[0] is a Transformer wrapping the underlying
-            # AutoModelForSequenceClassification (exposed as .auto_model). The
-            # classifier head still lives on that HF model.
+            # CrossEncoder is a nn.Sequential of modules; [0] is the Transformer
+            # wrapping the HF model exposed as .auto_model.
             self._hook_handler = self.cross_encoder[0].auto_model.classifier.register_forward_hook(
                 self._classifier_hook
             )
@@ -317,9 +315,6 @@ class Ranker:
 
     def clear_ram(self) -> None:
         """Clear model from RAM and GPU memory."""
-        # sentence-transformers v5 CrossEncoder is itself a nn.Sequential, so we
-        # call .cpu() on the wrapper directly instead of the (now-absent)
-        # underlying `.model` attribute.
         self.cross_encoder.cpu()
         del self.cross_encoder
         gc.collect()

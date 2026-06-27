@@ -104,7 +104,7 @@ def test_resolve_recurses_into_nested_extra(monkeypatch: pytest.MonkeyPatch) -> 
     _patch_metadata(
         monkeypatch,
         {
-            "autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"],
+            "autointent": ["transformers[torch]>=5.0.0,<6.0.0 ; extra == 'transformers'"],
             "transformers": [
                 "torch>=2.2 ; extra == 'torch'",
                 "accelerate>=0.26.0 ; extra == 'torch'",
@@ -180,13 +180,13 @@ def test_require_detects_missing_nested_accelerate(monkeypatch: pytest.MonkeyPat
     _patch_metadata(
         monkeypatch,
         {
-            "autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"],
+            "autointent": ["transformers[torch]>=5.0.0,<6.0.0 ; extra == 'transformers'"],
             "transformers": [
                 "torch>=2.2 ; extra == 'torch'",
                 "accelerate>=0.26.0 ; extra == 'torch'",
             ],
         },
-        {"transformers": "4.49.0", "torch": "2.2.0"},  # accelerate absent
+        {"transformers": "5.0.0", "torch": "2.2.0"},  # accelerate absent
     )
     with pytest.raises(ImportError) as exc:
         deps.require("transformers")
@@ -200,7 +200,7 @@ def test_require_reports_extra_package_entirely_missing(monkeypatch: pytest.Monk
     # `transformers[torch]` requirement is flagged as missing with the install hint.
     _patch_metadata(
         monkeypatch,
-        {"autointent": ["transformers[torch]>=4.49.0,<5.0.0 ; extra == 'transformers'"]},
+        {"autointent": ["transformers[torch]>=5.0.0,<6.0.0 ; extra == 'transformers'"]},
         {},  # transformers (and everything else) absent
     )
     with pytest.raises(ImportError) as exc:
