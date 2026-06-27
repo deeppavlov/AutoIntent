@@ -154,7 +154,15 @@ class PTuningScorer(BertScorer):
         model = super()._initialize_model()
         from peft import get_peft_model
 
-        return get_peft_model(model, self._ptuning_config)
+        peft_model = get_peft_model(model, self._ptuning_config)
+        # PEFT's save_pretrained vocab-check (save_and_load.py:380-384) calls
+        # AutoConfig.from_pretrained(base_model_name_or_path) with no revision
+        # during every Trainer checkpoint. On a cold cache this falls through
+        # to an unpinned hf_hub_download. Clearing base_model_name_or_path
+        # short-circuits the check; our dumper saves the base model
+        # separately (HFModelDumper), so the adapter doesn't need to remember it.
+        peft_model.peft_config["default"].base_model_name_or_path = ""
+        return peft_model
 
     def dump(self, path: str) -> None:
         from peft import PromptEncoderConfig
