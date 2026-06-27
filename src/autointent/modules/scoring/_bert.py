@@ -130,6 +130,9 @@ class BertScorer(BaseScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         from transformers import AutoModelForSequenceClassification
 
+        # huggingface_hub v1 StrictDataclass requires label2id keys to be str
+        # (and id2label values to be str); int-keyed dicts raise
+        # StrictDataclassFieldValidationError on from_pretrained in v5.
         label2id = {str(i): i for i in range(self._n_classes)}
         id2label = {i: str(i) for i in range(self._n_classes)}
 
