@@ -32,6 +32,8 @@ TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 OUTPUT_JSON="$OUTPUT_DIR/banking77_$TIMESTAMP.json"
 LOG_FILE="$OUTPUT_DIR/banking77_$TIMESTAMP.log"
 
+export WANDB_PROJECT="autointent_feasibility"
+
 mkdir -p "$OUTPUT_DIR"
 
 # Assemble optional flags.

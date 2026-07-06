@@ -274,12 +274,12 @@ class _ModuleTracker(OptimizerCallback):
         pass
 
 
-def _attach_tracker(pipeline: Pipeline, tracker: _ModuleTracker) -> None:
-    """Instance-patch ``pipeline._fit`` so ``tracker`` is appended to the callback chain."""
+def _attach_callbacks(pipeline: Pipeline, callbacks: list[OptimizerCallback]) -> None:
+    """Instance-patch ``pipeline._fit`` to append ``callbacks`` to the callback chain."""
     original_fit = pipeline._fit  # noqa: SLF001
 
     def patched(context: Any) -> Any:  # noqa: ANN401
-        context.callback_handler.callbacks.append(tracker)
+        context.callback_handler.callbacks.extend(callbacks)
         return original_fit(context)
 
     pipeline._fit = patched  # type: ignore[method-assign]  # noqa: SLF001
@@ -288,16 +288,10 @@ def _attach_tracker(pipeline: Pipeline, tracker: _ModuleTracker) -> None:
 # === per-preset run ======================================================
 
 
-def _override_trials(pipeline: Pipeline, max_trials: int | None, *, enable_wandb: bool) -> None:
-    """Cap n_trials, disable dumping, optionally enable W&B for post-run analysis."""
-    updates: dict[str, Any] = {}
+def _override_trials(pipeline: Pipeline, max_trials: int | None) -> None:
+    """Cap n_trials and disable dumping for the calibration run."""
     if max_trials is not None:
-        updates["n_trials"] = max_trials
-    if enable_wandb:
-        # Trigger built-in per-run system-metrics collection in W&B.
-        updates["report_to"] = ["wandb"]
-    if updates:
-        pipeline.set_config(pipeline.hpo_config.model_copy(update=updates))
+        pipeline.set_config(pipeline.hpo_config.model_copy(update={"n_trials": max_trials}))
     # We don't want the calibration run to leave dumped module weights on disk.
     pipeline.set_config(LoggingConfig(dump_modules=False, clear_ram=True))
 
@@ -322,7 +316,7 @@ def _calibrate_one(
         row.error = f"from_preset failed: {e}"
         return row
 
-    _override_trials(pipeline, max_trials, enable_wandb=enable_wandb)
+    _override_trials(pipeline, max_trials)
 
     try:
         report: PreflightReport = run_preflight(
@@ -356,7 +350,15 @@ def _calibrate_one(
     _reset_vram_peak()
 
     tracker = _ModuleTracker()
-    _attach_tracker(pipeline, tracker)
+    callbacks: list[OptimizerCallback] = [tracker]
+    if enable_wandb:
+        try:
+            from autointent._callbacks.wandb import WandbCallback
+
+            callbacks.append(WandbCallback())
+        except ImportError as e:
+            row.notes.append(f"W&B requested but not available: {e}")
+    _attach_callbacks(pipeline, callbacks)
 
     is_mps = hardware.accelerator == "mps"
     start = time.perf_counter()
@@ -384,8 +386,8 @@ def _calibrate_one(
         "disk_download_gb": actual_disk_download_gb,
     }
     row.modules = tracker.records
-    if enable_wandb:
-        row.notes.append("W&B reporter enabled — inspect wandb.ai run group for per-step GPU/system metrics")
+    if enable_wandb and not any("W&B requested but not available" in n for n in row.notes):
+        row.notes.append("W&B reporter attached — inspect wandb.ai run group for per-step GPU/system metrics")
 
     def _ratio(actual: float | None, predicted: float) -> float | None:
         if actual is None or predicted <= 0:
