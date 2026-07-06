@@ -110,6 +110,16 @@ def _build_parser() -> argparse.ArgumentParser:
             "Requires ``wandb`` installed + ``WANDB_API_KEY`` in the environment."
         ),
     )
+    p.add_argument(
+        "--run-name",
+        type=str,
+        default=None,
+        help=(
+            "Suffix appended to each preset's LoggingConfig.run_name — the resulting "
+            "value is ``{preset}_{run_name}`` and is used by the LoggingHandler as the "
+            "W&B run group / on-disk dump directory name."
+        ),
+    )
     p.add_argument("-v", "--verbose", action="store_true")
     return p
 
@@ -288,12 +298,14 @@ def _attach_callbacks(pipeline: Pipeline, callbacks: list[OptimizerCallback]) ->
 # === per-preset run ======================================================
 
 
-def _override_trials(pipeline: Pipeline, max_trials: int | None) -> None:
-    """Cap n_trials and disable dumping for the calibration run."""
+def _override_trials(pipeline: Pipeline, max_trials: int | None, *, run_name: str | None = None) -> None:
+    """Cap n_trials and disable dumping. When ``run_name`` is set, tag the
+    ``LoggingConfig.run_name`` (used by W&B run groups / dump dir names)."""
     if max_trials is not None:
         pipeline.set_config(pipeline.hpo_config.model_copy(update={"n_trials": max_trials}))
     # We don't want the calibration run to leave dumped module weights on disk.
-    pipeline.set_config(LoggingConfig(dump_modules=False, clear_ram=True))
+    logging_config = LoggingConfig(dump_modules=False, clear_ram=True, run_name=run_name)
+    pipeline.set_config(logging_config)
 
 
 def _calibrate_one(
@@ -306,6 +318,7 @@ def _calibrate_one(
     skip_fit: bool,
     poll_interval_ms: int,
     enable_wandb: bool,
+    run_name: str | None,
 ) -> CalibrationRow:
     row = CalibrationRow(preset=preset)
 
@@ -316,7 +329,8 @@ def _calibrate_one(
         row.error = f"from_preset failed: {e}"
         return row
 
-    _override_trials(pipeline, max_trials)
+    tagged_run_name = f"{preset}_{run_name}" if run_name else None
+    _override_trials(pipeline, max_trials, run_name=tagged_run_name)
 
     try:
         report: PreflightReport = run_preflight(
@@ -509,6 +523,7 @@ def main(argv: list[str] | None = None) -> int:
             skip_fit=args.skip_fit,
             poll_interval_ms=args.poll_interval_ms,
             enable_wandb=args.wandb,
+            run_name=args.run_name,
         )
         rows.append(row)
 

@@ -11,6 +11,9 @@
 #   PRESETS      Space-separated preset names (default: every bundled preset)
 #   MAX_TRIALS   Cap for hpo_config.n_trials (default: unset -> preset default)
 #   WANDB        If non-empty, pass --wandb so system metrics land in wandb.ai
+#   RUN_NAME     Suffix appended to each preset's LoggingConfig.run_name — the
+#                resulting name is ``{preset}_{RUN_NAME}`` (default: unset ->
+#                autointent generates a random name)
 #   OUTPUT_DIR   Where JSON reports + logs land (default: ./calibration_runs)
 #   SKIP_FIT     If non-empty, only run preflight (no real fit) for a fast sanity check
 #
@@ -19,6 +22,7 @@
 #   MAX_TRIALS=3 scripts/run_calibration_banking77.sh              # quick sweep
 #   PRESETS="classic-light nn-medium" scripts/run_calibration_banking77.sh
 #   WANDB=1 MAX_TRIALS=5 scripts/run_calibration_banking77.sh
+#   RUN_NAME=calib_2026_07 WANDB=1 scripts/run_calibration_banking77.sh
 
 set -euo pipefail
 
@@ -46,6 +50,9 @@ if [[ -n "${WANDB:-}" ]]; then
 fi
 if [[ -n "${SKIP_FIT:-}" ]]; then
     EXTRA_FLAGS+=("--skip-fit")
+fi
+if [[ -n "${RUN_NAME:-}" ]]; then
+    EXTRA_FLAGS+=("--run-name" "$RUN_NAME")
 fi
 
 # Preset list: pull it from the advisor package at runtime unless overridden,
