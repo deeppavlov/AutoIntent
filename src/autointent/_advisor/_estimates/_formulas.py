@@ -202,6 +202,11 @@ def _ram_for_module(meta: ModelMeta, stats: DatasetStats) -> float:
     return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / _BYTES_PER_GB
 
 
+def _embedding_cache_disk_gb(n_samples: int, hidden_size: int) -> float:
+    """Disk footprint of one fp32 cached embedding file: ``n_samples x hidden_size x 4``."""
+    return (n_samples * hidden_size * 4) / _BYTES_PER_GB
+
+
 # Coefficients are dimensional (per-sample-per-feature-per-iteration seconds)
 # rather than empirically tuned constants — they give relative-cost ordering
 # across configurations and absolute ballpark wall-times.

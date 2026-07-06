@@ -29,6 +29,7 @@ from ._formulas import (
     _activations_gb_per_sample,
     _classify_severity,
     _embedder_dim,
+    _embedding_cache_disk_gb,
     _largest_embedder,
     _max_fitting_batch_size,
     _ram_for_catboost,
@@ -75,6 +76,27 @@ _TRANSFORMER_TRAINING_MODE = {
     "ptuning": "lora",
     "lora": "lora",
 }
+
+# Scorers that consume embeddings (cache key = model + utterances + prompt) but
+# don't train the encoder — embedder forward is shared via the persistent cache.
+_CACHE_HONORING_MODULES = frozenset(
+    {
+        "linear",
+        "catboost",
+        "knn",
+        "mlknn",
+        "retrieval",
+        "description_bi",
+        "description_cross",
+        "description_llm",
+    },
+)
+
+# Cache-honoring modules whose per-entry estimate already bundles the embedder
+# forward into `time_hours` (vs. classic linear/catboost which don't).
+_EMBEDDER_FORWARD_TRANSFORMER_MODULES = frozenset(
+    {"knn", "mlknn", "retrieval", "description_bi", "description_cross", "description_llm"},
+)
 
 
 @dataclass
@@ -241,6 +263,51 @@ def _estimate_classic_entry(
     )
 
 
+def _apply_embedding_cache(
+    module_estimates: list[_ModuleEstimate],
+    seen_models: dict[str, ModelMeta],
+    *,
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+) -> set[str]:
+    """Adjust ``module_estimates`` in-place for autointent's persistent embedding cache.
+
+    Per unique embedder, the first cache-honoring entry pays the forward; later
+    transformer entries get ``time_hours`` zeroed (cache hit), and classic
+    entries (linear/catboost) get a synthetic forward added since their
+    per-entry estimate doesn't include one.
+
+    Returns the set of unique embedder model names whose forward was charged.
+    """
+    paid: set[str] = set()
+    for me in module_estimates:
+        module = me.driver["module"]
+        if module not in _CACHE_HONORING_MODULES:
+            continue
+        model = me.driver["model"]
+        if model not in seen_models:  # synthetic / "(no embedder)" rows
+            continue
+        if model in paid:
+            if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
+                me.time_hours = 0.0
+                me.driver["time_hours"] = 0.0
+                me.driver["mode"] = f"{me.driver['mode']}+cached"
+        else:
+            paid.add(model)
+            if module in {"linear", "catboost"}:
+                forward_h = _time_for_transformer(
+                    n_trials=1,
+                    epochs=1,
+                    batch_size=32,
+                    n_samples=stats.n_samples,
+                    accelerator=hardware.accelerator,
+                )
+                me.time_hours += forward_h
+                me.driver["time_hours"] = round(me.time_hours, 2)
+                me.driver["mode"] = f"{me.driver['mode']}+embed"
+    return paid
+
+
 def _aggregate_disk(
     estimate: ResourceEstimate,
     seen_models: dict[str, ModelMeta],
@@ -248,8 +315,10 @@ def _aggregate_disk(
     *,
     dump_modules: bool,
     n_trials: int,
+    cached_embedders: set[str] | None = None,
+    stats: DatasetStats | None = None,
 ) -> None:
-    """Fold per-model download/cached sizes into ``estimate`` and apply dump-modules accounting."""
+    """Fold per-model download/cached/embedding-cache sizes into ``estimate``."""
     for meta in seen_models.values():
         if meta.cached_locally:
             estimate.disk_cached_gb += meta.disk_gb
@@ -259,6 +328,16 @@ def _aggregate_disk(
         # Each trial selects one variant per node, so per-trial dumped weights
         # are bounded by the heaviest module in each node, summed across nodes.
         estimate.disk_dump_gb = sum(node_max_weights.values()) * n_trials
+
+    if cached_embedders and stats is not None:
+        for name in cached_embedders:
+            meta = seen_models.get(name)
+            if meta is None:
+                continue
+            estimate.disk_embedding_cache_gb += _embedding_cache_disk_gb(
+                n_samples=stats.n_samples,
+                hidden_size=_embedder_dim(meta),
+            )
 
 
 def _emit_resource_findings(
@@ -296,12 +375,14 @@ def _emit_resource_findings(
         metric="ram",
     )
 
-    disk_total = estimate.disk_download_gb + estimate.disk_dump_gb
+    disk_total = estimate.disk_download_gb + estimate.disk_dump_gb + estimate.disk_embedding_cache_gb
     disk_msg = f"Disk ~{estimate.disk_download_gb:.1f} GB to download"
     if estimate.disk_cached_gb > 0:
         disk_msg += f", {estimate.disk_cached_gb:.1f} GB already cached"
     if estimate.disk_dump_gb > 0:
         disk_msg += f", +{estimate.disk_dump_gb:.1f} GB during training (dump_modules=True)"
+    if estimate.disk_embedding_cache_gb > 0:
+        disk_msg += f", +{estimate.disk_embedding_cache_gb:.2f} GB embedding cache"
     disk_msg += f" vs {hardware.free_disk_gb:.0f} GB free"
     report.add("resource", _classify_severity(disk_total, hardware.free_disk_gb), disk_msg, metric="disk")
 
@@ -383,6 +464,9 @@ def _resource_phase(
         if classic_estimate is not None:
             module_estimates.append(classic_estimate)
 
+    # Cache-aware time/disk: must run before the fold below.
+    cached_embedders = _apply_embedding_cache(module_estimates, seen_models, stats=stats, hardware=hardware)
+
     estimate = ResourceEstimate(parallel_factor=n_jobs)
     for me in module_estimates:
         estimate.vram_gb = max(estimate.vram_gb, me.vram_gb)
@@ -390,7 +474,15 @@ def _resource_phase(
         estimate.time_hours += me.time_hours
         estimate.drivers.append(me.driver)
 
-    _aggregate_disk(estimate, seen_models, node_max_weights, dump_modules=dump_modules, n_trials=n_trials)
+    _aggregate_disk(
+        estimate,
+        seen_models,
+        node_max_weights,
+        dump_modules=dump_modules,
+        n_trials=n_trials,
+        cached_embedders=cached_embedders,
+        stats=stats,
+    )
 
     # Flip low_confidence if any model fell back to the heuristic path (Hub
     # unreachable, repo missing safetensors metadata, local-path checkpoint).

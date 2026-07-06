@@ -270,11 +270,37 @@ class TestRunPreflightFeatures:
             n_samples=20,
             n_classes=5,
             avg_tokens=10,
-            rare_classes=["intent_a", "intent_b"],
+            class_counts={"intent_a": 1, "intent_b": 2, "intent_c": 6, "intent_d": 6, "intent_e": 5},
         )
         report = run_preflight(cfg, stats, _profile())
         assert any(
-            f.phase == "data" and "LogisticRegressionCV" in f.message and f.severity == Severity.OVER
+            f.phase == "data" and "LogisticRegressionCV (cv=3)" in f.message and f.severity == Severity.OVER
+            for f in report.findings
+        )
+
+    def test_rare_classes_threshold_follows_entry_cv(self) -> None:
+        """When a linear entry sets cv=5, classes with 4 samples should still fail."""
+        cfg = {
+            "search_space": [
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {"module_name": "linear", "cv": 5},
+                    ],
+                }
+            ]
+        }
+        # All classes have >=3 samples, so a cv=3 check would pass — but cv=5
+        # needs >=5, so intent_a (4 samples) must be flagged.
+        stats = DatasetStats(
+            n_samples=20,
+            n_classes=3,
+            avg_tokens=10,
+            class_counts={"intent_a": 4, "intent_b": 8, "intent_c": 8},
+        )
+        report = run_preflight(cfg, stats, _profile())
+        assert any(
+            f.phase == "data" and "cv=5" in f.message and "intent_a" in f.message
             for f in report.findings
         )
 
@@ -407,7 +433,9 @@ class TestLinearCatboostFormulas:
         assert report.resource.ram_gb > 0
         assert report.resource.time_hours > 0
         assert cb["vram_gb"] == 0
-        assert cb["mode"] == "catboost"
+        # The "+embed" suffix is added when the embedder forward is folded into
+        # this classic entry via the embedding-cache adjustment.
+        assert cb["mode"].startswith("catboost")
 
     def test_catboost_gpu_moves_cost_to_vram(self) -> None:
         cfg = {
@@ -432,7 +460,9 @@ class TestLinearCatboostFormulas:
         cb = next(d for d in report.resource.drivers if d["module"] == "catboost")
         assert report.resource.vram_gb > 0
         assert cb["ram_gb"] == 0
-        assert cb["mode"] == "catboost-gpu"
+        # The "+embed" suffix is added when the embedder forward is folded into
+        # this classic entry via the embedding-cache adjustment.
+        assert cb["mode"].startswith("catboost-gpu")
 
     def test_linear_scales_with_n_samples(self) -> None:
         cfg = {
@@ -599,3 +629,103 @@ class TestDumpModulesBounding:
         bert = _hub.resolve_model("microsoft/deberta-v3-small")
         expected = (embedder.weights_gb + bert.weights_gb) * 2
         assert report.resource.disk_dump_gb == pytest.approx(expected, rel=0.01)
+
+
+class TestEmbeddingCache:
+    """Cache-aware time + disk accounting for embedder-honoring scorers.
+
+    autointent's ``SentenceTransformerEmbedding`` (``use_cache=True`` by default)
+    persists per-(model, utterances, prompt) embeddings to disk, so subsequent
+    trials/modules that reuse the same embedder hit the cache instead of
+    re-running the forward pass.
+    """
+
+    def _embedder_node(self) -> dict[str, Any]:
+        return {
+            "node_type": "embedder",
+            "search_space": [
+                {
+                    "module_name": "sentence_transformer",
+                    "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
+                }
+            ],
+        }
+
+    def test_duplicate_knn_entries_zero_time_after_first(self) -> None:
+        """Two knn entries sharing an embedder: the second one's forward is free."""
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "knn",
+                            "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
+                            "batch_size": [32],
+                            "max_length": [128],
+                        },
+                        {
+                            "module_name": "knn",
+                            "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
+                            "batch_size": [32],
+                            "max_length": [128],
+                        },
+                    ],
+                },
+            ],
+            "hpo_config": {"n_trials": 5},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        knn_drivers = [d for d in report.resource.drivers if d["module"] == "knn"]
+        assert len(knn_drivers) == 2
+        first, second = knn_drivers
+        assert first["time_hours"] > 0
+        assert second["time_hours"] == 0
+        assert "cached" in second["mode"]
+
+    def test_classic_entry_gets_synthetic_embedder_forward(self) -> None:
+        """A linear scorer alone with an embedder: the embedder forward is added once."""
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear"}],
+                },
+            ],
+            "hpo_config": {"n_trials": 3},
+        }
+        # Re-run with the embedder node removed to compare cleanly.
+        cfg_no_embed = {
+            "search_space": [
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear"}],
+                },
+            ],
+            "hpo_config": {"n_trials": 3},
+        }
+        with_embed = run_preflight(cfg, DatasetStats.placeholder(n_samples=10_000), _profile())
+        no_embed = run_preflight(cfg_no_embed, DatasetStats.placeholder(n_samples=10_000), _profile())
+        # The linear row gets a "+embed" suffix when an embedder is present.
+        linear_with = next(d for d in with_embed.resource.drivers if d["module"] == "linear")
+        linear_no = next(d for d in no_embed.resource.drivers if d["module"] == "linear")
+        assert "embed" in linear_with["mode"]
+        assert linear_with["time_hours"] >= linear_no["time_hours"]
+
+    def test_disk_embedding_cache_scales_with_n_samples(self) -> None:
+        """``disk_embedding_cache_gb`` ~ n_samples × hidden_size × 4 bytes per embedder."""
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [{"module_name": "linear"}],
+                },
+            ],
+        }
+        small = run_preflight(cfg, DatasetStats.placeholder(n_samples=1_000), _profile())
+        big = run_preflight(cfg, DatasetStats.placeholder(n_samples=1_000_000), _profile())
+        assert small.resource.disk_embedding_cache_gb > 0
+        assert big.resource.disk_embedding_cache_gb > small.resource.disk_embedding_cache_gb * 100

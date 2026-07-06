@@ -33,6 +33,7 @@ class ResourceEstimate:
     disk_download_gb: float = 0.0
     disk_cached_gb: float = 0.0
     disk_dump_gb: float = 0.0
+    disk_embedding_cache_gb: float = 0.0
     ram_gb: float = 0.0
     vram_gb: float = 0.0
     time_hours: float = 0.0
@@ -41,7 +42,7 @@ class ResourceEstimate:
 
     @property
     def total_disk_gb(self) -> float:
-        return self.disk_download_gb + self.disk_dump_gb
+        return self.disk_download_gb + self.disk_dump_gb + self.disk_embedding_cache_gb
 
 
 @dataclass
@@ -57,7 +58,8 @@ class DatasetStats:
     p95_tokens: int | None = None
     multilabel: bool = False
     has_descriptions: bool | None = None
-    rare_classes: list[str] = field(default_factory=list)
+    # Per-class train-split sample counts; empty when no real dataset was provided.
+    class_counts: dict[str, int] = field(default_factory=dict)
     source: str = "placeholder"
 
     @classmethod

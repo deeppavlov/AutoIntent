@@ -27,6 +27,8 @@ from .runner import run_preflight
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from autointent import Dataset
+
     from ._report import PreflightReport
 
 
@@ -92,8 +94,46 @@ def stats_from_dataset(path: str, *, multilabel: bool = False) -> DatasetStats:
         p95_tokens=p95,
         multilabel=detected_multilabel,
         has_descriptions=None,
-        rare_classes=_rare_classes(train, label_col, detected_multilabel, n_classes) if label_col else [],
+        class_counts=_class_counts(train, label_col, detected_multilabel, n_classes) if label_col else {},
         source=f"dataset:{path}",
+    )
+
+
+def stats_from_dataset_obj(dataset: Dataset) -> DatasetStats:
+    """Build :class:`DatasetStats` straight from an in-memory ``Dataset``.
+
+    Counterpart of :func:`stats_from_dataset` that skips HF ``load_dataset``
+    and reads the train split + autointent-specific attributes (``n_classes``,
+    ``multilabel``, ``has_descriptions``) directly.
+    """
+    from autointent.custom_types import Split
+
+    train_key = Split.TRAIN if Split.TRAIN in dataset else f"{Split.TRAIN}_0"
+    if train_key not in dataset:
+        return DatasetStats.placeholder()
+    train = dataset[train_key]
+    utt_col = dataset.utterance_feature
+    label_col = dataset.label_feature
+
+    sample = train[:_SAMPLE_LIMIT] if len(train) > _SAMPLE_LIMIT else train[:]
+    lengths = [len(str(s).split()) for s in sample.get(utt_col, [])]
+    avg_tokens = int(sum(lengths) / max(1, len(lengths))) if lengths else 32
+    if lengths:
+        sorted_lengths = sorted(lengths)
+        idx = max(0, min(len(sorted_lengths) - 1, round((len(sorted_lengths) - 1) * _P95_PERCENTILE)))
+        p95 = sorted_lengths[idx]
+    else:
+        p95 = avg_tokens * 2
+
+    return DatasetStats(
+        n_samples=len(train),
+        n_classes=dataset.n_classes,
+        avg_tokens=avg_tokens,
+        p95_tokens=p95,
+        multilabel=dataset.multilabel,
+        has_descriptions=dataset.has_descriptions,
+        class_counts=_class_counts(train, label_col, dataset.multilabel, dataset.n_classes),
+        source="dataset:in-memory",
     )
 
 
@@ -119,22 +159,17 @@ def _label_shape(train: Any, label_col: str | None, *, fallback_multilabel: bool
     return False, len({label for label in train[label_col] if label is not None})
 
 
-def _rare_classes(
+def _class_counts(
     train: Any,  # noqa: ANN401
     label_col: str,
     multilabel: bool,
     n_classes: int,
-    min_count: int = 3,
-) -> list[str]:
-    """Return labels with fewer than ``min_count`` samples in the train split.
-
-    Used to surface the LogisticRegressionCV(cv=3) failure case before fit.
-    Returns an empty list on any error so the advisor stays best-effort.
-    """
+) -> dict[str, int]:
+    """Per-class sample counts in the train split; empty on any error."""
     try:
         labels = train[label_col]
     except (KeyError, AttributeError, TypeError):
-        return []
+        return {}
     counts: dict[str, int] = {}
     if multilabel:
         for row in labels:
@@ -148,7 +183,7 @@ def _rare_classes(
     else:
         for label in labels:
             counts[str(label)] = counts.get(str(label), 0) + 1
-    return sorted(name for name, c in counts.items() if c < min_count)
+    return counts
 
 
 def inspect(

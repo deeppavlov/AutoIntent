@@ -5,13 +5,19 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import yaml
 from typing_extensions import assert_never
 
 from autointent import Context, OptimizationConfig
+from autointent._advisor import (
+    Severity,
+    detect_hardware,
+    run_preflight,
+    stats_from_dataset_obj,
+)
 from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
@@ -34,8 +40,21 @@ from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
     from autointent import Dataset
+    from autointent._advisor import PreflightReport
     from autointent.custom_types import ListOfGenericLabels, SearchSpacePreset, SearchSpaceValidationMode
     from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
+
+
+PreflightMode = Literal["off", "warn", "strict"]
+
+
+class PreflightError(RuntimeError):
+    """Raised when ``Pipeline.fit(preflight="strict")`` finds OVER-budget resources."""
+
+    def __init__(self, findings: list[Any]) -> None:
+        self.findings = findings
+        lines = "\n".join(f"  [{f.phase}] {f.message}" for f in findings)
+        super().__init__(f"Preflight check failed with {len(findings)} OVER finding(s):\n{lines}")
 
 
 class Pipeline:
@@ -152,6 +171,40 @@ class Pipeline:
         pipeline.set_config(optimization_config.hpo_config)
         return pipeline
 
+    def _build_advisor_config(self) -> dict[str, Any]:
+        """Reconstruct an ``OptimizationConfig``-shaped dict for the advisor."""
+        search_space = [
+            {"node_type": opt.node_type, "search_space": opt.modules_search_spaces}
+            for opt in self.nodes.values()
+            if isinstance(opt, NodeOptimizer)
+        ]
+        return {
+            "search_space": search_space,
+            "data_config": self.data_config.model_dump(),
+            "logging_config": self.logging_config.model_dump(),
+            "embedder_config": self.embedder_config.model_dump(),
+            "cross_encoder_config": self.cross_encoder_config.model_dump(),
+            "transformer_config": self.transformer_config.model_dump(),
+            "hpo_config": self.hpo_config.model_dump(),
+        }
+
+    def _run_preflight(self, dataset: Dataset, *, refit_after: bool, mode: PreflightMode) -> PreflightReport:
+        """Run the advisor against this pipeline's effective config + dataset.
+
+        Logs each finding at INFO/WARNING/ERROR (by severity). When ``mode`` is
+        ``"strict"`` and any OVER finding is produced, raises ``PreflightError``.
+        """
+        config = self._build_advisor_config()
+        stats = stats_from_dataset_obj(dataset)
+        hardware = detect_hardware()
+        report = run_preflight(config, stats, hardware, refit_after=refit_after)
+        _log_preflight_report(report, self._logger)
+        if mode == "strict":
+            over = [f for f in report.findings if f.severity == Severity.OVER]
+            if over:
+                raise PreflightError(over)
+        return report
+
     def _fit(self, context: Context) -> None:
         """Optimize the pipeline.
 
@@ -193,6 +246,7 @@ class Pipeline:
         dataset: Dataset,
         refit_after: bool = False,
         incompatible_search_space: SearchSpaceValidationMode = "filter",
+        preflight: PreflightMode = "warn",
     ) -> Context:
         """Optimize the pipeline from dataset.
 
@@ -201,13 +255,23 @@ class Pipeline:
             refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
             sampler: sampler type to use.
             incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
+            preflight: gate that runs :func:`autointent._advisor.run_preflight` over the
+                pipeline's effective config + dataset before any heavy work.
+                ``"off"`` skips it. ``"warn"`` (default) logs findings — INFO for
+                AMPLE, WARNING for TIGHT, ERROR for OVER — but never raises.
+                ``"strict"`` additionally raises :class:`PreflightError` when any
+                finding has severity OVER, so unfeasible runs abort before fit.
 
         Raises:
             RuntimeError: If pipeline is in inference mode.
+            PreflightError: If ``preflight="strict"`` and any OVER finding is produced.
         """
         if self._is_inference():
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
+
+        if preflight != "off":
+            self._run_preflight(dataset, refit_after=refit_after, mode=preflight)
 
         context = Context(self._seed)
         context.set_dataset(dataset, self.data_config)
@@ -472,3 +536,18 @@ def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     messages = [json.dumps(c, indent=4) for c in configs]
     msg = "\n".join(messages)
     return "resulting pipeline configuration is the following:\n" + msg
+
+
+def _log_preflight_report(report: PreflightReport, logger: logging.Logger) -> None:
+    """Log each preflight finding at the appropriate level."""
+    level_for = {
+        Severity.AMPLE: logging.INFO,
+        Severity.TIGHT: logging.WARNING,
+        Severity.OVER: logging.ERROR,
+    }
+    header = f"Preflight ({report.preset_name or 'pipeline'}): verdict={'feasible' if report.is_feasible else 'INFEASIBLE'}"
+    logger.info(header)
+    for finding in report.findings:
+        logger.log(level_for[finding.severity], "[%s] %s", finding.phase, finding.message)
+    if report.low_confidence:
+        logger.info("Preflight: low-confidence (heuristic fallback in use)")

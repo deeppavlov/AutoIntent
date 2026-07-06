@@ -149,15 +149,24 @@ def _data_phase(
                 f"Train tokens p95~{p95} exceeds {module_name}.max_length={max_len}; expect silent truncation.",
             )
 
-    # rare class x linear-CV (LogisticRegressionCV cv=3 needs >=3 samples/class;
-    # multilabel path uses one-vs-rest without CV so the failure can't occur there)
-    has_linear = any(e.get("module_name") == "linear" for _, e in _walk_modules(search_space))
-    if has_linear and stats.rare_classes and not stats.multilabel:
-        report.add(
-            "data",
-            Severity.OVER,
-            f"LogisticRegressionCV (cv=3) will fail: classes {stats.rare_classes[:5]} have <3 samples.",
-        )
+    # sklearn LogisticRegressionCV inner-CV failure: each class needs >= cv samples.
+    # cv is configurable per linear entry (default 3); use the strictest one across
+    # the search space. Multilabel uses LogisticRegression (no CV), so skip there.
+    if not stats.multilabel and stats.class_counts:
+        linear_cvs = [
+            _max_int(e.get("cv"), 3)
+            for _, e in _walk_modules(search_space)
+            if e.get("module_name") == "linear"
+        ]
+        if linear_cvs:
+            cv_max = max(linear_cvs)
+            failing = sorted(name for name, count in stats.class_counts.items() if count < cv_max)
+            if failing:
+                report.add(
+                    "data",
+                    Severity.OVER,
+                    f"LogisticRegressionCV (cv={cv_max}) will fail: classes {failing[:5]} have <{cv_max} samples.",
+                )
 
     # partial descriptions x description scorer
     description_modules = {"description_bi", "description_cross", "description_llm"}
