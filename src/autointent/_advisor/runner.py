@@ -154,9 +154,7 @@ def _data_phase(
     # the search space. Multilabel uses LogisticRegression (no CV), so skip there.
     if not stats.multilabel and stats.class_counts:
         linear_cvs = [
-            _max_int(e.get("cv"), 3)
-            for _, e in _walk_modules(search_space)
-            if e.get("module_name") == "linear"
+            _max_int(e.get("cv"), 3) for _, e in _walk_modules(search_space) if e.get("module_name") == "linear"
         ]
         if linear_cvs:
             cv_max = max(linear_cvs)

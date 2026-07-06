@@ -57,9 +57,7 @@ def test_preflight_warn_logs_findings(dataset: Dataset, caplog: pytest.LogCaptur
     assert any("Preflight" in m and "verdict=" in m for m in msgs)
 
 
-def test_preflight_strict_raises_on_infeasible(
-    dataset: Dataset, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_preflight_strict_raises_on_infeasible(dataset: Dataset, monkeypatch: pytest.MonkeyPatch) -> None:
     """preflight='strict' raises PreflightError when findings include OVER.
 
     Forces a tiny hardware budget so even cheap presets blow it.
@@ -97,7 +95,7 @@ def test_pipeline_advisor_config_round_trip(dataset: Dataset) -> None:
     preset's search space (not silently empty).
     """
     p = _classic_light_pipeline()
-    config = p._build_advisor_config()  # noqa: SLF001
+    config = p._build_advisor_config()
     stats = stats_from_dataset_obj(dataset)
     hardware = detect_hardware()
 

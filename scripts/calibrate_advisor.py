@@ -43,7 +43,11 @@ from autointent._advisor import (
     stats_from_dataset_obj,
 )
 from autointent._callbacks.base import OptimizerCallback
-from autointent.configs import HPOConfig, LoggingConfig
+from autointent.configs import LoggingConfig
+from autointent import setup_logging
+
+setup_logging("INFO", log_filename="logs.log")
+logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger("calibrate_advisor")
 
@@ -175,14 +179,13 @@ class _PeakSampler:
 
     def _run(self) -> None:
         try:
-            import torch  # noqa: PLC0415
+            import torch
         except ImportError:
             torch = None  # type: ignore[assignment]
         while not self._stop.is_set():
             try:
                 rss = self._proc.memory_info().rss / _BYTES_PER_GB
-                if rss > self.peak_ram_gb:
-                    self.peak_ram_gb = rss
+                self.peak_ram_gb = max(self.peak_ram_gb, rss)
                 if self._sample_mps and torch is not None:
                     mps = float(torch.mps.current_allocated_memory()) / _BYTES_PER_GB
                     if self.peak_mps_gb is None or mps > self.peak_mps_gb:
@@ -227,11 +230,11 @@ class _ModuleTracker(OptimizerCallback):
 
     name = "calibration_tracker"
 
-    def __init__(self) -> None:  # noqa: D401
+    def __init__(self) -> None:
         self.records: list[dict[str, Any]] = []
         self._current: dict[str, Any] | None = None
 
-    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:  # noqa: ARG002
+    def start_run(self, run_name: str, dirpath: Path, log_interval_time: float) -> None:
         pass
 
     def start_module(self, module_name: str, num: int, module_kwargs: dict[str, Any]) -> None:
@@ -243,9 +246,7 @@ class _ModuleTracker(OptimizerCallback):
         except ImportError:
             pass
         # Only capture JSON-safe scalars in the config snapshot.
-        safe_config = {
-            k: v for k, v in module_kwargs.items() if isinstance(v, (str, int, float, bool)) or v is None
-        }
+        safe_config = {k: v for k, v in module_kwargs.items() if isinstance(v, (str, int, float, bool)) or v is None}
         self._current = {
             "module": module_name,
             "num": num,
@@ -253,10 +254,10 @@ class _ModuleTracker(OptimizerCallback):
             "_start": time.perf_counter(),
         }
 
-    def log_value(self, **kwargs: Any) -> None:  # noqa: ANN401, ARG002
+    def log_value(self, **kwargs: Any) -> None:  # noqa: ANN401
         pass
 
-    def log_metrics(self, metrics: dict[str, Any]) -> None:  # noqa: ARG002
+    def log_metrics(self, metrics: dict[str, Any]) -> None:
         pass
 
     def end_module(self) -> None:
@@ -280,7 +281,7 @@ class _ModuleTracker(OptimizerCallback):
     def end_run(self) -> None:
         pass
 
-    def log_final_metrics(self, metrics: dict[str, Any]) -> None:  # noqa: ARG002
+    def log_final_metrics(self, metrics: dict[str, Any]) -> None:
         pass
 
 
@@ -299,11 +300,15 @@ def _attach_callbacks(pipeline: Pipeline, callbacks: list[OptimizerCallback]) ->
 
 
 def _override_trials(pipeline: Pipeline, max_trials: int | None, *, run_name: str | None = None) -> None:
-    """Cap n_trials and disable dumping. When ``run_name`` is set, tag the
-    ``LoggingConfig.run_name`` (used by W&B run groups / dump dir names)."""
+    """Cap n_trials, force ``n_jobs=1`` (serial HPO to keep wall-time measurements clean
+    and to prevent CPU oversubscription with sklearn's own ``n_jobs``), disable dumping.
+    When ``run_name`` is set, tag ``LoggingConfig.run_name`` (used as the W&B group /
+    dump-dir name).
+    """
+    updates: dict[str, Any] = {"n_jobs": 1}
     if max_trials is not None:
-        pipeline.set_config(pipeline.hpo_config.model_copy(update={"n_trials": max_trials}))
-    # We don't want the calibration run to leave dumped module weights on disk.
+        updates["n_trials"] = max_trials
+    pipeline.set_config(pipeline.hpo_config.model_copy(update=updates))
     logging_config = LoggingConfig(dump_modules=False, clear_ram=True, run_name=run_name)
     pipeline.set_config(logging_config)
 
@@ -475,6 +480,25 @@ def _print_summary(rows: list[CalibrationRow]) -> None:
             print(f"      · {mod.get('module', '?')}#{mod.get('num', '?')}  {duration_s}  vram={vram_s}")
 
 
+def _apply_thread_cap() -> None:
+    """Cap torch intra-op threads to the same value as OMP_NUM_THREADS.
+
+    Env vars (OMP/MKL/OpenBLAS) MUST be set before Python starts to be effective —
+    that's the bash wrapper's job. This function is belt-and-braces: torch reads
+    OMP_NUM_THREADS on init, but ``set_num_threads`` also caps its C++ intra-op
+    pool if a caller forgets the env var.
+    """
+    n = int(os.environ.get("OMP_NUM_THREADS", "0") or 0)
+    if n <= 0:
+        return
+    try:
+        import torch
+
+        torch.set_num_threads(n)
+    except ImportError:
+        pass
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -482,6 +506,7 @@ def main(argv: list[str] | None = None) -> int:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(levelname)s %(name)s: %(message)s",
     )
+    _apply_thread_cap()
 
     presets = args.presets or list(BUNDLED_PRESETS)
     unknown = [p for p in presets if p not in BUNDLED_PRESETS]
@@ -509,6 +534,13 @@ def main(argv: list[str] | None = None) -> int:
         hardware.vram_gb,
         hardware.ram_gb,
         hardware.free_disk_gb,
+    )
+    logger.info(
+        "Thread caps: OMP=%s MKL=%s OPENBLAS=%s TOKENIZERS_PARALLELISM=%s",
+        os.environ.get("OMP_NUM_THREADS", "<unset>"),
+        os.environ.get("MKL_NUM_THREADS", "<unset>"),
+        os.environ.get("OPENBLAS_NUM_THREADS", "<unset>"),
+        os.environ.get("TOKENIZERS_PARALLELISM", "<unset>"),
     )
 
     rows: list[CalibrationRow] = []

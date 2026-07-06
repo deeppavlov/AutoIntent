@@ -299,10 +299,7 @@ class TestRunPreflightFeatures:
             class_counts={"intent_a": 4, "intent_b": 8, "intent_c": 8},
         )
         report = run_preflight(cfg, stats, _profile())
-        assert any(
-            f.phase == "data" and "cv=5" in f.message and "intent_a" in f.message
-            for f in report.findings
-        )
+        assert any(f.phase == "data" and "cv=5" in f.message and "intent_a" in f.message for f in report.findings)
 
     def test_truncation_red_when_p95_dominates_max_length(self) -> None:
         cfg = {

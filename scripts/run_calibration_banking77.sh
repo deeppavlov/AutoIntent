@@ -7,22 +7,27 @@
 # ``hpo_config.n_trials``.
 #
 # Environment overrides:
-#   DATASET      HF Hub repo id (default: DeepPavlov/banking77)
-#   PRESETS      Space-separated preset names (default: every bundled preset)
-#   MAX_TRIALS   Cap for hpo_config.n_trials (default: unset -> preset default)
-#   WANDB        If non-empty, pass --wandb so system metrics land in wandb.ai
-#   RUN_NAME     Suffix appended to each preset's LoggingConfig.run_name — the
-#                resulting name is ``{preset}_{RUN_NAME}`` (default: unset ->
-#                autointent generates a random name)
-#   OUTPUT_DIR   Where JSON reports + logs land (default: ./calibration_runs)
-#   SKIP_FIT     If non-empty, only run preflight (no real fit) for a fast sanity check
+#   DATASET          HF Hub repo id (default: DeepPavlov/banking77)
+#   PRESETS          Space-separated preset names (default: every bundled preset)
+#   MAX_TRIALS       Cap for hpo_config.n_trials (default: unset -> preset default)
+#   WANDB            If non-empty, pass --wandb so system metrics land in wandb.ai
+#   RUN_NAME         Suffix appended to each preset's LoggingConfig.run_name — the
+#                    resulting name is ``{preset}_{RUN_NAME}`` (default: unset ->
+#                    autointent generates a random name)
+#   OUTPUT_DIR       Where JSON reports + logs land (default: ./calibration_runs)
+#   SKIP_FIT         If non-empty, only run preflight (no real fit) — fast sanity check
+#   THREADS_PER_JOB  Cap for BLAS/OpenMP/torch intra-op threads per HPO trial
+#                    (default: 1). Increase carefully — sklearn's own ``n_jobs`` and
+#                    HPO parallelism multiply on top, so oversubscription is easy
+#                    on many-core boxes.
 #
 # Examples:
-#   scripts/run_calibration_banking77.sh                           # full sweep
+#   scripts/run_calibration_banking77.sh                           # full sweep, serial
 #   MAX_TRIALS=3 scripts/run_calibration_banking77.sh              # quick sweep
 #   PRESETS="classic-light nn-medium" scripts/run_calibration_banking77.sh
 #   WANDB=1 MAX_TRIALS=5 scripts/run_calibration_banking77.sh
 #   RUN_NAME=calib_2026_07 WANDB=1 scripts/run_calibration_banking77.sh
+#   THREADS_PER_JOB=4 scripts/run_calibration_banking77.sh         # 4-thread BLAS
 
 set -euo pipefail
 
@@ -37,6 +42,22 @@ OUTPUT_JSON="$OUTPUT_DIR/banking77_$TIMESTAMP.json"
 LOG_FILE="$OUTPUT_DIR/banking77_$TIMESTAMP.log"
 
 export WANDB_PROJECT="autointent_feasibility"
+
+# ---------------------------------------------------------------------------
+# CPU thread caps — set BEFORE python starts, because numpy/torch/sklearn read
+# them at import time. Without these, on a 16+ core box each BLAS-backed
+# operation defaults to N-thread pools which multiply with sklearn's own
+# ``n_jobs`` and HPO parallelism → the machine oversubscribes and stalls.
+# ---------------------------------------------------------------------------
+THREADS_PER_JOB="${THREADS_PER_JOB:-1}"
+export OMP_NUM_THREADS="$THREADS_PER_JOB"
+export MKL_NUM_THREADS="$THREADS_PER_JOB"
+export OPENBLAS_NUM_THREADS="$THREADS_PER_JOB"
+export NUMEXPR_NUM_THREADS="$THREADS_PER_JOB"
+# HF tokenizers deadlock on fork if left in parallel mode.
+export TOKENIZERS_PARALLELISM="${TOKENIZERS_PARALLELISM:-false}"
+# torch reads OMP_NUM_THREADS for intra-op, but set explicitly too — belt-and-braces.
+export PYTORCH_NUM_THREADS="$THREADS_PER_JOB"
 
 mkdir -p "$OUTPUT_DIR"
 
@@ -73,12 +94,13 @@ PY
     )
 fi
 
-echo "Repo:      $REPO_ROOT"
-echo "Dataset:   $DATASET"
-echo "Presets:   ${PRESET_ARR[*]}"
-echo "Output:    $OUTPUT_JSON"
-echo "Log:       $LOG_FILE"
-echo "Flags:     ${EXTRA_FLAGS[*]:-<none>}"
+echo "Repo:            $REPO_ROOT"
+echo "Dataset:         $DATASET"
+echo "Presets:         ${PRESET_ARR[*]}"
+echo "Output:          $OUTPUT_JSON"
+echo "Log:             $LOG_FILE"
+echo "Flags:           ${EXTRA_FLAGS[*]:-<none>}"
+echo "Threads per job: $THREADS_PER_JOB (OMP/MKL/OpenBLAS/torch)"
 echo
 
 uv run --no-sync python scripts/calibrate_advisor.py \

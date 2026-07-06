@@ -545,7 +545,9 @@ def _log_preflight_report(report: PreflightReport, logger: logging.Logger) -> No
         Severity.TIGHT: logging.WARNING,
         Severity.OVER: logging.ERROR,
     }
-    header = f"Preflight ({report.preset_name or 'pipeline'}): verdict={'feasible' if report.is_feasible else 'INFEASIBLE'}"
+    header = (
+        f"Preflight ({report.preset_name or 'pipeline'}): verdict={'feasible' if report.is_feasible else 'INFEASIBLE'}"
+    )
     logger.info(header)
     for finding in report.findings:
         logger.log(level_for[finding.severity], "[%s] %s", finding.phase, finding.message)
