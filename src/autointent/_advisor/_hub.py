@@ -20,8 +20,17 @@ Confidence = Literal["hub", "heuristic"]
 
 logger = logging.getLogger(__name__)
 
-_DEFAULT_HEURISTIC_PARAMS = 110_000_000
+# Conservative "large-model" shape used when Hub metadata is unavailable —
+# roughly deberta-v3-large / bert-large sized. Previously we defaulted to a
+# BERT-base shape (110M / 768 / 12), which *under*-predicted a real deberta-large
+# fit by ~2×. Because the advisor's contract is a pessimistic upper bound, the
+# offline fallback needs to over-estimate small models rather than under-estimate
+# large ones. Callers can still see the fallback happened via ``confidence ==
+# "heuristic"`` and ``PreflightReport.low_confidence``.
+_DEFAULT_HEURISTIC_PARAMS = 350_000_000
 _DEFAULT_BYTES_PER_PARAM = 4
+_DEFAULT_HEURISTIC_HIDDEN = 1024
+_DEFAULT_HEURISTIC_LAYERS = 24
 _BYTES_PER_GB = 1024**3  # using the binary GiB convention everywhere in the advisor
 
 
@@ -138,9 +147,15 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
     if hidden_size is None or n_layers is None:
         logger.warning(
             "Could not read hidden_size / num_hidden_layers from config.json for %s; "
-            "activation-memory estimates will fall back to BERT-base defaults (768 / 12).",
+            "activation-memory estimates will fall back to CONSERVATIVE large-model "
+            "defaults (hidden=%d, layers=%d) to avoid under-predicting.",
             model_name,
+            _DEFAULT_HEURISTIC_HIDDEN,
+            _DEFAULT_HEURISTIC_LAYERS,
         )
+        hidden_size = hidden_size or _DEFAULT_HEURISTIC_HIDDEN
+        n_layers = n_layers or _DEFAULT_HEURISTIC_LAYERS
+        confidence = "heuristic"
 
     return ModelMeta(
         name=model_name,
@@ -157,8 +172,12 @@ def _hub_metadata(model_name: str) -> ModelMeta | None:
 def _heuristic_metadata(model_name: str) -> ModelMeta:
     logger.warning(
         "Falling back to name-pattern heuristic for %s; "
-        "activation-memory estimates will use BERT-base defaults (hidden=768, layers=12).",
+        "using CONSERVATIVE large-model defaults (params=%dM, hidden=%d, layers=%d) "
+        "so cost estimates upper-bound rather than under-predict.",
         model_name,
+        _DEFAULT_HEURISTIC_PARAMS // 1_000_000,
+        _DEFAULT_HEURISTIC_HIDDEN,
+        _DEFAULT_HEURISTIC_LAYERS,
     )
     total_file_bytes = _DEFAULT_HEURISTIC_PARAMS * _DEFAULT_BYTES_PER_PARAM
     return ModelMeta(
@@ -168,6 +187,8 @@ def _heuristic_metadata(model_name: str) -> ModelMeta:
         total_file_bytes=total_file_bytes,
         cached_locally=_is_warm_cached(model_name),
         confidence="heuristic",
+        hidden_size=_DEFAULT_HEURISTIC_HIDDEN,
+        n_layers=_DEFAULT_HEURISTIC_LAYERS,
     )
 
 

@@ -253,7 +253,9 @@ class TestRunPreflightFeatures:
         }
         report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
         assert report.low_confidence is True
-        assert any("Heuristic fallback" in n for n in report.notes)
+        # Low-confidence used to be a note; it's now a prominent finding so
+        # reviewers of the report see it in the main findings block.
+        assert any("LOW CONFIDENCE" in f.message for f in report.findings)
 
     def test_rare_classes_with_linear_scorer_flag_red(self) -> None:
         cfg = {
@@ -673,7 +675,10 @@ class TestEmbeddingCache:
             ],
             "hpo_config": {"n_trials": 5},
         }
-        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        # Use a large placeholder so per-step FLOPs are enough to register as
+        # non-zero rounded time even for tiny MiniLM. Behavior we're testing is
+        # "first entry pays, second is cached" — needs first > 0 to be visible.
+        report = run_preflight(cfg, DatasetStats.placeholder(n_samples=1_000_000), _profile())
         knn_drivers = [d for d in report.resource.drivers if d["module"] == "knn"]
         assert len(knn_drivers) == 2
         first, second = knn_drivers
@@ -726,3 +731,41 @@ class TestEmbeddingCache:
         big = run_preflight(cfg, DatasetStats.placeholder(n_samples=1_000_000), _profile())
         assert small.resource.disk_embedding_cache_gb > 0
         assert big.resource.disk_embedding_cache_gb > small.resource.disk_embedding_cache_gb * 100
+
+    def test_warm_cache_probe_zeroes_forward_and_disk(self) -> None:
+        """When ``embedding_cache_probe`` reports the embedder is warm, the
+        advisor must predict 0 forward time AND 0 ``disk_embedding_cache_gb``
+        for that model — mirrors HF-weights ``cached_locally`` behavior."""
+        cfg = {
+            "search_space": [
+                self._embedder_node(),
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "knn",
+                            "embedder_config": [
+                                {"model_name": "sentence-transformers/all-MiniLM-L6-v2"}
+                            ],
+                            "batch_size": [32],
+                            "max_length": [128],
+                        }
+                    ],
+                },
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+        stats = DatasetStats.placeholder(n_samples=1_000_000)
+        cold = run_preflight(cfg, stats, _profile())
+        warm = run_preflight(cfg, stats, _profile(), embedding_cache_probe=lambda _name: True)
+
+        cold_knn = next(d for d in cold.resource.drivers if d["module"] == "knn")
+        warm_knn = next(d for d in warm.resource.drivers if d["module"] == "knn")
+
+        assert cold_knn["time_hours"] > 0
+        assert warm_knn["time_hours"] == 0
+        assert "warm" in warm_knn["mode"]
+        assert cold.resource.disk_embedding_cache_gb > 0
+        # Warm: forward wasn't charged → model isn't in ``cached_embedders`` →
+        # no disk_embedding_cache contribution.
+        assert warm.resource.disk_embedding_cache_gb == 0

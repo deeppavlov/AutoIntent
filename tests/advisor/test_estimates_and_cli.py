@@ -59,7 +59,29 @@ def test_heavy_preset_is_infeasible_on_2gb_budget() -> None:
     assert not report.is_feasible, "deberta-v3-large should not fit in 2 GB"
 
 
-def test_light_preset_is_feasible_on_8gb_budget() -> None:
+def test_light_preset_is_feasible_on_8gb_budget(monkeypatch: pytest.MonkeyPatch) -> None:
+    # This test runs under the offline fixture, which now returns
+    # ``_heuristic_metadata`` (conservative large-model shape) — that's
+    # deliberately pessimistic, so "light" would look infeasible on 8 GB.
+    # Restore small-model resolution just for this test so we're verifying
+    # the "light on 8 GB" contract, not the fallback pessimism.
+    from autointent._advisor import _hub
+
+    def _small_model(name: str) -> _hub.ModelMeta:
+        return _hub.ModelMeta(
+            name=name,
+            total_params=140_000_000,
+            weight_bytes_per_param=4,
+            total_file_bytes=140_000_000 * 4,
+            cached_locally=False,
+            confidence="hub",
+            hidden_size=768,
+            n_layers=6,
+        )
+
+    _hub.resolve_model.cache_clear()
+    monkeypatch.setattr(_hub, "resolve_model", _small_model)
+
     cfg = load_preset("transformers-light")
     stats = DatasetStats.placeholder(n_samples=1000, n_classes=10, avg_tokens=24)
     report = run_preflight(cfg, stats, _profile(vram_gb=8.0), preset_name="transformers-light")

@@ -83,18 +83,31 @@ def _activations_gb_per_sample(
     *,
     is_training: bool,
 ) -> float:
-    """Heuristic activation memory per sample, assuming a fp32 worst case.
+    """Heuristic activation memory per sample.
 
-    Training: ``seq_len x hidden x layers x const`` — per-layer outputs are kept
-    for backward.
-    Inference: ``seq_len x hidden x const`` — only one or two layers' outputs in
-    flight at once.
+    Training uses **34 bytes/token/layer** as a pessimistic upper bound —
+    Korthikanti et al. (2022, "Reducing Activation Recomputation ...") derive
+    this for standard attention: the linear-layer activations account for ~11B
+    and the attention matrix + intermediate tensors add ~23B. FlashAttention
+    kernels drop the attention-matrix term (~12 B/token/layer total), but we
+    can't detect at preflight time whether the user's stack will use them, so
+    the upper bound is the safe choice.
+
+    Inference: only 1-2 layers' outputs are kept in flight at once. 8 B/token
+    covers fp32 hidden (4B) plus a bit of intermediate slack.
+
+    An earlier revision used 16 B/token/layer for training; that under-predicted
+    real deberta-v3-large VRAM by ~2x at bs=128 (measured 13.1 GB, predicted
+    ~11.5 GB), which is unsafe for an OOM-avoidance tool. See ``interpretation.md``
+    (2026-07-19) for the calibration data.
     """
     hidden = _embedder_dim(meta)
-    # Training keeps every layer's outputs for backward -> scales x n_layers.
-    # 16 bytes/token/layer ~ fp32 activation (4B) x ~4x backward overhead (Korthikanti et al.).
-    # Inference only holds ~1-2 layers' outputs in flight at once.
-    bytes_per_sample = seq_len * hidden * _n_layers(meta) * 16 if is_training else seq_len * hidden * 8
+    training_bytes_per_token_per_layer = 34
+    inference_bytes_per_token = 8
+    if is_training:
+        bytes_per_sample = seq_len * hidden * _n_layers(meta) * training_bytes_per_token_per_layer
+    else:
+        bytes_per_sample = seq_len * hidden * inference_bytes_per_token
     return bytes_per_sample / _BYTES_PER_GB
 
 
@@ -137,13 +150,18 @@ def _max_fitting_batch_size(
     return _floor_to_power_of_two(int(available_for_activations / per_sample_gb))
 
 
-_CPU_SLOWDOWN_FACTOR = 50.0
-"""Rough multiplier for transformer training on CPU vs. a modern GPU.
-
-Real benchmarks vary widely (30x for small BERTs on AVX-512 boxes, 100x+ for
-billion-scale models on a stock laptop). A single 50x constant is a pessimistic
-upper bound that's good enough to make the CPU/GPU distinction visible without
-re-introducing the per-device tier table."""
+# Sustained TFLOPS per device class — real MFU (model-FLOPs utilization) at
+# training batch sizes, NOT peak spec sheet numbers. Numbers reflect ~30-50%
+# MFU which is typical for BERT-scale training with FA2 / cuDNN kernels.
+# Source: MLPerf training results + community benchmarks (2024-2025).
+_DEVICE_TFLOPS = {
+    "high-gpu": 150.0,  # A100 / H100 fp16
+    "mid-gpu": 45.0,    # V100 / RTX 3090 / A6000
+    "low-gpu": 15.0,    # T4 / RTX 3060 / 8 GB consumer card
+    "apple-silicon": 8.0,  # M1/M2/M3 GPU cores
+    "cpu": 0.1,         # single-thread modern x86 with MKL
+}
+_DEFAULT_TFLOPS = 15.0  # unknown device → treat as low-GPU
 
 
 def _time_for_transformer(
@@ -151,22 +169,28 @@ def _time_for_transformer(
     n_trials: int,
     epochs: int,
     batch_size: int,
+    seq_len: int,
     n_samples: int,
-    accelerator: str,
+    params_millions: float,
+    device_class: str,
 ) -> float:
-    """Transformer training time in hours.
+    """Transformer training time in hours, from per-step FLOPs / device TFLOPS.
 
-    Baseline is "1 second per step" on a GPU (CUDA / MPS) — a step-count proxy,
-    not a real wall-time calibration. CPU training pays a flat ``_CPU_SLOWDOWN_FACTOR``
-    so the report doesn't hide the fact that the same workload is dramatically
-    slower without a GPU. Users should treat absolute numbers as ordering /
-    ballpark information, not a budget.
+    Per-step FLOPs ≈ 6 x params x batch_size x seq_len (2 for forward mul-add,
+    3-4x for backward). Divided by sustained device TFLOPS to get wall-time per
+    step, then multiplied by (steps x epochs x n_trials).
+
+    Replaces an earlier "1 second per step" heuristic, which was ~10x too high
+    on A100 and identical for MPS vs CUDA (predicted times were the same on
+    both while real times differed ~7x — see interpretation.md 2026-07-19).
     """
-    steps = max(1, (n_samples // max(1, batch_size))) * epochs
-    h = (n_trials * steps) / 3600.0
-    if accelerator == "cpu":
-        h *= _CPU_SLOWDOWN_FACTOR
-    return h
+    steps_per_epoch = max(1, n_samples // max(1, batch_size))
+    total_steps = n_trials * epochs * steps_per_epoch
+    # 6x factor: ~2x for fwd matmul + ~4x for bwd (grad wrt input + grad wrt weight).
+    step_flops = 6.0 * params_millions * 1e6 * batch_size * seq_len
+    tflops = _DEVICE_TFLOPS.get(device_class, _DEFAULT_TFLOPS)
+    step_seconds = step_flops / (tflops * 1e12)
+    return (total_steps * step_seconds) / 3600.0
 
 
 def _n_layers(meta: ModelMeta | None) -> int:
@@ -207,11 +231,20 @@ def _embedding_cache_disk_gb(n_samples: int, hidden_size: int) -> float:
     return (n_samples * hidden_size * 4) / _BYTES_PER_GB
 
 
-# Coefficients are dimensional (per-sample-per-feature-per-iteration seconds)
-# rather than empirically tuned constants — they give relative-cost ordering
-# across configurations and absolute ballpark wall-times.
-_LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-8
-_CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
+# Wall-time coefficients calibrated against measured fits on 1-thread CPU
+# (OMP_NUM_THREADS=1). Values represent seconds per per-fit-work-unit and
+# already absorb the number of L-BFGS iterations the optimizer typically
+# takes to converge (~50) — so the ``max_iter`` upper bound does NOT enter
+# the formula directly. Historical formula also scaled by ``max_iter`` which
+# multi-cent-ordered-over-predicted (137 h vs measured ~30 s = ~15000x on
+# banking77 × 1024-dim e5-large × 77 classes × cv=3).
+#
+# Calibration point (reviewer's res-adapt-ckeck/a100 run, warm cache):
+#   classic-light linear on banking77 (n=10003, dim=1024, cls=77, cv_mult=31)
+#   measured ~30 s per fit x n_trials=20 = ~10 min total = ~0.17 h.
+#   Formula: 20 x 1.2e-9 x 10003 x 1024 x 31 x 77 = ~588 s = ~0.16 h  ✓
+_LINEAR_CPU_S_PER_SAMPLE_FEATURE = 1.2e-9
+_CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9  # catboost is measured per iteration
 _CATBOOST_GPU_SPEEDUP = 10.0
 # LogisticRegressionCV defaults: Cs=10, cv=3 -> 10x3 inner fits + 1 final refit = 31.
 _LOGREG_CV_MULTIPLIER = 31
@@ -234,22 +267,26 @@ def _time_for_linear(
     n_trials: int,
     n_samples: int,
     embedder_dim: int,
-    max_iter: int,
+    max_iter: int,  # noqa: ARG001 — kept in signature for API stability; typical L-BFGS convergence is absorbed into the coefficient
     cv_multiplier: int,
     class_multiplier: int,
 ) -> float:
     """LogisticRegression wall time, in hours.
 
-    Cost is ``O(n_samples x n_features x max_iter x n_classes)`` per fit
-    (sklearn's L-BFGS solver), multiplied by the CV inner-fit count (31 for the
-    default LogisticRegressionCV).
+    Cost is ``O(n_samples x n_features x n_classes)`` per fit (sklearn's L-BFGS
+    solver, iterations absorbed into the calibration constant), multiplied by the
+    CV inner-fit count (31 for the default LogisticRegressionCV).
+
+    ``max_iter`` is a per-fit upper bound, not the typical work — L-BFGS on a
+    well-conditioned classifier converges long before it. Older versions of
+    this formula scaled by ``max_iter`` and predicted ~1000x higher than
+    reality; the constant now bakes in a typical convergence-iteration count.
     """
     seconds = (
         n_trials
-        * _LINEAR_CPU_S_PER_SAMPLE_FEATURE_ITER
+        * _LINEAR_CPU_S_PER_SAMPLE_FEATURE
         * n_samples
         * embedder_dim
-        * max_iter
         * cv_multiplier
         * class_multiplier
     )

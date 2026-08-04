@@ -7,7 +7,7 @@ Everything below it is supporting machinery for the three phases.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from pydantic import ValidationError
 
@@ -31,6 +31,7 @@ def run_preflight(
     *,
     preset_name: str | None = None,
     refit_after: bool = False,
+    embedding_cache_probe: Callable[[str], bool] | None = None,
 ) -> PreflightReport:
     """Run all three preflight phases and return one report.
 
@@ -43,6 +44,12 @@ def run_preflight(
         preset_name: optional friendly name for the report header.
         refit_after: matches the ``Pipeline.fit(refit_after=...)`` argument.
             When True, time estimates include the extra refit-on-full-data pass.
+        embedding_cache_probe: optional callable ``(embedder_model_name) -> bool``.
+            Return True when the embedding cache already holds this model's
+            embeddings for the current dataset — the advisor then predicts 0
+            forward time and 0 ``disk_embedding_cache_gb`` for that embedder
+            (mirrors the ``cached_locally`` treatment for HF weights). Default
+            is the pessimistic cold assumption every embedder pays once.
 
     Returns:
         ``PreflightReport`` with findings across resource / data / config phases.
@@ -79,6 +86,9 @@ def run_preflight(
         hardware=hardware,
         report=report,
         refit_after=refit_after,
+        cross_encoder_model_name=cfg.cross_encoder_config.model_name,
+        transformer_model_name=cfg.transformer_config.model_name,
+        cache_probe=embedding_cache_probe,
     )
     _data_phase(cfg.search_space, stats, report)
     _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, hardware, report)

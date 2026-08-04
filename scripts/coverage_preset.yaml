@@ -1,0 +1,42 @@
+## Coverage-only preset for the calibration harness.
+#
+# Bundled presets don't touch lora / ptuning / dnnc / gcn / a plain
+# cross-encoder scorer, so the advisor's estimates for those modules go
+# unvalidated. This preset packs one of each into a single small run so
+# `scripts/calibrate_advisor.py` can exercise them against a real fit.
+#
+# Intentionally cheap (n_trials: 1 per scorer, single decision module) —
+# the point is coverage, not tuning quality. Skip cleanly when the peft
+# extra is missing (lora/ptuning will be marked skipped by the harness).
+search_space:
+  - node_type: scoring
+    target_metric: scoring_f1
+    search_space:
+      - module_name: lora
+        classification_model_config:
+          - model_name: microsoft/deberta-v3-small
+        num_train_epochs: [1]
+        batch_size: [16]
+        learning_rate: [5.0e-5]
+      - module_name: ptuning
+        classification_model_config:
+          - model_name: microsoft/deberta-v3-small
+        num_train_epochs: [1]
+        batch_size: [16]
+        learning_rate: [5.0e-5]
+        num_virtual_tokens: [8]
+      - module_name: dnnc
+        k: [3]
+      - module_name: gcn
+        num_train_epochs: [1]
+        batch_size: [16]
+        learning_rate: [1.0e-3]
+      - module_name: description_cross
+  - node_type: decision
+    target_metric: decision_accuracy
+    search_space:
+      - module_name: argmax
+hpo_config:
+  sampler: tpe
+  n_trials: 5
+  n_startup_trials: 2

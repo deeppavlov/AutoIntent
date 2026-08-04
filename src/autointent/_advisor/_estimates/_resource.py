@@ -11,7 +11,7 @@ private machinery.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from autointent._advisor import _hub
 from autointent._advisor._report import ResourceEstimate, Severity
@@ -160,8 +160,10 @@ def _estimate_transformer_model(
         n_trials=n_trials,
         epochs=epochs,
         batch_size=batch_size,
+        seq_len=seq_len,
         n_samples=stats.n_samples,
-        accelerator=hardware.accelerator,
+        params_millions=meta.total_params / 1_000_000,
+        device_class=hardware.device_class,
     )
     if mode != "inference":
         time_h *= _refit_factor(refit_after=refit_after, n_trials=n_trials)
@@ -269,6 +271,7 @@ def _apply_embedding_cache(
     *,
     stats: DatasetStats,
     hardware: HardwareProfile,
+    cache_probe: Callable[[str], bool] | None = None,
 ) -> set[str]:
     """Adjust ``module_estimates`` in-place for autointent's persistent embedding cache.
 
@@ -277,15 +280,36 @@ def _apply_embedding_cache(
     entries (linear/catboost) get a synthetic forward added since their
     per-entry estimate doesn't include one.
 
-    Returns the set of unique embedder model names whose forward was charged.
+    ``cache_probe`` (optional): callable that takes an embedder model_name and
+    returns True if the embedding is already cached on disk. When it returns
+    True, the model is treated as pre-paid — forward is zero and disk cache
+    delta is zero. Default (None) preserves the pessimistic cold assumption
+    the advisor shipped with — every embedder pays once.
+
+    Returns the set of unique embedder model names whose forward was charged
+    (i.e. contributed to ``disk_embedding_cache_gb`` in the disk aggregation).
     """
     paid: set[str] = set()
+    # Models the probe reports as already-warm — pre-populate ``paid`` so the
+    # first-seen module also hits the cache-hit branch instead of paying the
+    # forward, and skip them in the disk-cache aggregation (already on disk).
+    warm_models: set[str] = set()
+    if cache_probe is not None:
+        for name in seen_models:
+            if cache_probe(name):
+                warm_models.add(name)
     for me in module_estimates:
         module = me.driver["module"]
         if module not in _CACHE_HONORING_MODULES:
             continue
         model = me.driver["model"]
         if model not in seen_models:  # synthetic / "(no embedder)" rows
+            continue
+        if model in warm_models:
+            if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
+                me.time_hours = 0.0
+                me.driver["time_hours"] = 0.0
+                me.driver["mode"] = f"{me.driver['mode']}+warm"
             continue
         if model in paid:
             if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
@@ -295,12 +319,15 @@ def _apply_embedding_cache(
         else:
             paid.add(model)
             if module in {"linear", "catboost"}:
+                embedder_meta = seen_models.get(model)
                 forward_h = _time_for_transformer(
                     n_trials=1,
                     epochs=1,
                     batch_size=32,
+                    seq_len=128,
                     n_samples=stats.n_samples,
-                    accelerator=hardware.accelerator,
+                    params_millions=(embedder_meta.total_params / 1_000_000) if embedder_meta else 100.0,
+                    device_class=hardware.device_class,
                 )
                 me.time_hours += forward_h
                 me.driver["time_hours"] = round(me.time_hours, 2)
@@ -395,6 +422,51 @@ def _emit_resource_findings(
         )
 
 
+_UNKNOWN_SCORER_MODULES = frozenset({"cnn", "rnn", "sklearn"})
+"""Scorer modules the advisor has no cost estimator for.
+
+These get a placeholder ``not-estimated`` driver row so they never appear as
+"free/safe" in the report — silent-zero was the ``nn-heavy`` predicted 0h/0GB
+bug that hid a real 0.52 h + 1.45 GB RAM cost.
+"""
+
+# Modules that consume the top-level ``cross_encoder_config.model_name`` as
+# their scoring model (see zero-shot-encoders preset: description_cross pulls
+# BAAI/bge-reranker-v2-m3 from that config, not from its per-entry dict).
+_CROSS_ENCODER_CONSUMERS = frozenset({"description_cross", "dnnc", "retrieval"})
+
+# Modules that fall back to the top-level ``transformer_config.model_name``
+# when no per-entry ``classification_model_config`` is given.
+_TRANSFORMER_CONFIG_CONSUMERS = frozenset({"bert"})
+
+
+def _not_estimated_row(*, node_type: str, module: str) -> _ModuleEstimate:
+    """Placeholder row for a module the advisor has no cost formula for.
+
+    Renders as ``mode="not-estimated"`` in the report so the module isn't
+    silently absent (would read as "free/safe") — a call to action for whoever
+    reads the JSON that the actual cost is unknown, not zero.
+    """
+    return _ModuleEstimate(
+        driver={
+            "node_type": node_type,
+            "module": module,
+            "model": "(not estimated)",
+            "mode": "not-estimated",
+            "vram_gb": 0.0,
+            "ram_gb": 0.0,
+            "time_hours": 0.0,
+            "batch_size": None,
+            "max_batch_size": None,
+            "confidence": "unknown",
+            "note": "advisor has no cost estimator for this module; treat as unknown, not zero",
+        },
+        vram_gb=0.0,
+        ram_gb=0.0,
+        time_hours=0.0,
+    )
+
+
 def _resource_phase(
     *,
     embedder_config: EmbedderConfig,
@@ -406,6 +478,9 @@ def _resource_phase(
     hardware: HardwareProfile,
     report: PreflightReport,
     refit_after: bool = False,
+    cross_encoder_model_name: str | None = None,
+    transformer_model_name: str | None = None,
+    cache_probe: Callable[[str], bool] | None = None,
 ) -> None:
     """Walk the validated search space, fold per-module costs into the report.
 
@@ -413,6 +488,15 @@ def _resource_phase(
     the largest model can drive ``embedder_dim`` for the classic pass), then
     linear / catboost. Disk, VRAM/RAM peak, time sum, and final findings are
     folded onto the report.
+
+    ``cross_encoder_model_name`` and ``transformer_model_name`` come from the
+    pipeline's top-level configs. They're used as the fallback model for
+    modules that don't declare a per-entry ``classification_model_config`` but
+    still consume one at runtime (``description_cross`` / ``dnnc`` /
+    ``retrieval`` pull from ``cross_encoder_config``; ``bert`` falls back to
+    ``transformer_config``). Seeding them here fixes the disk-download
+    under-count called out in the follow-up review (missing 6.4 GB reranker in
+    ``zero-shot-encoders``).
     """
     seen_models: dict[str, ModelMeta] = {}
     global_embedder = _embedder_model_name(embedder_config)
@@ -427,8 +511,17 @@ def _resource_phase(
     for node_idx, node_type, entry in transformer_entries:
         module = entry.get("module_name", "?")
         model_names = _extract_model_names(entry)
-        if not model_names and global_embedder and module in {"knn", "mlknn"}:
-            model_names = [global_embedder]
+        if not model_names:
+            if module in {"knn", "mlknn"} and global_embedder:
+                model_names = [global_embedder]
+            elif module in _CROSS_ENCODER_CONSUMERS and cross_encoder_model_name:
+                model_names = [cross_encoder_model_name]
+            elif module in _TRANSFORMER_CONFIG_CONSUMERS and transformer_model_name:
+                model_names = [transformer_model_name]
+            elif module in _UNKNOWN_SCORER_MODULES:
+                # Placeholder so the row is visible instead of silently zeroed.
+                module_estimates.append(_not_estimated_row(node_type=node_type, module=module))
+                continue
         for name in model_names:
             meta = seen_models.setdefault(name, _hub.resolve_model(name))
             me = _estimate_transformer_model(
@@ -465,7 +558,9 @@ def _resource_phase(
             module_estimates.append(classic_estimate)
 
     # Cache-aware time/disk: must run before the fold below.
-    cached_embedders = _apply_embedding_cache(module_estimates, seen_models, stats=stats, hardware=hardware)
+    cached_embedders = _apply_embedding_cache(
+        module_estimates, seen_models, stats=stats, hardware=hardware, cache_probe=cache_probe,
+    )
 
     estimate = ResourceEstimate(parallel_factor=n_jobs)
     for me in module_estimates:
@@ -486,12 +581,18 @@ def _resource_phase(
 
     # Flip low_confidence if any model fell back to the heuristic path (Hub
     # unreachable, repo missing safetensors metadata, local-path checkpoint).
+    # Emit as a TIGHT finding (not just a note) so it shows up in the main
+    # rendered findings block — buried notes previously let ~2× under-prediction
+    # of large-model shapes slip past the reviewer.
     heuristic_models = [m.name for m in seen_models.values() if m.confidence == "heuristic"]
     if heuristic_models:
         report.low_confidence = True
-        report.notes.append(
-            f"Heuristic fallback used for {len(heuristic_models)} model(s) - sizes are BERT-base "
-            f"defaults: {', '.join(heuristic_models[:3])}{'...' if len(heuristic_models) > 3 else ''}",  # noqa: PLR2004
+        sample = ", ".join(heuristic_models[:3]) + ("..." if len(heuristic_models) > 3 else "")  # noqa: PLR2004
+        report.add(
+            "resource",
+            Severity.TIGHT,
+            f"LOW CONFIDENCE - Hub metadata unavailable for {len(heuristic_models)} model(s); "
+            f"cost estimates use conservative large-model defaults (may over-predict small models): {sample}",
         )
 
     report.resource = estimate

@@ -12,9 +12,11 @@ from ._report import DatasetStats, Finding, PreflightReport, RecommendationResul
 from .runner import run_preflight
 from .workflows import (
     BUNDLED_PRESETS,
+    ReduceToFitError,
     inspect,
     load_config,
     recommend,
+    reduce_to_fit,
     stats_from_dataset,
     stats_from_dataset_obj,
 )
@@ -26,12 +28,14 @@ __all__ = [
     "HardwareProfile",
     "PreflightReport",
     "RecommendationResult",
+    "ReduceToFitError",
     "ResourceEstimate",
     "Severity",
     "detect_hardware",
     "inspect",
     "load_config",
     "recommend",
+    "reduce_to_fit",
     "run_preflight",
     "stats_from_dataset",
     "stats_from_dataset_obj",
