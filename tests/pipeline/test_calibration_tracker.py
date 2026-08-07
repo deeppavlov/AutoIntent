@@ -9,7 +9,12 @@ from pathlib import Path
 _SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts"
 sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from calibrate_advisor import _ModuleTracker, _classify_module_role, _sum_time_by_role  # noqa: E402
+from calibrate_advisor import (  # noqa: E402
+    _ModuleTracker,
+    _StepTimingCallback,
+    _classify_module_role,
+    _sum_time_by_role,
+)
 
 
 def test_tracker_records_wall_time_per_module() -> None:
@@ -114,3 +119,32 @@ def test_role_classification_and_time_decomposition() -> None:
     assert [r["role"] for r in tracker.records] == ["embedder", "scorer", "decision"]
     totals = _sum_time_by_role(tracker.records)
     assert totals == {"embedder": 8.0, "scorer": 2.0, "decision": 0.5}
+
+
+def test_step_timing_callback_answers_every_hf_hook() -> None:
+    """HF's CallbackHandler dispatches with a bare ``getattr(cb, event)`` — no
+    hasattr probe — so the callback MUST answer every ``on_*`` hook it may
+    ever ask for, even ones we don't time.
+
+    Pins the regression that surfaced as
+    ``AttributeError: '_StepTimingCallback' object has no attribute 'on_train_begin'``
+    when a bert scorer trial fired the harness's step-timing patch on real HF
+    Trainer machinery. The fix is to subclass ``transformers.TrainerCallback``
+    directly so every default hook is inherited as a no-op — no ``__getattr__``
+    trickery, no per-hook boilerplate.
+    """
+    from transformers import TrainerCallback
+
+    cb = _StepTimingCallback(sink=[])
+    # Must actually be an HF TrainerCallback — this is the guarantee that
+    # every hook HF may dispatch resolves to an inherited pass-through.
+    assert isinstance(cb, TrainerCallback)
+
+    # Sanity-check a representative slice of hooks (every documented HF hook
+    # subclass has one, and the isinstance above already proves the rest are
+    # inherited). Calling them with (args, state, control, **kwargs) must
+    # succeed and return None — HF's call_event keeps the incoming control
+    # unchanged when the result is None.
+    for name in ["on_init_end", "on_train_begin", "on_epoch_begin", "on_log", "on_save", "on_train_end"]:
+        hook = getattr(cb, name)
+        assert hook(None, None, "control", model=None) is None, name

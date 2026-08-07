@@ -367,7 +367,26 @@ def _classify_module_role(module_name: str) -> str:
     return "scorer"
 
 
-class _StepTimingCallback:
+# Base class for _StepTimingCallback. We inherit from HF's real
+# ``TrainerCallback`` when transformers is installed — that gives us the
+# correct no-op default for every ``on_*`` hook (on_train_begin/on_log/
+# on_save/...) automatically, so we only override the two we time. HF's
+# ``CallbackHandler.call_event`` dispatches with a bare ``getattr`` (no
+# hasattr probe), so a plain class missing hooks would ``AttributeError``
+# the moment a real trial calls e.g. ``on_train_begin``.
+#
+# When transformers isn't installed we fall back to ``object`` so the
+# harness still imports on classic-only runs. In that case the callback is
+# never actually instantiated (``_patch_trainer_for_step_timing`` bails out
+# in the same ``ImportError`` branch), so the fallback base is only needed
+# to make the class definition itself succeed.
+try:
+    from transformers import TrainerCallback as _StepTimingBase  # type: ignore[import-not-found]
+except ImportError:
+    _StepTimingBase = object  # type: ignore[assignment,misc]
+
+
+class _StepTimingCallback(_StepTimingBase):  # type: ignore[misc,valid-type]
     """HF ``TrainerCallback`` that appends the wall-time of each optimizer step
     to a caller-owned list.
 
@@ -376,17 +395,15 @@ class _StepTimingCallback:
     step buffer on :class:`_ModuleTracker`, so the transformer's per-step
     latency lands in that module's record automatically — no plumbing across
     module boundaries.
-
-    Duck-typed (not a ``TrainerCallback`` subclass) so importing transformers
-    stays lazy — the harness must work on classic-only runs without the
-    transformers extra.
     """
 
     def __init__(self, sink: list[float]) -> None:
+        # TrainerCallback.__init__ takes (*args, **kwargs); calling super is
+        # safe both when the base is the real HF class and when it's ``object``.
+        super().__init__()
         self._sink = sink
         self._t0: float | None = None
 
-    # HF's CallbackHandler calls these positionally with (args, state, control, **kwargs)
     def on_step_begin(self, args: Any, state: Any, control: Any, **kwargs: Any) -> None:  # noqa: ANN401, ARG002
         self._t0 = time.perf_counter()
 
@@ -394,8 +411,6 @@ class _StepTimingCallback:
         if self._t0 is not None:
             self._sink.append(time.perf_counter() - self._t0)
             self._t0 = None
-
-    # HF's CallbackHandler probes each callback with hasattr; leave the rest unset.
 
 
 def _summarize_step_times(step_times: list[float]) -> dict[str, float]:
