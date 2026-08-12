@@ -307,6 +307,43 @@ class OpenSearchBackend(BaseIndexBackend):
         self._generation_index = generation
         self._read_only = True
 
+    @classmethod
+    def _delete_generation(cls, client: Any, manifest: dict[str, Any]) -> None:  # noqa: ANN401
+        """Delete the generation index a manifest references — only if we still own it."""
+        generation = manifest["index"]
+        if not client.indices.exists(index=generation):
+            return
+        mappings = client.indices.get_mapping(index=generation)[generation]["mappings"]
+        if mappings.get("_meta", {}).get("dump_id") != manifest["dump_id"]:
+            logger.warning(
+                "cluster index '%s' was recreated since this dump was written; leaving it in place",
+                generation,
+            )
+            return
+        client.indices.delete(index=generation)
+
+    @classmethod
+    def delete_dumped_generation(cls, path: Path) -> None:
+        """Delete the cluster-side generation referenced by the dump directory at ``path``.
+
+        Reads ``remote_manifest.json`` and ``config.json`` from ``path`` to locate the
+        cluster and the index. Safe to call twice; refuses to delete an index whose
+        ``_meta.dump_id`` no longer matches the manifest.
+        """
+        with (path / cls._manifest_filename).open("r", encoding="utf-8") as file:
+            manifest = json.load(file)
+        with (path / cls._config_filename).open("r", encoding="utf-8") as file:
+            config = OpenSearchConfig.model_validate(json.load(file))
+
+        try:
+            import opensearchpy
+        except ImportError as e:  # same optional dependency story as __init__
+            msg = "Unable to delete OpenSearch dump generation. Install opensearch-py python package first."
+            raise RuntimeError(msg) from e
+
+        client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
+        cls._delete_generation(client, manifest)
+
     def dump(self, path: Path) -> None:
         """Snapshot the index into an immutable cluster-side generation.
 

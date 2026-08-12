@@ -562,3 +562,37 @@ def test_opensearch_manifestless_dump_loads_as_reference(opensearch_container: t
     assert loaded.index_name == live_name
     _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
     assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_delete_dumped_generation_removes_index(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)
+    assert not backend._client.indices.exists(index=generation)
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)  # idempotent: already gone is fine
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_delete_dumped_generation_spares_recreated_index(opensearch_container: tuple[str, int]) -> None:
+    """Never delete an index we don't own: dump_id mismatch means someone recreated it."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    backend._client.indices.delete(index=generation)
+    backend._client.indices.create(index=generation)  # recreated by "someone else", no _meta
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)
+    assert backend._client.indices.exists(index=generation)
