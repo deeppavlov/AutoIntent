@@ -144,6 +144,26 @@ class TestVectorIndex:
         embeddings = vector_index.get_all_embeddings()
         assert embeddings.shape[0] == 4
 
+    def test_first_add_of_new_instance_replaces_index_contents(
+        self,
+        vector_index: VectorIndex,
+        embedder_config: HashingVectorizerEmbeddingConfig,
+        sample_texts: list[str],
+        sample_labels: list[int],
+    ) -> None:
+        """A fresh instance's first add() starts from an empty index (issue #342, CV fold isolation).
+
+        Mirrors cross-validation: each fold's fit() constructs a new VectorIndex over the
+        same backend config. The previous fold's documents must not survive into this one.
+        """
+        vector_index.add(sample_texts, sample_labels)
+
+        second_index = VectorIndex(embedder_config=embedder_config, config=vector_index.config)
+        fold_texts, fold_labels = sample_texts[1:4], sample_labels[1:4]
+        second_index.add(fold_texts, fold_labels)
+
+        assert second_index.get_all_embeddings().shape[0] == len(fold_texts)
+
     def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test querying the index with text."""
         vector_index.add(sample_texts, sample_labels)

@@ -37,6 +37,7 @@ class OpenSearchBackend(BaseIndexBackend):
         self.config = config.model_copy()
         self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
         self._index_name = self.config.index_name
+        self._has_written = False
 
     @property
     def index_name(self) -> str:
@@ -94,7 +95,12 @@ class OpenSearchBackend(BaseIndexBackend):
             )
 
     def add(self, embeddings: NDArray[Any], documents: list[Document]) -> None:
-        """Add embeddings and documents to OpenSearch index."""
+        """Add embeddings and documents to OpenSearch index.
+
+        The first ``add()`` call on this instance replaces any pre-existing contents of
+        the remote index (fit-replaces semantics, see #342); subsequent calls append.
+        This also holds for instances restored via ``load()``.
+        """
         if len(embeddings) != len(documents):
             msg = f"Number of embeddings ({len(embeddings)}) must match number of documents ({len(documents)})"
             raise ValueError(msg)
@@ -122,6 +128,10 @@ class OpenSearchBackend(BaseIndexBackend):
             )
 
         self._init_index()
+
+        if not self._has_written:
+            self.reset()
+            self._has_written = True
 
         # Use bulk API for efficient indexing
         try:
