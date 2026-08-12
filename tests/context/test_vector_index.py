@@ -398,3 +398,18 @@ class TestVectorIndexEdgeCases:
         finally:
             # Restore original modules
             sys.modules.update(original_modules)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_empty_index_query_raises_actionable_error(opensearch_container: tuple[str, int]) -> None:
+    """Querying an empty index names the problem instead of failing later with a numpy cast error (issue #342)."""
+    host, port = opensearch_container
+    config = OpenSearchConfig(
+        hosts=[{"host": host, "port": port}],
+        index_name=f"test_empty_{uuid.uuid4().hex[:8]}",
+    )
+    backend = OpenSearchBackend(config=config, vector_size=8)
+    backend._init_index()
+
+    with pytest.raises(RuntimeError, match="empty"):
+        backend.query(np.zeros((1, 8)), k=3)

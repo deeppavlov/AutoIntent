@@ -193,6 +193,12 @@ class OpenSearchBackend(BaseIndexBackend):
 
             hits = response_item["hits"]["hits"]
 
+            if not hits:
+                msg = (
+                    f"OpenSearch index '{self.index_name}' returned no documents for a query. "
+                    "The index is empty: fit() was never called on it, or it was reset."
+                )
+                raise RuntimeError(msg)
             # Extract similarities (OpenSearch script_score returns exact similarity scores)
             similarities = np.array([hit["_score"] for hit in hits])
             cosine_similarities.append(similarities)
