@@ -7,7 +7,7 @@ import pytest
 from autointent import Pipeline
 from autointent.configs import LoggingConfig, TokenizerConfig, get_default_embedder_config
 from autointent.custom_types import NodeType
-from tests.conftest import apply_test_models, get_search_space
+from tests.conftest import apply_test_models, get_search_space, get_test_embedder_config
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -170,6 +170,39 @@ def test_load_with_overrided_params(dataset: Dataset, tmp_path: Path) -> None:
     # reason: deliberate escape for private state access
     loaded_scoring_module: Any = cast("Any", loaded_pipe.nodes[NodeType.scoring]).module
     assert loaded_scoring_module._embedder.config.tokenizer_config.max_length == 8
+
+
+def test_dump_load_with_tuple_valued_embedder_config(dataset: Dataset, project_dir: Path) -> None:
+    """HashingVectorizer's `ngram_range` is a `tuple[int, int]`; dumped pipelines must reload (#342, side finding 1)."""
+    search_space: list[dict[str, Any]] = [
+        {
+            "node_type": "scoring",
+            "target_metric": "scoring_f1",
+            "search_space": [{"module_name": "knn", "k": [3], "weights": ["distance"]}],
+        },
+        {
+            "node_type": "decision",
+            "target_metric": "decision_accuracy",
+            "search_space": [{"module_name": "argmax"}],
+        },
+    ]
+    pipeline_optimizer = Pipeline.from_search_space(search_space)
+    pipeline_optimizer.set_config(get_test_embedder_config())
+    logging_config = LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=False)
+    pipeline_optimizer.set_config(logging_config)
+
+    context = pipeline_optimizer.fit(dataset)
+    utterances = ["123", "hello world"]
+
+    context.dump()
+    loaded_from_context_dump = Pipeline.load(logging_config.dirpath)
+    prediction = loaded_from_context_dump.predict(utterances)
+    assert len(prediction) == len(utterances)
+
+    dump_dir = project_dir / "dumped_pipeline"
+    pipeline_optimizer.dump(dump_dir)
+    loaded_from_pipeline_dump = Pipeline.load(dump_dir)
+    assert loaded_from_pipeline_dump.predict(utterances) == prediction
 
 
 def test_no_saving(dataset: Dataset, tmp_path: Path) -> None:
