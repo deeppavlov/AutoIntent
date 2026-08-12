@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from autointent._dump_tools import Dumper
+from autointent._wrappers.vector_index import remove_module_dump
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 
@@ -127,7 +128,7 @@ class OptimizationInfo:
             if old_best_metric_value_idx is not None:
                 prev_best_dump = self.trials.get_trials(node_type)[old_best_metric_value_idx].module_dump_dir
                 if prev_best_dump is not None:
-                    shutil.rmtree(prev_best_dump, ignore_errors=True)  # workaround for windows
+                    remove_module_dump(prev_best_dump)
         else:
             module_dump_dir = None
 
