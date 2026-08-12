@@ -28,6 +28,8 @@ from tests.conftest import get_test_embedder_config
 if TYPE_CHECKING:
     from types import ModuleType
 
+    import numpy.typing as npt
+
 
 def _docker_available() -> bool:
     """Detect whether Docker is reachable for testcontainers (skipped on most Windows CI)."""
@@ -421,7 +423,7 @@ def _os_backend(host: str, port: int, index_name: str | None, vector_size: int =
     return OpenSearchBackend(config=config, vector_size=vector_size)
 
 
-def _one_hot_docs(prefix: str, n: int = 4, label: int = 0) -> tuple[np.ndarray, list[Document]]:
+def _one_hot_docs(prefix: str, n: int = 4, label: int = 0) -> tuple[npt.NDArray[np.float32], list[Document]]:
     """One-hot embeddings make nearest-neighbor assertions exact: query eye[i] -> doc i."""
     return np.eye(8, dtype="float32")[:n], [Document(text=f"{prefix} {i}", label=label) for i in range(n)]
 
