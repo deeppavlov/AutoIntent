@@ -292,6 +292,23 @@ class OpenSearchBackend(BaseIndexBackend):
             raise RuntimeError(msg)
         self._client.indices.refresh(index=dest)
 
+    def _swap_serving_alias(self, base: str, generation: str) -> None:
+        """Point the ``{base}-best`` alias at the new generation, best-effort.
+
+        Nothing in the library consumes this alias — it exists purely as an operator
+        convenience for querying "whatever is currently served" from outside AutoIntent.
+        A failure here (e.g. a naming conflict with a real index) must not fail the dump.
+        """
+        alias = f"{base}-best"
+        try:
+            actions: list[dict[str, Any]] = [{"add": {"index": generation, "alias": alias}}]
+            existing = self._client.indices.get_alias(name=alias, ignore=404)
+            if isinstance(existing, dict) and "error" not in existing:
+                actions = [{"remove": {"index": index, "alias": alias}} for index in existing] + actions
+            self._client.indices.update_aliases(body={"actions": actions})  # remove+add is atomic
+        except Exception as exc:  # noqa: BLE001 -- alias is operator convenience; dump must not fail on it
+            logger.warning("failed to update serving alias '%s' for generation '%s': %s", alias, generation, exc)
+
     def _bind_generation(self, generation: str, dump_id: str) -> None:
         """Bind this instance read-only to a dump generation, verifying it is intact."""
         stored: str | None = None
@@ -307,6 +324,21 @@ class OpenSearchBackend(BaseIndexBackend):
         self._index_name = generation
         self._generation_index = generation
         self._read_only = True
+
+    @classmethod
+    def _read_manifest(cls, path: Path) -> dict[str, str]:
+        """Read and validate ``remote_manifest.json`` at a dump directory.
+
+        Raises a specific, actionable error if the expected keys are missing or empty,
+        instead of letting callers fail later with an opaque ``KeyError``.
+        """
+        manifest_path = path / cls._manifest_filename
+        with manifest_path.open("r", encoding="utf-8") as file:
+            manifest: dict[str, str] = json.load(file)
+        if not manifest.get("index") or not manifest.get("dump_id"):
+            msg = f"dump manifest at '{manifest_path}' is malformed: expected keys 'index' and 'dump_id'"
+            raise RuntimeError(msg)
+        return manifest
 
     @classmethod
     def _delete_generation(cls, client: Any, manifest: dict[str, Any]) -> None:  # noqa: ANN401
@@ -331,8 +363,7 @@ class OpenSearchBackend(BaseIndexBackend):
         cluster and the index. Safe to call twice; refuses to delete an index whose
         ``_meta.dump_id`` no longer matches the manifest.
         """
-        with (path / cls._manifest_filename).open("r", encoding="utf-8") as file:
-            manifest = json.load(file)
+        manifest = cls._read_manifest(path)
         with (path / cls._config_filename).open("r", encoding="utf-8") as file:
             config = OpenSearchConfig.model_validate(json.load(file))
 
@@ -368,15 +399,17 @@ class OpenSearchBackend(BaseIndexBackend):
             base = self.index_name.split("-best-")[0]
             generation = f"{base}-best-{dump_id}"
             self._client.indices.create(index=generation, body=self._index_body(dump_id))
-            source = self._generation_index or self.index_name
-            self._copy_index(source=source, dest=generation)
-            self._client.indices.put_settings(index=generation, body={"index": {"blocks": {"write": True}}})
-            alias = f"{base}-best"
-            actions: list[dict[str, Any]] = [{"add": {"index": generation, "alias": alias}}]
-            existing = self._client.indices.get_alias(name=alias, ignore=404)
-            if isinstance(existing, dict) and "error" not in existing:
-                actions = [{"remove": {"index": index, "alias": alias}} for index in existing] + actions
-            self._client.indices.update_aliases(body={"actions": actions})  # remove+add is atomic
+            try:
+                source = self._generation_index or self.index_name
+                self._copy_index(source=source, dest=generation)
+                self._client.indices.put_settings(index=generation, body={"index": {"blocks": {"write": True}}})
+                self._swap_serving_alias(base=base, generation=generation)
+            except Exception:
+                try:
+                    self._client.indices.delete(index=generation)
+                except Exception:
+                    logger.exception("failed to delete partial generation '%s' after dump failure", generation)
+                raise
             self._generation_index = generation
             manifest = {"engine": "opensearch", "index": generation, "dump_id": dump_id}
 
@@ -414,7 +447,6 @@ class OpenSearchBackend(BaseIndexBackend):
 
         manifest_path = path / cls._manifest_filename
         if manifest_path.exists():
-            with manifest_path.open("r", encoding="utf-8") as file:
-                manifest = json.load(file)
+            manifest = cls._read_manifest(path)
             instance._bind_generation(manifest["index"], manifest["dump_id"])
         return instance

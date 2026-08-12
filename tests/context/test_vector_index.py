@@ -681,3 +681,98 @@ def test_opensearch_dump_swaps_serving_alias_to_latest_generation(opensearch_con
 
     alias_targets = backend._client.indices.get_alias(name=f"{live_name}-best")
     assert list(alias_targets) == [latest_generation]
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_failed_dump_leaves_no_stranded_generation(
+    opensearch_container: tuple[str, int], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If copying data into the new generation fails, the generation must not be left
+    dangling in the cluster (issue #343 follow-up): nothing references it, nothing can
+    ever clean it up."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    def _raise_boom(source: str, dest: str) -> None:
+        msg = "boom"
+        raise RuntimeError(msg)
+
+    monkeypatch.setattr(backend, "_copy_index", _raise_boom)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    with pytest.raises(RuntimeError, match="boom"):
+        backend.dump(dump_dir)
+
+    assert backend._client.indices.get(index=f"{live_name}-best-*") == {}
+    assert not (dump_dir / "remote_manifest.json").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_alias_conflict_does_not_fail_dump(opensearch_container: tuple[str, int]) -> None:
+    """The serving alias is operator convenience, not load-bearing: a naming conflict
+    on the alias swap must not fail the dump itself."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    # A real INDEX (not an alias) already occupies the name the alias would need.
+    backend._client.indices.create(index=f"{live_name}-best")
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)  # must not raise despite the alias conflict
+
+    manifest = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))
+    generation = manifest["index"]
+    assert backend._client.indices.exists(index=generation)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_redump_of_loaded_instance(opensearch_container: tuple[str, int]) -> None:
+    """Production path: Pipeline.fit(clear_ram=True) then Pipeline.dump() loads the module
+    back from its own dump before re-dumping it; the re-dump must still work and must not
+    accumulate a nested '-best-' infix in the generation name."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(first_dump)
+
+    loaded = OpenSearchBackend.load(first_dump)
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    loaded.dump(second_dump)
+
+    served = OpenSearchBackend.load(second_dump)
+    _, results = served.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+    manifest = json.loads((second_dump / "remote_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["index"].count("-best-") == 1
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_on_malformed_manifest(opensearch_container: tuple[str, int]) -> None:
+    """A manifest missing the expected keys must fail loudly and specifically, not with
+    an opaque KeyError."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    (dump_dir / "remote_manifest.json").write_text(json.dumps({"engine": "opensearch"}), encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="malformed"):
+        OpenSearchBackend.load(dump_dir)

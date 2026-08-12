@@ -152,8 +152,13 @@ Notes specific to the OpenSearch backend:
   ``rm -rf`` strands the generation (recoverable: generations are pattern-named
   ``*-best-*``, so ops can also enforce an ISM age policy). AutoIntent's optimizer
   uses this helper automatically when a new best trial replaces the previous one, so
-  the steady-state cluster footprint is the live scratch index plus one generation
-  per node type.
+  during optimization the steady-state cluster footprint is the live scratch index
+  plus one generation per node type; a later ``Pipeline.dump()`` re-dump of an
+  already-optimized pipeline adds one more generation per node, which lingers until
+  the corresponding dump directory is deleted.
+- **Naming.** Avoid naming your own live indices with a ``-best-`` infix —
+  ``{base}-best-*`` is the namespace AutoIntent uses for generations and the serving
+  alias.
 - **Portability.** A dumped OpenSearch pipeline is portable only as far as the
   cluster: copying the dump directory to an environment that cannot reach the same
   cluster carries a dangling reference. This is inherent to keeping the corpus in
