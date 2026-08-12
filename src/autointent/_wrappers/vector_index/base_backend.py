@@ -21,8 +21,11 @@ class BaseIndexBackend(ABC):
     def add(self, embeddings: npt.NDArray[Any], documents: list[Document]) -> None:
         """Add documents and their embeddings to the index.
 
-        The first ``add()`` call on an instance replaces any pre-existing contents
-        of the underlying index (fit-replaces semantics); subsequent calls append.
+        The first ``add()`` call on a fresh instance must start from empty index
+        contents (fit-replaces semantics); subsequent calls append. Backends with
+        durable shared state (e.g. OpenSearch) satisfy this by resetting the
+        remote index on their first write; purely local backends (Faiss) satisfy
+        it by construction.
         """
 
     @abstractmethod
