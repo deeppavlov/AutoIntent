@@ -37,6 +37,7 @@ class OpenSearchBackend(BaseIndexBackend):
         self.config = config.model_copy()
         self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
         self._index_name = self.config.index_name
+        self._has_written = False
 
     @property
     def index_name(self) -> str:
@@ -76,7 +77,15 @@ class OpenSearchBackend(BaseIndexBackend):
             self._client.indices.create(index=self.index_name, body=index_body)
 
     def clear_ram(self) -> None:
-        """Clear the index by deleting all documents."""
+        """Release local resources (none held): documents live in the remote index and are not touched.
+
+        Deleting remote documents here would destroy the durable state that ``dump()``
+        only references — the dumped pipeline would reload an empty index (#342).
+        Use :meth:`reset` to actually drop index contents.
+        """
+
+    def reset(self) -> None:
+        """Drop all documents from the remote index (durable state)."""
         if self._client.indices.exists(index=self.index_name):
             self._client.delete_by_query(
                 index=self.index_name,
@@ -85,7 +94,12 @@ class OpenSearchBackend(BaseIndexBackend):
             )
 
     def add(self, embeddings: NDArray[Any], documents: list[Document]) -> None:
-        """Add embeddings and documents to OpenSearch index."""
+        """Add embeddings and documents to OpenSearch index.
+
+        The first ``add()`` call on this instance replaces any pre-existing contents of
+        the remote index (fit-replaces semantics, see #342); subsequent calls append.
+        This also holds for instances restored via ``load()``.
+        """
         if len(embeddings) != len(documents):
             msg = f"Number of embeddings ({len(embeddings)}) must match number of documents ({len(documents)})"
             raise ValueError(msg)
@@ -114,6 +128,9 @@ class OpenSearchBackend(BaseIndexBackend):
 
         self._init_index()
 
+        if not self._has_written:
+            self.reset()
+
         # Use bulk API for efficient indexing
         try:
             _, failed_items = self._opensearchpy.helpers.bulk(
@@ -131,6 +148,8 @@ class OpenSearchBackend(BaseIndexBackend):
         # Refresh index to make documents searchable immediately
         # Note: For large datasets, consider batching refreshes or using refresh=wait_for in bulk operations
         self._client.indices.refresh(index=self.index_name)
+
+        self._has_written = True
 
     def query(self, embedding: NDArray[Any], k: int) -> tuple[NDArray[Any], list[list[Document]]]:
         """Query the index using exact vector similarity search with script scoring."""
@@ -174,6 +193,12 @@ class OpenSearchBackend(BaseIndexBackend):
 
             hits = response_item["hits"]["hits"]
 
+            if not hits:
+                msg = (
+                    f"OpenSearch index '{self.index_name}' returned no documents for a query. "
+                    "The index is empty: fit() was never called on it, or it was reset."
+                )
+                raise RuntimeError(msg)
             # Extract similarities (OpenSearch script_score returns exact similarity scores)
             similarities = np.array([hit["_score"] for hit in hits])
             cosine_similarities.append(similarities)

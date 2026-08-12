@@ -12,6 +12,7 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
+from autointent._wrappers.vector_index.faiss import FaissBackend
 from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
 from autointent.configs import (
     FaissConfig,
@@ -143,6 +144,26 @@ class TestVectorIndex:
         embeddings = vector_index.get_all_embeddings()
         assert embeddings.shape[0] == 4
 
+    def test_first_add_of_new_instance_replaces_index_contents(
+        self,
+        vector_index: VectorIndex,
+        embedder_config: HashingVectorizerEmbeddingConfig,
+        sample_texts: list[str],
+        sample_labels: list[int],
+    ) -> None:
+        """A fresh instance's first add() starts from an empty index (issue #342, CV fold isolation).
+
+        Mirrors cross-validation: each fold's fit() constructs a new VectorIndex over the
+        same backend config. The previous fold's documents must not survive into this one.
+        """
+        vector_index.add(sample_texts, sample_labels)
+
+        second_index = VectorIndex(embedder_config=embedder_config, config=vector_index.config)
+        fold_texts, fold_labels = sample_texts[1:4], sample_labels[1:4]
+        second_index.add(fold_texts, fold_labels)
+
+        assert second_index.get_all_embeddings().shape[0] == len(fold_texts)
+
     def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test querying the index with text."""
         vector_index.add(sample_texts, sample_labels)
@@ -210,20 +231,48 @@ class TestVectorIndex:
             assert len(documents[0]) <= 1
 
     def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
-        """Test clearing the index from RAM."""
+        """clear_ram() releases local resources and must not destroy durable state (issue #342)."""
         vector_index.add(sample_texts, sample_labels)
 
-        # Clear RAM
         vector_index.clear_ram()
 
-        # For FaissBackend, index should be reset
-        # For OpenSearchBackend, documents should be deleted
-        # Both should handle this gracefully
         if isinstance(vector_index.config, FaissConfig):
-            # Faiss index should be reset but still exist
-            assert hasattr(vector_index, "index")
-            embeddings = vector_index.get_all_embeddings()
-            assert embeddings.shape[0] == 0
+            # everything is local: the in-RAM vectors are dropped
+            assert vector_index.get_all_embeddings().shape[0] == 0
+        else:
+            # documents live remotely; releasing local resources must not delete them
+            assert vector_index.get_all_embeddings().shape[0] == len(sample_texts)
+
+    def test_dump_survives_clear_ram(
+        self,
+        vector_index: VectorIndex,
+        sample_texts: list[str],
+        sample_labels: list[int],
+        tmp_path: Path,
+    ) -> None:
+        """The optimizer dumps the best module, then clear_ram()s it; the dump must stay servable (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+        dump_dir = tmp_path / "dump"
+        vector_index.dump(dump_dir)
+
+        vector_index.clear_ram()
+
+        loaded = VectorIndex.load(dump_dir)
+        _distances, documents = loaded.query(["password reset"], k=2)
+        assert len(documents[0]) == 2
+
+    def test_reset_drops_all_documents(
+        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
+    ) -> None:
+        """reset() drops every indexed document, including durable state (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+
+        vector_index.index.reset()
+
+        assert vector_index.get_all_embeddings().shape[0] == 0
+        if isinstance(vector_index.index, FaissBackend):
+            # reset() must clear the documents store too, not only the vectors
+            assert vector_index.index._documents == []
 
     def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test dumping and loading the vector index."""
@@ -349,3 +398,18 @@ class TestVectorIndexEdgeCases:
         finally:
             # Restore original modules
             sys.modules.update(original_modules)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_empty_index_query_raises_actionable_error(opensearch_container: tuple[str, int]) -> None:
+    """Querying an empty index names the problem instead of failing later with a numpy cast error (issue #342)."""
+    host, port = opensearch_container
+    config = OpenSearchConfig(
+        hosts=[{"host": host, "port": port}],
+        index_name=f"test_empty_{uuid.uuid4().hex[:8]}",
+    )
+    backend = OpenSearchBackend(config=config, vector_size=8)
+    backend._init_index()
+
+    with pytest.raises(RuntimeError, match="empty"):
+        backend.query(np.zeros((1, 8)), k=3)

@@ -82,6 +82,11 @@ class VectorIndex:
     def add(self, texts: list[str], labels: ListOfLabels) -> None:
         """Add texts and their corresponding labels to the index.
 
+        The first ``add()`` call creates the backend; per the backend contract, a fresh
+        backend's first write starts from empty index contents (fit-replaces semantics) —
+        for OpenSearch this clears any pre-existing documents in the configured index.
+        Subsequent calls append.
+
         Args:
             texts: List of input texts.
             labels: List of labels corresponding to the texts.
