@@ -22,7 +22,6 @@ can clean up the referenced cluster index (see ``remote_dumps.remove_module_dump
 """
 
 
-
 class BaseIndexBackend(ABC):
     @abstractmethod
     def __init__(self, config: VectorIndexConfig, vector_size: int) -> None: ...

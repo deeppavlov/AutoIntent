@@ -43,6 +43,8 @@ class OpenSearchBackend(BaseIndexBackend):
         self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
         self._index_name = self.config.index_name
         self._has_written = False
+        self._generation_index: str | None = None
+        self._read_only = False
 
     @property
     def index_name(self) -> str:
@@ -257,7 +259,6 @@ class OpenSearchBackend(BaseIndexBackend):
             self._client.clear_scroll(scroll_id=scroll_id)
 
         return np.array(embeddings)
-
 
     def _copy_index(self, source: str, dest: str) -> None:
         """Server-side copy: data moves shard-to-shard inside the cluster, never through the client.
