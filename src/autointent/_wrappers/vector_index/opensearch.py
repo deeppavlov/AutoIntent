@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
+import time
+import uuid
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -9,7 +12,7 @@ import numpy as np
 from autointent.configs import OpenSearchConfig
 from autointent.custom_types import Document
 
-from .base_backend import BaseIndexBackend
+from .base_backend import MANIFEST_FILENAME, BaseIndexBackend
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -18,11 +21,13 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 
+logger = logging.getLogger(__name__)
+
+
 class OpenSearchBackend(BaseIndexBackend):
-    _documents_filename = "documents.json"
     _config_filename = "config.json"
-    _embeddings_filename = "embeddings.json"
     _vector_size_filename = "vector_size.txt"
+    _manifest_filename = MANIFEST_FILENAME
 
     def __init__(self, config: OpenSearchConfig, vector_size: int) -> None:
         try:
@@ -46,35 +51,40 @@ class OpenSearchBackend(BaseIndexBackend):
             raise RuntimeError(msg)
         return self._index_name
 
+    def _index_body(self, dump_id: str | None = None) -> dict[str, Any]:
+        """Index settings/mappings for exact vector search; optionally stamped with a dump identity."""
+        body: dict[str, Any] = {
+            "settings": {
+                "index": {
+                    "knn": False,  # Disable approximate kNN for exact search
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0,
+                }
+            },
+            "mappings": {
+                "properties": {
+                    "values": {
+                        "type": "knn_vector",
+                        "dimension": self.vector_size,
+                        # No method specified - this enables exact search with script scoring
+                    },
+                    "text": {
+                        "type": "text",
+                        "analyzer": "standard",
+                    },
+                    "label": {
+                        "type": "keyword",
+                    },
+                }
+            },
+        }
+        if dump_id is not None:
+            body["mappings"]["_meta"] = {"dump_id": dump_id}
+        return body
+
     def _init_index(self) -> None:
         if not self._client.indices.exists(index=self.index_name):
-            # Create index for exact vector search using script scoring
-            index_body = {
-                "settings": {
-                    "index": {
-                        "knn": False,  # Disable approximate kNN for exact search
-                        "number_of_shards": 1,
-                        "number_of_replicas": 0,
-                    }
-                },
-                "mappings": {
-                    "properties": {
-                        "values": {
-                            "type": "knn_vector",
-                            "dimension": self.vector_size,
-                            # No method specified - this enables exact search with script scoring
-                        },
-                        "text": {
-                            "type": "text",
-                            "analyzer": "standard",
-                        },
-                        "label": {
-                            "type": "keyword",
-                        },
-                    }
-                },
-            }
-            self._client.indices.create(index=self.index_name, body=index_body)
+            self._client.indices.create(index=self.index_name, body=self._index_body())
 
     def clear_ram(self) -> None:
         """Release local resources (none held): documents live in the remote index and are not touched.
@@ -248,15 +258,62 @@ class OpenSearchBackend(BaseIndexBackend):
 
         return np.array(embeddings)
 
+
+    def _copy_index(self, source: str, dest: str) -> None:
+        """Server-side copy: data moves shard-to-shard inside the cluster, never through the client.
+
+        Polls the task API instead of ``wait_for_completion=true`` so arbitrarily large
+        corpora are not capped by the HTTP client timeout.
+        """
+        self._client.indices.refresh(index=source)
+        response = self._client.reindex(
+            body={"source": {"index": source}, "dest": {"index": dest}},
+            wait_for_completion=False,
+        )
+        task_id = response["task"]
+        while True:
+            status = self._client.tasks.get(task_id=task_id)
+            if status.get("completed"):
+                break
+            time.sleep(0.2)
+        error = status.get("error")
+        failures = status.get("response", {}).get("failures", [])
+        if error or failures:
+            msg = f"Server-side copy from '{source}' to '{dest}' failed: {error or failures}"
+            raise RuntimeError(msg)
+        self._client.indices.refresh(index=dest)
+
     def dump(self, path: Path) -> None:
-        """Save index data to files."""
+        """Snapshot the index into an immutable cluster-side generation.
+
+        Creates ``{base}-best-{uuid}`` with the same mapping as the live index, copies the
+        current contents into it server-side, write-blocks it, and records it in
+        ``remote_manifest.json`` so ``load()`` serves exactly the data present now — later
+        fits of the live index cannot change it (issue #343). If the instance was never
+        fitted, only the plain config reference is written.
+        """
         path.mkdir(parents=True, exist_ok=True)
+
+        manifest: dict[str, Any] | None = None
+        if self._index_name is not None:
+            dump_id = uuid.uuid4().hex[:12]
+            base = self.index_name.split("-best-")[0]
+            generation = f"{base}-best-{dump_id}"
+            self._client.indices.create(index=generation, body=self._index_body(dump_id))
+            self._copy_index(source=self.index_name, dest=generation)
+            self._client.indices.put_settings(index=generation, body={"index": {"blocks": {"write": True}}})
+            self._generation_index = generation
+            manifest = {"engine": "opensearch", "index": generation, "dump_id": dump_id}
 
         with (path / self._config_filename).open("w", encoding="utf-8") as file:
             json.dump(self.config.model_dump(), file, indent=4, ensure_ascii=False)
 
         with (path / self._vector_size_filename).open("w", encoding="utf-8") as file:
             file.write(str(self.vector_size))
+
+        if manifest is not None:
+            with (path / self._manifest_filename).open("w", encoding="utf-8") as file:
+                json.dump(manifest, file, indent=4, ensure_ascii=False)
 
     @classmethod
     def load(cls, path: Path) -> Self:

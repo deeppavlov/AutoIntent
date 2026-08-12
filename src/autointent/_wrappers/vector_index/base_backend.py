@@ -13,6 +13,16 @@ if TYPE_CHECKING:
     from autointent.custom_types import Document
 
 
+MANIFEST_FILENAME = "remote_manifest.json"
+"""Marker file inside a dump directory: the dump references remote cluster state.
+
+Any backend whose ``dump()`` leaves data in an external engine writes this file
+(``{"engine": ..., "index": ..., "dump_id": ...}``) so that dump-deletion tooling
+can clean up the referenced cluster index (see ``remote_dumps.remove_module_dump``).
+"""
+
+
+
 class BaseIndexBackend(ABC):
     @abstractmethod
     def __init__(self, config: VectorIndexConfig, vector_size: int) -> None: ...

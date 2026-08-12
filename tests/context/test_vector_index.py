@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
@@ -413,3 +414,61 @@ def test_opensearch_empty_index_query_raises_actionable_error(opensearch_contain
 
     with pytest.raises(RuntimeError, match="empty"):
         backend.query(np.zeros((1, 8)), k=3)
+
+
+def _os_backend(host: str, port: int, index_name: str | None, vector_size: int = 8) -> OpenSearchBackend:
+    config = OpenSearchConfig(hosts=[{"host": host, "port": port}], index_name=index_name)
+    return OpenSearchBackend(config=config, vector_size=vector_size)
+
+
+def _one_hot_docs(prefix: str, n: int = 4, label: int = 0) -> tuple[np.ndarray, list[Document]]:
+    """One-hot embeddings make nearest-neighbor assertions exact: query eye[i] -> doc i."""
+    return np.eye(8, dtype="float32")[:n], [Document(text=f"{prefix} {i}", label=label) for i in range(n)]
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_creates_write_blocked_generation(opensearch_container: tuple[str, int]) -> None:
+    """dump() copies the live index into an immutable generation and records a manifest (issue #343)."""
+    import opensearchpy
+
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    manifest = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["engine"] == "opensearch"
+    generation = manifest["index"]
+    assert generation.startswith(f"{live_name}-best-")
+    assert generation.endswith(manifest["dump_id"])
+
+    client = backend._client
+    assert client.indices.exists(index=generation)
+    assert client.count(index=generation)["count"] == 4
+
+    meta = client.indices.get_mapping(index=generation)[generation]["mappings"]["_meta"]
+    assert meta["dump_id"] == manifest["dump_id"]
+
+    with pytest.raises(opensearchpy.exceptions.TransportError):
+        client.index(index=generation, body={"values": [0.0] * 8, "text": "stray write", "label": 0})
+
+    # the pre-existing reference files are still written
+    assert (dump_dir / "config.json").exists()
+    assert (dump_dir / "vector_size.txt").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_before_fit_writes_no_manifest(opensearch_container: tuple[str, int]) -> None:
+    """A never-fitted backend dumps a plain reference (no generation to copy)."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, index_name=None)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    assert not (dump_dir / "remote_manifest.json").exists()
+    assert (dump_dir / "config.json").exists()
