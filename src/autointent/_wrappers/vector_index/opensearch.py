@@ -84,6 +84,15 @@ class OpenSearchBackend(BaseIndexBackend):
                 refresh=True,
             )
 
+    def reset(self) -> None:
+        """Drop all documents from the remote index (durable state)."""
+        if self._client.indices.exists(index=self.index_name):
+            self._client.delete_by_query(
+                index=self.index_name,
+                body={"query": {"match_all": {}}},
+                refresh=True,
+            )
+
     def add(self, embeddings: NDArray[Any], documents: list[Document]) -> None:
         """Add embeddings and documents to OpenSearch index."""
         if len(embeddings) != len(documents):

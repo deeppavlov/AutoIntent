@@ -18,10 +18,24 @@ class BaseIndexBackend(ABC):
     def __init__(self, config: VectorIndexConfig, vector_size: int) -> None: ...
 
     @abstractmethod
-    def add(self, embeddings: npt.NDArray[Any], documents: list[Document]) -> None: ...
+    def add(self, embeddings: npt.NDArray[Any], documents: list[Document]) -> None:
+        """Add documents and their embeddings to the index.
+
+        The first ``add()`` call on an instance replaces any pre-existing contents
+        of the underlying index (fit-replaces semantics); subsequent calls append.
+        """
 
     @abstractmethod
-    def clear_ram(self) -> None: ...
+    def clear_ram(self) -> None:
+        """Release local (in-process) resources held by the backend.
+
+        Must not destroy durable index state: after ``clear_ram()``, a backend
+        restored via ``load()`` from a previous ``dump()`` must still serve queries.
+        """
+
+    @abstractmethod
+    def reset(self) -> None:
+        """Drop all indexed documents, including durable state shared across instances."""
 
     @abstractmethod
     def query(self, embedding: npt.NDArray[Any], k: int) -> tuple[npt.NDArray[Any], list[list[Document]]]:

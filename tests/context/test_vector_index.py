@@ -12,6 +12,7 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
+from autointent._wrappers.vector_index.faiss import FaissBackend
 from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
 from autointent.configs import (
     FaissConfig,
@@ -224,6 +225,19 @@ class TestVectorIndex:
             assert hasattr(vector_index, "index")
             embeddings = vector_index.get_all_embeddings()
             assert embeddings.shape[0] == 0
+
+    def test_reset_drops_all_documents(
+        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
+    ) -> None:
+        """reset() drops every indexed document, including durable state (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+
+        vector_index.index.reset()
+
+        assert vector_index.get_all_embeddings().shape[0] == 0
+        if isinstance(vector_index.index, FaissBackend):
+            # reset() must clear the documents store too, not only the vectors
+            assert vector_index.index._documents == []
 
     def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test dumping and loading the vector index."""
