@@ -131,7 +131,6 @@ class OpenSearchBackend(BaseIndexBackend):
 
         if not self._has_written:
             self.reset()
-            self._has_written = True
 
         # Use bulk API for efficient indexing
         try:
@@ -150,6 +149,8 @@ class OpenSearchBackend(BaseIndexBackend):
         # Refresh index to make documents searchable immediately
         # Note: For large datasets, consider batching refreshes or using refresh=wait_for in bulk operations
         self._client.indices.refresh(index=self.index_name)
+
+        self._has_written = True
 
     def query(self, embedding: NDArray[Any], k: int) -> tuple[NDArray[Any], list[list[Document]]]:
         """Query the index using exact vector similarity search with script scoring."""
