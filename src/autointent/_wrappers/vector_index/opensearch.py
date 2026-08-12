@@ -371,6 +371,12 @@ class OpenSearchBackend(BaseIndexBackend):
             source = self._generation_index or self.index_name
             self._copy_index(source=source, dest=generation)
             self._client.indices.put_settings(index=generation, body={"index": {"blocks": {"write": True}}})
+            alias = f"{base}-best"
+            actions: list[dict[str, Any]] = [{"add": {"index": generation, "alias": alias}}]
+            existing = self._client.indices.get_alias(name=alias, ignore=404)
+            if isinstance(existing, dict) and "error" not in existing:
+                actions = [{"remove": {"index": index, "alias": alias}} for index in existing] + actions
+            self._client.indices.update_aliases(body={"actions": actions})  # remove+add is atomic
             self._generation_index = generation
             manifest = {"engine": "opensearch", "index": generation, "dump_id": dump_id}
 

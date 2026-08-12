@@ -663,3 +663,21 @@ def test_opensearch_dump_twice_to_same_path_replaces_generation(opensearch_conta
     loaded = OpenSearchBackend.load(dump_dir)
     _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
     assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_swaps_serving_alias_to_latest_generation(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(first_dump)
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(second_dump)
+    latest_generation = json.loads((second_dump / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    alias_targets = backend._client.indices.get_alias(name=f"{live_name}-best")
+    assert list(alias_targets) == [latest_generation]
