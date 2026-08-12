@@ -169,6 +169,7 @@ class OpenSearchBackend(BaseIndexBackend):
         self._client.indices.refresh(index=self.index_name)
 
         self._has_written = True
+        self._generation_index = None  # the live index is the source of truth again
 
     def query(self, embedding: NDArray[Any], k: int) -> tuple[NDArray[Any], list[list[Document]]]:
         """Query the index using exact vector similarity search with script scoring."""
@@ -355,13 +356,20 @@ class OpenSearchBackend(BaseIndexBackend):
         """
         path.mkdir(parents=True, exist_ok=True)
 
+        manifest_path = path / self._manifest_filename
+        old_manifest: dict[str, Any] | None = None
+        if manifest_path.exists():
+            with manifest_path.open("r", encoding="utf-8") as file:
+                old_manifest = json.load(file)
+
         manifest: dict[str, Any] | None = None
         if self._index_name is not None:
             dump_id = uuid.uuid4().hex[:12]
             base = self.index_name.split("-best-")[0]
             generation = f"{base}-best-{dump_id}"
             self._client.indices.create(index=generation, body=self._index_body(dump_id))
-            self._copy_index(source=self.index_name, dest=generation)
+            source = self._generation_index or self.index_name
+            self._copy_index(source=source, dest=generation)
             self._client.indices.put_settings(index=generation, body={"index": {"blocks": {"write": True}}})
             self._generation_index = generation
             manifest = {"engine": "opensearch", "index": generation, "dump_id": dump_id}
@@ -373,8 +381,13 @@ class OpenSearchBackend(BaseIndexBackend):
             file.write(str(self.vector_size))
 
         if manifest is not None:
-            with (path / self._manifest_filename).open("w", encoding="utf-8") as file:
+            with manifest_path.open("w", encoding="utf-8") as file:
                 json.dump(manifest, file, indent=4, ensure_ascii=False)
+        elif old_manifest is not None:
+            manifest_path.unlink()
+
+        if old_manifest is not None and (manifest is None or old_manifest["index"] != manifest["index"]):
+            self._delete_generation(self._client, old_manifest)
 
     @classmethod
     def load(cls, path: Path) -> Self:

@@ -596,3 +596,70 @@ def test_opensearch_delete_dumped_generation_spares_recreated_index(opensearch_c
 
     OpenSearchBackend.delete_dumped_generation(dump_dir)
     assert backend._client.indices.exists(index=generation)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_redump_after_live_overwrite_serves_original_data(opensearch_container: tuple[str, int]) -> None:
+    """Pipeline.dump() path: re-dumping the best module after later trials rewrote the live
+    index must snapshot the module's own fitted data (sourced from its earlier generation)."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+
+    best = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    best.add(embeddings, documents)
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(first_dump)  # what log_module_optimization does at is_new_best time
+
+    later = _os_backend(host, port, live_name)
+    later_embeddings, later_documents = _one_hot_docs("later", label=1)
+    later.add(later_embeddings, later_documents)  # last trial rewrites the live index
+
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(second_dump)  # what Pipeline.dump() does afterwards
+
+    loaded = OpenSearchBackend.load(second_dump)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_add_after_dump_makes_live_index_source_again(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    backend.dump(Path(tempfile.mkdtemp()) / "vector_index")
+
+    more_embeddings, more_documents = _one_hot_docs("more", label=2)
+    backend.add(more_embeddings, more_documents)  # second add on same instance appends to live
+
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(second_dump)
+
+    loaded = OpenSearchBackend.load(second_dump)
+    assert loaded._client.count(index=loaded.index_name)["count"] == 8  # 4 "best" + 4 "more"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_twice_to_same_path_replaces_generation(opensearch_container: tuple[str, int]) -> None:
+    """A dump directory owns exactly one generation: re-dumping replaces it in the cluster."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    first_generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    backend.dump(dump_dir)
+    second_generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    assert first_generation != second_generation
+    assert not backend._client.indices.exists(index=first_generation)
+    assert backend._client.indices.exists(index=second_generation)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
