@@ -472,3 +472,93 @@ def test_opensearch_dump_before_fit_writes_no_manifest(opensearch_container: tup
 
     assert not (dump_dir / "remote_manifest.json").exists()
     assert (dump_dir / "config.json").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dumped_pipeline_survives_later_writes(opensearch_container: tuple[str, int]) -> None:
+    """THE regression test for issue #343: a dump serves the data present at dump time,
+    even after later trials rewrite — or someone deletes — the live index."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+
+    best = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    best.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(dump_dir)
+
+    later = _os_backend(host, port, live_name)  # next trial: fresh instance, fit-replaces
+    later_embeddings, later_documents = _one_hot_docs("later", label=1)
+    later.add(later_embeddings, later_documents)
+
+    best._client.indices.delete(index=live_name)  # even destroying the live index is fine
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_when_generation_missing(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+    backend._client.indices.delete(index=generation)
+
+    with pytest.raises(RuntimeError, match="no longer exists or was recreated"):
+        OpenSearchBackend.load(dump_dir)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_when_generation_recreated(opensearch_container: tuple[str, int]) -> None:
+    """A same-named index without our dump_id is somebody else's index — refuse, don't serve it."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+    backend._client.indices.delete(index=generation)
+    backend._client.indices.create(index=generation)  # recreated, no _meta.dump_id
+
+    with pytest.raises(RuntimeError, match="no longer exists or was recreated"):
+        OpenSearchBackend.load(dump_dir)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_loaded_instance_rejects_writes(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    with pytest.raises(RuntimeError, match="immutable"):
+        loaded.add(embeddings, documents)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_manifestless_dump_loads_as_reference(opensearch_container: tuple[str, int]) -> None:
+    """Backward compatibility: dumps created before #343 (no manifest) keep today's semantics."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    (dump_dir / "remote_manifest.json").unlink()  # simulate a pre-#343 dump
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    assert loaded.index_name == live_name
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"

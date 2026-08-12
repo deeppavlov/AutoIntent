@@ -112,6 +112,13 @@ class OpenSearchBackend(BaseIndexBackend):
         the remote index (fit-replaces semantics, see #342); subsequent calls append.
         This also holds for instances restored via ``load()``.
         """
+        if self._read_only:
+            msg = (
+                f"This instance was loaded from a dump and serves the immutable generation index "
+                f"'{self.index_name}'. Create a new backend (or re-fit the module) to write data."
+            )
+            raise RuntimeError(msg)
+
         if len(embeddings) != len(documents):
             msg = f"Number of embeddings ({len(embeddings)}) must match number of documents ({len(documents)})"
             raise ValueError(msg)
@@ -284,6 +291,22 @@ class OpenSearchBackend(BaseIndexBackend):
             raise RuntimeError(msg)
         self._client.indices.refresh(index=dest)
 
+    def _bind_generation(self, generation: str, dump_id: str) -> None:
+        """Bind this instance read-only to a dump generation, verifying it is intact."""
+        stored: str | None = None
+        if self._client.indices.exists(index=generation):
+            mappings = self._client.indices.get_mapping(index=generation)[generation]["mappings"]
+            stored = mappings.get("_meta", {}).get("dump_id")
+        if stored != dump_id:
+            msg = (
+                f"dump references cluster index '{generation}' which no longer exists or was recreated "
+                f"(expected dump_id={dump_id!r}, found {stored!r})"
+            )
+            raise RuntimeError(msg)
+        self._index_name = generation
+        self._generation_index = generation
+        self._read_only = True
+
     def dump(self, path: Path) -> None:
         """Snapshot the index into an immutable cluster-side generation.
 
@@ -318,7 +341,12 @@ class OpenSearchBackend(BaseIndexBackend):
 
     @classmethod
     def load(cls, path: Path) -> Self:
-        """Load index from saved files."""
+        """Load index from saved files.
+
+        If the dump carries a ``remote_manifest.json``, the instance binds read-only to the
+        immutable generation index recorded there (and verifies its identity). Dumps without
+        a manifest (pre-#343, or dumped before any fit) bind to the configured live index.
+        """
         with (path / cls._config_filename).open("r", encoding="utf-8") as file:
             config_data = json.load(file)
 
@@ -326,4 +354,11 @@ class OpenSearchBackend(BaseIndexBackend):
             vector_size = int(file.read())
 
         config = OpenSearchConfig.model_validate(config_data)
-        return cls(config=config, vector_size=vector_size)
+        instance = cls(config=config, vector_size=vector_size)
+
+        manifest_path = path / cls._manifest_filename
+        if manifest_path.exists():
+            with manifest_path.open("r", encoding="utf-8") as file:
+                manifest = json.load(file)
+            instance._bind_generation(manifest["index"], manifest["dump_id"])
+        return instance
