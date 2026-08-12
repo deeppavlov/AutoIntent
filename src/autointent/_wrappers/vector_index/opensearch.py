@@ -77,13 +77,12 @@ class OpenSearchBackend(BaseIndexBackend):
             self._client.indices.create(index=self.index_name, body=index_body)
 
     def clear_ram(self) -> None:
-        """Clear the index by deleting all documents."""
-        if self._client.indices.exists(index=self.index_name):
-            self._client.delete_by_query(
-                index=self.index_name,
-                body={"query": {"match_all": {}}},
-                refresh=True,
-            )
+        """Release local resources (none held): documents live in the remote index and are not touched.
+
+        Deleting remote documents here would destroy the durable state that ``dump()``
+        only references — the dumped pipeline would reload an empty index (#342).
+        Use :meth:`reset` to actually drop index contents.
+        """
 
     def reset(self) -> None:
         """Drop all documents from the remote index (durable state)."""

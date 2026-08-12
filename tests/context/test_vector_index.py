@@ -231,20 +231,35 @@ class TestVectorIndex:
             assert len(documents[0]) <= 1
 
     def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
-        """Test clearing the index from RAM."""
+        """clear_ram() releases local resources and must not destroy durable state (issue #342)."""
         vector_index.add(sample_texts, sample_labels)
 
-        # Clear RAM
         vector_index.clear_ram()
 
-        # For FaissBackend, index should be reset
-        # For OpenSearchBackend, documents should be deleted
-        # Both should handle this gracefully
         if isinstance(vector_index.config, FaissConfig):
-            # Faiss index should be reset but still exist
-            assert hasattr(vector_index, "index")
-            embeddings = vector_index.get_all_embeddings()
-            assert embeddings.shape[0] == 0
+            # everything is local: the in-RAM vectors are dropped
+            assert vector_index.get_all_embeddings().shape[0] == 0
+        else:
+            # documents live remotely; releasing local resources must not delete them
+            assert vector_index.get_all_embeddings().shape[0] == len(sample_texts)
+
+    def test_dump_survives_clear_ram(
+        self,
+        vector_index: VectorIndex,
+        sample_texts: list[str],
+        sample_labels: list[int],
+        tmp_path: Path,
+    ) -> None:
+        """The optimizer dumps the best module, then clear_ram()s it; the dump must stay servable (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+        dump_dir = tmp_path / "dump"
+        vector_index.dump(dump_dir)
+
+        vector_index.clear_ram()
+
+        loaded = VectorIndex.load(dump_dir)
+        _distances, documents = loaded.query(["password reset"], k=2)
+        assert len(documents[0]) == 2
 
     def test_reset_drops_all_documents(
         self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
