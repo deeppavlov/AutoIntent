@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-import sys
 import tempfile
 import uuid
+from importlib import metadata
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -26,8 +26,6 @@ from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
-    from types import ModuleType
-
     import numpy.typing as npt
 
 
@@ -371,36 +369,20 @@ class TestVectorIndexEdgeCases:
             vector_index.add(["test"], [0])
 
     def test_opensearch_dependency_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """Test OpenSearch dependency error handling."""
-        # Mock opensearchpy import to fail
+        """require('opensearch') surfaces a clear ImportError when opensearch-py isn't installed."""
+        original_version = metadata.version
 
-        original_modules = sys.modules.copy()
+        def fake_version(name: str) -> str:
+            if name == "opensearch-py":
+                raise metadata.PackageNotFoundError(name)
+            return original_version(name)
 
-        try:
-            # Remove opensearchpy from sys.modules if it exists
-            if "opensearchpy" in sys.modules:
-                del sys.modules["opensearchpy"]
+        monkeypatch.setattr(metadata, "version", fake_version)
 
-            # Mock import to raise ImportError
-            def mock_import(name: str, *args: object, **kwargs: object) -> ModuleType | None:
-                if name == "opensearchpy":
-                    msg = "No module named opensearchpy"
-                    raise ImportError(msg)
-                return original_modules.get(name)
+        config = OpenSearchConfig(hosts=[{"host": "localhost", "port": 9200}])
 
-            monkeypatch.setattr("builtins.__import__", mock_import)
-
-            # Import the backend module fresh to trigger the import error
-            from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
-
-            config = OpenSearchConfig(hosts=[{"host": "localhost", "port": 9200}])
-
-            with pytest.raises(RuntimeError, match="Install opensearch-py python package first"):
-                OpenSearchBackend(config=config, vector_size=384)
-
-        finally:
-            # Restore original modules
-            sys.modules.update(original_modules)
+        with pytest.raises(ImportError, match="opensearch-py"):
+            OpenSearchBackend(config=config, vector_size=384)
 
 
 @pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
