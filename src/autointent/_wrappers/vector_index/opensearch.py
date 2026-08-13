@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from autointent._deps import require
 from autointent.configs import OpenSearchConfig
 from autointent.custom_types import Document
 
@@ -30,14 +31,10 @@ class OpenSearchBackend(BaseIndexBackend):
     _manifest_filename = MANIFEST_FILENAME
 
     def __init__(self, config: OpenSearchConfig, vector_size: int) -> None:
-        try:
-            import opensearchpy
+        require("opensearch")
+        import opensearchpy
 
-            self._opensearchpy = opensearchpy
-        except ImportError as e:
-            msg = "Unable to create OpenSearch vector index. Install opensearch-py python package first."
-            raise RuntimeError(msg) from e
-
+        self._opensearchpy = opensearchpy
         self.vector_size = vector_size
         self.config = config.model_copy()
         self._client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
@@ -367,11 +364,8 @@ class OpenSearchBackend(BaseIndexBackend):
         with (path / cls._config_filename).open("r", encoding="utf-8") as file:
             config = OpenSearchConfig.model_validate(json.load(file))
 
-        try:
-            import opensearchpy
-        except ImportError as e:  # same optional dependency story as __init__
-            msg = "Unable to delete OpenSearch dump generation. Install opensearch-py python package first."
-            raise RuntimeError(msg) from e
+        require("opensearch")
+        import opensearchpy
 
         client = opensearchpy.OpenSearch(hosts=config.hosts, **config.init_kwargs)
         cls._delete_generation(client, manifest)
