@@ -88,9 +88,7 @@ class TestMain:
         assert json.loads(outputs["matrix"]) == cm.FULL_MATRIX
         assert json.loads(outputs["warm_os"]) == ["ubuntu-latest", "windows-latest"]
 
-    def test_pr_without_label_writes_minimal_matrix(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-    ) -> None:
+    def test_pr_without_label_writes_minimal_matrix(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         out = tmp_path / "out.txt"
         monkeypatch.setenv("EVENT_NAME", "pull_request")
         monkeypatch.setenv("LABELS_JSON", '["bug"]')
@@ -103,9 +101,7 @@ class TestMain:
         assert json.loads(outputs["matrix"]) == cm.MINIMAL_MATRIX
         assert json.loads(outputs["warm_os"]) == ["ubuntu-latest"]
 
-    def test_pr_with_full_ci_label_writes_full_matrix(
-        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-    ) -> None:
+    def test_pr_with_full_ci_label_writes_full_matrix(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         out = tmp_path / "out.txt"
         monkeypatch.setenv("EVENT_NAME", "pull_request")
         monkeypatch.setenv("LABELS_JSON", '["full-ci"]')

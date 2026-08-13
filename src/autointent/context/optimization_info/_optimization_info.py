@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from autointent._dump_tools import Dumper
+from autointent._wrappers.vector_index import remove_module_dump
 from autointent.configs import InferenceNodeConfig
 from autointent.custom_types import NodeType
 
@@ -34,6 +35,12 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+
+def _dump_dir_nonempty(path: str) -> bool:
+    """Whether a module dump directory exists and contains at least one entry."""
+    dump_path = Path(path)
+    return dump_path.is_dir() and any(dump_path.iterdir())
 
 
 @dataclass
@@ -127,7 +134,14 @@ class OptimizationInfo:
             if old_best_metric_value_idx is not None:
                 prev_best_dump = self.trials.get_trials(node_type)[old_best_metric_value_idx].module_dump_dir
                 if prev_best_dump is not None:
-                    shutil.rmtree(prev_best_dump, ignore_errors=True)  # workaround for windows
+                    if module_dump_dir is not None and _dump_dir_nonempty(module_dump_dir):
+                        remove_module_dump(prev_best_dump)
+                    else:
+                        logger.warning(
+                            "keeping previous best dump %s: the new best trial's dump at %s was not produced",
+                            prev_best_dump,
+                            module_dump_dir,
+                        )
         else:
             module_dump_dir = None
 
