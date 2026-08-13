@@ -820,7 +820,7 @@ Optional dependencies are grouped as pip extras (see `pyproject.toml`). For the 
 pip install "autointent[sentence-transformers]"
 ```
 
-Other backends need their own extras, for example `autointent[openai]` or `autointent[vllm]`, as shown in the sections below. When a backend package is missing, code paths that need it typically call `autointent._utils.require`, which raises an `ImportError` that includes the matching `pip install autointent[<extra>]` hint.
+Other backends need their own extras, for example `autointent[openai]` or `autointent[vllm]`, as shown in the sections below. When a backend package is missing, code paths that need it typically call `autointent._deps.require`, which raises an `ImportError` that includes the matching `pip install autointent[<extra>]` hint.
 
 ## Configuration Approaches
 

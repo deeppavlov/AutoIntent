@@ -1,0 +1,9 @@
+autointent.server.mcp.lifespan
+==============================
+
+.. py:function:: autointent.server.mcp.lifespan(_)
+   :async:
+
+
+   Lifespan manager for the MCP server.
+

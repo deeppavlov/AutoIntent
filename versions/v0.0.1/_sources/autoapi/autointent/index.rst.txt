@@ -62,11 +62,13 @@ Functions
    :hidden:
 
    /autoapi/autointent/setup_logging
+   /autoapi/autointent/remove_module_dump
    /autoapi/autointent/load_dataset
 
 .. autoapisummary::
 
    autointent.setup_logging
+   autointent.remove_module_dump
    autointent.load_dataset
 
 

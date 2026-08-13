@@ -1,0 +1,71 @@
+autointent.context.optimization_info.ScorerArtifact
+===================================================
+
+.. py:class:: autointent.context.optimization_info.ScorerArtifact(/, **data)
+
+   Bases: :py:obj:`Artifact`
+
+
+   Artifact containing outputs from the scoring node.
+
+   Outputs from the best scorer, numpy arrays of shape (n_samples, n_classes).
+
+   .. attribute:: train_scores
+
+      Scorer outputs for train utterances.
+
+   .. attribute:: validation_scores
+
+      Scorer outputs for validation utterances.
+
+   .. attribute:: test_scores
+
+      Scorer outputs for test utterances.
+
+   .. attribute:: folded_scores
+
+      Scores for each fold from cross-validation.
+
+
+   .. py:attribute:: model_config
+
+      Configuration for the model, should be a dictionary conforming to [`ConfigDict`][pydantic.config.ConfigDict].
+
+
+   .. py:attribute:: train_scores
+      :type:  numpy.typing.NDArray[numpy.float64] | None
+      :value: None
+
+
+
+   .. py:attribute:: validation_scores
+      :type:  numpy.typing.NDArray[numpy.float64] | None
+      :value: None
+
+
+
+   .. py:attribute:: test_scores
+      :type:  numpy.typing.NDArray[numpy.float64] | None
+      :value: None
+
+
+
+   .. py:attribute:: folded_scores
+      :type:  list[numpy.typing.NDArray[numpy.float64]] | None
+      :value: None
+
+
+
+   .. py:method:: model_dump(**kwargs)
+
+      Convert the model to a dictionary, converting numpy arrays to lists.
+
+
+
+   .. py:method:: model_validate(obj)
+      :classmethod:
+
+
+      Convert lists back to numpy arrays during validation.
+
+

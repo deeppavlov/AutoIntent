@@ -1,0 +1,7 @@
+autointent.server.mcp.get_settings
+==================================
+
+.. py:function:: autointent.server.mcp.get_settings()
+
+   Get or create settings instance.
+

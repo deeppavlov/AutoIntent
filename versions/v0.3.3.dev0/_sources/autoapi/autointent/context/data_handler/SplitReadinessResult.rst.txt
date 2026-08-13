@@ -1,0 +1,39 @@
+autointent.context.data_handler.SplitReadinessResult
+====================================================
+
+.. py:class:: autointent.context.data_handler.SplitReadinessResult
+
+   Result of checking whether a dataset can be fed to autointent pipeline.
+
+   .. attribute:: ready
+
+      True if stratification can be performed (enough samples per class).
+
+   .. attribute:: underpopulated_classes
+
+      List of (label, n_samples) for classes below the minimum.
+
+   .. attribute:: min_samples_per_class_required
+
+      Minimum samples per class used for the check.
+
+   .. attribute:: reason
+
+      Human-readable reason when not ready (e.g. OOS not configured).
+
+
+   .. py:attribute:: ready
+      :type:  bool
+
+
+   .. py:attribute:: underpopulated_classes
+      :type:  list[ClassCount]
+
+
+   .. py:attribute:: min_samples_per_class_required
+      :type:  int
+
+
+   .. py:attribute:: reason
+      :type:  str | None
+

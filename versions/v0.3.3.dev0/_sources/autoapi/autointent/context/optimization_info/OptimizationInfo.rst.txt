@@ -1,0 +1,133 @@
+autointent.context.optimization_info.OptimizationInfo
+=====================================================
+
+.. py:class:: autointent.context.optimization_info.OptimizationInfo
+
+   Tracks optimization results, including trials, artifacts, and modules.
+
+   This class provides methods for logging optimization results, retrieving
+   the best-performing modules and artifacts, and generating configuration
+   for inference nodes.
+
+   .. attribute:: artifacts
+
+      Container for storing optimization artifacts.
+
+   .. attribute:: trials
+
+      Container for storing optimization trials.
+
+   .. attribute:: modules
+
+      Container for storing module instances.
+
+   .. attribute:: pipeline_metrics
+
+      Dictionary storing pipeline-level metrics.
+
+
+   .. py:attribute:: artifacts
+
+
+   .. py:attribute:: trials
+
+
+   .. py:attribute:: modules
+
+
+   .. py:attribute:: pipeline_metrics
+      :type:  dict[str, float]
+
+
+   .. py:method:: log_module_optimization(node_type, module_name, module_params, metric_value, metric_name, metrics, module_dump_dir, module)
+
+      Log optimization results for a module.
+
+      :param node_type: Type of the node being optimized.
+      :param module_name: Type of the module.
+      :param module_params: Parameters of the module for the trial.
+      :param metric_value: Metric value achieved by the module.
+      :param metric_name: Name of the evaluation metric.
+      :param metrics: Dictionary of metric names and their values.
+      :param module_dump_dir: Directory where the module is dumped.
+      :param module: The module instance, if available.
+
+
+
+   .. py:method:: get_best_embedder()
+
+      Retrieve the name of the best embedder from the retriever node.
+
+      :returns: Configuration of the best embedder.
+
+
+
+   .. py:method:: get_best_train_scores()
+
+      Retrieve the train scores from the best scorer node.
+
+      :returns: Train scores as a numpy array.
+
+
+
+   .. py:method:: get_best_validation_scores()
+
+      Retrieve the validation scores from the best scorer node.
+
+      :returns: Validation scores as a numpy array.
+
+
+
+   .. py:method:: get_best_folded_scores()
+
+      Retrieve the validation scores from the best scorer node.
+
+      :returns: Validation scores as a numpy array.
+
+
+
+   .. py:method:: get_best_test_scores()
+
+      Retrieve the test scores from the best scorer node.
+
+      :returns: Test scores as a numpy array.
+
+
+
+   .. py:method:: dump_evaluation_results()
+
+      Dump evaluation results for all nodes.
+
+      :returns: Dictionary containing metrics and configurations for all nodes.
+
+
+
+   .. py:method:: dump(path)
+
+      Dump the optimization information to a file.
+
+
+
+   .. py:method:: load(path)
+
+      Load the optimization information from a file.
+
+
+
+   .. py:method:: get_inference_nodes_config(asdict = False)
+
+      Generate configuration for inference nodes based on the best trials.
+
+      :param asdict: Whether to return the configuration as dictionaries.
+
+      :returns: List of configurations for inference nodes.
+
+
+
+   .. py:method:: get_best_modules()
+
+      Retrieve the best modules for all node types.
+
+      :returns: Dictionary of the best modules for each node type.
+
+

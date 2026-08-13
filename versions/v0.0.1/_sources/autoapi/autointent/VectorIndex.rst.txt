@@ -24,6 +24,11 @@ autointent.VectorIndex
 
       Add texts and their corresponding labels to the index.
 
+      The first ``add()`` call creates the backend; per the backend contract, a fresh
+      backend's first write starts from empty index contents (fit-replaces semantics) —
+      for OpenSearch this clears any pre-existing documents in the configured index.
+      Subsequent calls append.
+
       :param texts: List of input texts.
       :param labels: List of labels corresponding to the texts.
 

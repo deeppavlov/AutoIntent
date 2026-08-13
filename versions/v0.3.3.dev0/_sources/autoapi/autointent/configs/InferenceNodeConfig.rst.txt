@@ -1,0 +1,27 @@
+autointent.configs.InferenceNodeConfig
+======================================
+
+.. py:class:: autointent.configs.InferenceNodeConfig(node_type, module_name, module_config, load_path, embedder_config = None, cross_encoder_config = None)
+
+   Configuration for the inference node.
+
+
+   .. py:attribute:: node_type
+
+
+   .. py:attribute:: module_name
+
+
+   .. py:attribute:: module_config
+
+
+   .. py:attribute:: load_path
+
+
+   .. py:method:: asdict()
+
+      Convert the InferenceNodeConfig to a dictionary.
+
+      :returns: A dictionary representation of the InferenceNodeConfig.
+
+

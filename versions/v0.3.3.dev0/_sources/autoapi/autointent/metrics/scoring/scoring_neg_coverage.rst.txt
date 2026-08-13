@@ -1,0 +1,15 @@
+autointent.metrics.scoring.scoring_neg_coverage
+===============================================
+
+.. py:function:: autointent.metrics.scoring.scoring_neg_coverage(labels, scores)
+
+   Calculate negative coverage for multilabel classification.
+
+   Evaluates how far we need to go down the list of labels to cover all proper labels.
+   The ideal value is 1, the worst value is 0.
+
+   :param labels: Ground truth labels for each utterance.
+   :param scores: For each utterance, scores for each of n_classes classes.
+
+   :returns: Negative coverage score.
+

@@ -1,0 +1,13 @@
+autointent.remove_module_dump
+=============================
+
+.. py:function:: autointent.remove_module_dump(path)
+
+   Remove a module (or whole pipeline) dump directory together with its remote state.
+
+   Scans the tree for ``remote_manifest.json`` files, deletes each referenced cluster
+   index (any future remote backend that drops a manifest inherits this cleanup), then
+   removes the directory. Cleanup is best-effort: cluster errors are logged, not raised,
+   matching the ``shutil.rmtree(..., ignore_errors=True)`` this replaces in the
+   optimization loop. Dumps without manifests (Faiss, pre-#343) are simply removed.
+

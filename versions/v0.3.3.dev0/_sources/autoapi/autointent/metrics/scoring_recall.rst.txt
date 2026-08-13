@@ -1,0 +1,14 @@
+autointent.metrics.scoring_recall
+=================================
+
+.. py:function:: autointent.metrics.scoring_recall(labels, scores)
+
+   Calculate recall for multiclass and multilabel classification.
+
+   Uses decision_recall to evaluate decisions.
+
+   :param labels: Ground truth labels for each sample.
+   :param scores: For each sample, scores for each of n_classes classes.
+
+   :returns: Recall score.
+

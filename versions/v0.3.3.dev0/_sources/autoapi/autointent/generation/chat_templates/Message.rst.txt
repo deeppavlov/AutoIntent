@@ -1,0 +1,18 @@
+autointent.generation.chat_templates.Message
+============================================
+
+.. py:class:: autointent.generation.chat_templates.Message
+
+   Bases: :py:obj:`TypedDict`
+
+
+   Schema for message to LLM.
+
+
+   .. py:attribute:: role
+      :type:  str
+
+
+   .. py:attribute:: content
+      :type:  str
+
