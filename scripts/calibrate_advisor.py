@@ -275,19 +275,23 @@ def _dir_size_gb(path: Path) -> float:
 
 
 class _PeakSampler:
-    """Background thread tracking peak RSS and (on MPS) peak GPU allocation.
+    """Background thread polling peak RSS + (optionally) MPS / CUDA current
+    allocation. CUDA polling catches allocations that fall outside any
+    module bracket — the per-module tracker's peak counter gets reset at each
+    start_module, losing anything allocated before it (e.g. the embedder
+    forward during pipeline setup). Best-effort: sub-poll-interval spikes
+    can be missed."""
 
-    CUDA has an accurate native peak-memory API and doesn't need polling; we
-    still read it after the fit. MPS lacks a peak API, so the sampler polls
-    ``torch.mps.current_allocated_memory()`` alongside RSS and keeps the max.
-    """
-
-    def __init__(self, interval_s: float = 0.1, *, sample_mps: bool = False) -> None:
+    def __init__(
+        self, interval_s: float = 0.1, *, sample_mps: bool = False, sample_cuda: bool = False,
+    ) -> None:
         self._interval_s = interval_s
         self._proc = psutil.Process()
         self.peak_ram_gb = self._proc.memory_info().rss / _BYTES_PER_GB
         self.peak_mps_gb: float | None = 0.0 if sample_mps else None
+        self.peak_cuda_gb: float | None = 0.0 if sample_cuda else None
         self._sample_mps = sample_mps
+        self._sample_cuda = sample_cuda
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
 
@@ -314,6 +318,10 @@ class _PeakSampler:
                     mps = float(torch.mps.current_allocated_memory()) / _BYTES_PER_GB
                     if self.peak_mps_gb is None or mps > self.peak_mps_gb:
                         self.peak_mps_gb = mps
+                if self._sample_cuda and torch is not None and torch.cuda.is_available():
+                    cuda = float(torch.cuda.memory_allocated()) / _BYTES_PER_GB
+                    if self.peak_cuda_gb is None or cuda > self.peak_cuda_gb:
+                        self.peak_cuda_gb = cuda
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 break
             self._stop.wait(self._interval_s)
@@ -866,10 +874,13 @@ def _calibrate_one(
     _attach_callbacks(pipeline, callbacks)
 
     is_mps = hardware.accelerator == "mps"
+    is_cuda = hardware.accelerator == "cuda"
     undo_step_patch = _patch_trainer_for_step_timing(tracker)
     start = time.perf_counter()
     try:
-        with _PeakSampler(interval_s=poll_interval_ms / 1000.0, sample_mps=is_mps) as sampler:
+        with _PeakSampler(
+            interval_s=poll_interval_ms / 1000.0, sample_mps=is_mps, sample_cuda=is_cuda,
+        ) as sampler:
             pipeline.fit(dataset, preflight="off")
     except Exception as e:  # noqa: BLE001
         row.error = f"fit failed: {e}"
@@ -883,12 +894,15 @@ def _calibrate_one(
     embed_after = _dir_size_gb(embed_cache)
     actual_time_h = elapsed_s / 3600.0
     actual_ram_gb = sampler.peak_ram_gb
-    # Prefer the tracker's per-module max: the fit-level torch.cuda peak is
-    # clobbered by the per-module reset_peak_memory_stats calls, so the final
-    # reading only reflects VRAM used since the last (usually CPU-only) module.
-    actual_vram_gb: float | None
-    if tracker.peak_vram_gb_overall > 0:
-        actual_vram_gb = tracker.peak_vram_gb_overall
+    # VRAM: take max of per-module tracker (inside brackets) and background
+    # sampler (outside brackets, e.g. classic-preset embedder forward).
+    # Fallback to a raw peak read only if both are zero.
+    actual_vram_gb: float | None = None
+    tracker_peak = tracker.peak_vram_gb_overall if tracker.peak_vram_gb_overall > 0 else None
+    sampler_peak = sampler.peak_cuda_gb if sampler.peak_cuda_gb and sampler.peak_cuda_gb > 0 else None
+    candidates = [x for x in (tracker_peak, sampler_peak) if x is not None]
+    if candidates:
+        actual_vram_gb = max(candidates)
     else:
         actual_vram_gb = _read_vram_peak_gb(hardware.accelerator)
     if actual_vram_gb is None and is_mps:
@@ -900,6 +914,9 @@ def _calibrate_one(
         "vram_gb": actual_vram_gb,
         "disk_download_gb": max(0.0, hf_after - hf_before),
         "disk_embedding_cache_gb": max(0.0, embed_after - embed_before),
+        # Per-signal breakdown; classic presets expect sampler > tracker.
+        "vram_gb_tracker": tracker_peak,
+        "vram_gb_sampler": sampler_peak,
     }
     row.modules = tracker.records
     if enable_wandb and not any("W&B requested but not available" in n for n in row.notes):

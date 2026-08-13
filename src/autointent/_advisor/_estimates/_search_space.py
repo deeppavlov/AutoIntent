@@ -56,22 +56,11 @@ def _max_int(value: Any, default: int) -> int:  # noqa: ANN401
 
 
 def _module_cardinality(entry: dict[str, Any]) -> int | None:
-    """Approximate number of unique configurations the module entry can produce.
+    """Unique configurations the module entry can produce.
 
-    Returns:
-        * ``1`` when every tunable field is a singleton (list of length 1, or a
-          plain scalar). Signal that HPO would rediscover the same config every
-          trial — real optuna dedupes, so effective n_trials = 1.
-        * ``N`` when the cardinality is finite and bounded (product of list
-          lengths across categorical fields, capped at :data:`_CARDINALITY_CAP`
-          to avoid overflow on large multi-list grids).
-        * ``None`` when any field declares a continuous range (``{low, high}``
-          dict) — treated as "unbounded" so the caller falls back to the full
-          node-level n_trials.
-
-    Ignores ``module_name`` (fixed, not a search dim), reserved keys like
-    ``target_metric``, and any non-tunable scalar keys that are already
-    single values.
+    Returns 1 when every tunable field is a singleton, N for finite list
+    products (capped at 10_000), None when any field is a continuous
+    ``{low, high}`` range.
     """
     _RESERVED = {"module_name", "target_metric"}
     _CARDINALITY_CAP = 10_000
@@ -80,22 +69,13 @@ def _module_cardinality(entry: dict[str, Any]) -> int | None:
         if key in _RESERVED:
             continue
         if isinstance(value, dict):
-            # Optuna-style range descriptor with low/high => continuous; treat
-            # as unbounded (many possible samples).
             if "low" in value and "high" in value:
-                return None
-            # Non-range dict (e.g. nested config) counts as 1 — the dict
-            # itself is fixed unless it wraps a list.
-            continue
-        if isinstance(value, list):
-            if not value:
-                continue
-            # A list of dicts (like classification_model_config: [{...}, {...}])
-            # still counts as N candidates. Length 1 = singleton.
+                return None  # continuous range
+            continue  # non-range dict = fixed
+        if isinstance(value, list) and value:
             product *= max(1, len(value))
             if product >= _CARDINALITY_CAP:
                 return _CARDINALITY_CAP
-        # Plain scalar (str/int/float/bool/None) is a singleton — contributes 1.
     return product
 
 

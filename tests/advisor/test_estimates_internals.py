@@ -769,3 +769,271 @@ class TestEmbeddingCache:
         # Warm: forward wasn't charged → model isn't in ``cached_embedders`` →
         # no disk_embedding_cache contribution.
         assert warm.resource.disk_embedding_cache_gb == 0
+
+
+class TestCnnRnnHeuristic:
+    """cnn/rnn get a real small-model estimate, not a not-estimated zero row."""
+
+    def test_cnn_row_is_nonzero(self) -> None:
+        cfg = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "cnn", "embed_dim": [128], "num_filters": [128],
+                     "kernel_sizes": [[3, 4, 5]], "batch_size": [64], "num_train_epochs": [60]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 10},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(n_samples=5000, n_classes=20), _profile())
+        cnn_row = next(d for d in report.resource.drivers if d["module"] == "cnn")
+        # Real numbers (not the not-estimated placeholder)
+        assert cnn_row["mode"] == "small-torch-train"
+        assert cnn_row["vram_gb"] > 0
+        assert cnn_row["ram_gb"] > 0
+        assert cnn_row["time_hours"] > 0
+
+    def test_rnn_row_uses_hidden_dim(self) -> None:
+        # Bigger hidden_dim → bigger VRAM.
+        base = {"module_name": "rnn", "embed_dim": [128], "batch_size": [64], "num_train_epochs": [30]}
+
+        def _run(hidden: int) -> float:
+            cfg = {
+                "search_space": [
+                    {"node_type": "scoring", "search_space": [{**base, "hidden_dim": [hidden]}]},
+                    {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+                ],
+                "hpo_config": {"n_trials": 5},
+            }
+            report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+            return next(d["vram_gb"] for d in report.resource.drivers if d["module"] == "rnn")
+
+        assert _run(1024) > _run(128), "larger hidden_dim must produce a larger VRAM row"
+
+
+class TestNtrialsSharedAcrossVariants:
+    """n_trials is a *node* budget shared across module_name candidates."""
+
+    def test_single_module_gets_full_n_trials(self) -> None:
+        # Big dataset + embedder so linear time is non-zero and comparable.
+        embedder_cfg = {"embedder_config": {"model_name": "intfloat/multilingual-e5-large-instruct"}}
+        cfg = {
+            **embedder_cfg,
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "linear"},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 200},
+        }
+        cfg2 = {
+            **embedder_cfg,
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "linear"},
+                    {"module_name": "knn", "k": [5]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 200},
+        }
+        stats = DatasetStats.placeholder(n_samples=10000, n_classes=77, avg_tokens=24)
+        solo = run_preflight(cfg, stats, _profile())
+        shared = run_preflight(cfg2, stats, _profile())
+
+        solo_lin = next(d["time_hours"] for d in solo.resource.drivers if d["module"] == "linear")
+        shared_lin = next(d["time_hours"] for d in shared.resource.drivers if d["module"] == "linear")
+        # Same module, same everything, but shared node has 2 variants → linear
+        # sees half the trials.
+        assert solo_lin > 0
+        assert shared_lin > 0
+        assert solo_lin > shared_lin, (
+            f"linear alone should get full n_trials, shared should get half; got solo={solo_lin} shared={shared_lin}"
+        )
+        # Concretely: solo=20 trials, shared=10 trials → 2x ratio (allow slop for rounding).
+        ratio = solo_lin / shared_lin
+        assert 1.5 < ratio < 2.5, f"expected ~2x ratio, got {ratio}"
+
+
+class TestProcessBaselineFloor:
+    """Every fit reserves ~1.5 GB RAM for torch/transformers/datasets."""
+
+    def test_ram_estimate_never_below_baseline(self) -> None:
+        # Minimal preset — no scoring modules that contribute RAM.
+        cfg = {
+            "search_space": [
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        # The floor is applied as an additive term, so even an empty pipeline
+        # must report at least the baseline in RAM.
+        assert report.resource.ram_gb >= 1.0
+
+    def test_cuda_vram_baseline_only_when_gpu_used(self) -> None:
+        cfg_cpu_only = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [{"module_name": "linear"}]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 1},
+        }
+        # linear scorer runs on CPU only → no CUDA baseline should apply.
+        report = run_preflight(cfg_cpu_only, DatasetStats.placeholder(), _profile(accelerator="cuda"))
+        assert report.resource.vram_gb == 0, "CPU-only preset must not spend the CUDA VRAM baseline"
+
+
+class TestModuleCardinality:
+    """1 for all-singleton, N for finite lists, None for continuous ranges."""
+
+    def test_all_singleton(self) -> None:
+        from autointent._advisor._estimates._search_space import _module_cardinality
+
+        assert _module_cardinality({"module_name": "bert"}) == 1
+        assert _module_cardinality({"module_name": "bert", "batch_size": [64], "epochs": [30]}) == 1
+
+    def test_multi_list_multiplies(self) -> None:
+        from autointent._advisor._estimates._search_space import _module_cardinality
+
+        # 2 batch × 3 lr candidates = 6 unique configs
+        cardinality = _module_cardinality(
+            {"module_name": "bert", "batch_size": [32, 64], "learning_rate": [1e-5, 5e-5, 1e-4]}
+        )
+        assert cardinality == 6
+
+    def test_range_dict_is_unbounded(self) -> None:
+        from autointent._advisor._estimates._search_space import _module_cardinality
+
+        # {low, high} → continuous → None (treated as unbounded)
+        assert _module_cardinality({"module_name": "knn", "k": {"low": 1, "high": 20}}) is None
+
+    def test_reserved_keys_skipped(self) -> None:
+        from autointent._advisor._estimates._search_space import _module_cardinality
+
+        # module_name / target_metric are not search dimensions
+        assert (
+            _module_cardinality(
+                {"module_name": "bert", "target_metric": "scoring_f1", "batch_size": [32, 64]}
+            )
+            == 2
+        )
+
+
+class TestNoOpHpoFinding:
+    """Config-phase warns when n_trials >> unique configs."""
+
+    def test_finding_on_singleton_bert_with_high_n_trials(self) -> None:
+        cfg = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "bert",
+                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                     "num_train_epochs": [30], "batch_size": [64]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 40},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        no_op = [f for f in report.findings if "unique configurations" in f.message]
+        assert len(no_op) == 1, f"expected exactly one no-op warning, got {[f.message for f in no_op]}"
+        assert no_op[0].phase == "config"
+        assert no_op[0].severity == Severity.TIGHT
+        assert "bert" in no_op[0].message
+
+    def test_no_finding_when_search_space_has_range(self) -> None:
+        cfg = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "bert",
+                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                     "learning_rate": {"low": 1e-5, "high": 1e-4}},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 40},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        no_op = [f for f in report.findings if "unique configurations" in f.message]
+        assert no_op == [], f"unexpected warning for ranged search space: {[f.message for f in no_op]}"
+
+    def test_no_finding_when_n_trials_matches_cardinality(self) -> None:
+        # n_trials=4, cardinality=2×2=4 → not a "no-op" waste
+        cfg = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "bert",
+                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                     "batch_size": [32, 64], "num_train_epochs": [10, 20]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 4},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
+        no_op = [f for f in report.findings if "unique configurations" in f.message]
+        assert no_op == [], "n_trials matching cardinality should not warn"
+
+
+class TestModeAwareVramBaseline:
+    """CUDA baseline + safety margin are mode-aware — training reserves more
+    cuDNN workspace than inference."""
+
+    def test_inference_only_preset_gets_smaller_vram_than_training(self) -> None:
+        # Both use e5-large; only the training config triggers the bigger baseline.
+        inference_only = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "knn", "k": [5]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "embedder_config": {"model_name": "intfloat/multilingual-e5-large-instruct"},
+            "hpo_config": {"n_trials": 5},
+        }
+        training = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "bert",
+                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                     "batch_size": [16], "num_train_epochs": [1]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "hpo_config": {"n_trials": 5},
+        }
+        stats = DatasetStats.placeholder(n_samples=1000, n_classes=10, avg_tokens=24)
+
+        infer_r = run_preflight(inference_only, stats, _profile(vram_gb=16.0))
+        train_r = run_preflight(training, stats, _profile(vram_gb=16.0))
+
+        # The training baseline is 1.0 GB, inference baseline is 0.3 GB — so
+        # subtracting the driver max should show at least the 0.7 GB gap.
+        infer_max_driver = max((d.get("vram_gb") or 0 for d in infer_r.resource.drivers), default=0)
+        train_max_driver = max((d.get("vram_gb") or 0 for d in train_r.resource.drivers), default=0)
+        infer_baseline = infer_r.resource.vram_gb - infer_max_driver
+        train_baseline = train_r.resource.vram_gb - train_max_driver
+        assert infer_baseline < train_baseline, (
+            f"inference baseline should be smaller; got infer={infer_baseline:.2f} train={train_baseline:.2f}"
+        )
+        # Should be roughly the 0.3 vs 1.0 gap (small tolerance for rounding).
+        assert train_baseline - infer_baseline > 0.5
+
+    def test_inference_only_still_has_a_cuda_baseline(self) -> None:
+        # Even inference-only should be > 0 on CUDA — a non-zero cuDNN + driver
+        # context is real. Not zeroing this out would falsely tell users that
+        # embedder-only presets need no GPU memory.
+        cfg = {
+            "search_space": [
+                {"node_type": "scoring", "search_space": [
+                    {"module_name": "knn", "k": [5]},
+                ]},
+                {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
+            ],
+            "embedder_config": {"model_name": "sentence-transformers/all-MiniLM-L6-v2"},
+            "hpo_config": {"n_trials": 5},
+        }
+        report = run_preflight(cfg, DatasetStats.placeholder(), _profile(vram_gb=16.0))
+        assert report.resource.vram_gb > 0

@@ -122,29 +122,27 @@ def test_role_classification_and_time_decomposition() -> None:
 
 
 def test_step_timing_callback_answers_every_hf_hook() -> None:
-    """HF's CallbackHandler dispatches with a bare ``getattr(cb, event)`` — no
-    hasattr probe — so the callback MUST answer every ``on_*`` hook it may
-    ever ask for, even ones we don't time.
-
-    Pins the regression that surfaced as
-    ``AttributeError: '_StepTimingCallback' object has no attribute 'on_train_begin'``
-    when a bert scorer trial fired the harness's step-timing patch on real HF
-    Trainer machinery. The fix is to subclass ``transformers.TrainerCallback``
-    directly so every default hook is inherited as a no-op — no ``__getattr__``
-    trickery, no per-hook boilerplate.
-    """
+    """HF dispatches every hook via bare getattr — callback must be a real
+    TrainerCallback subclass so all defaults are inherited as no-ops.
+    Regression: AttributeError on on_train_begin during a bert trial."""
     from transformers import TrainerCallback
 
     cb = _StepTimingCallback(sink=[])
-    # Must actually be an HF TrainerCallback — this is the guarantee that
-    # every hook HF may dispatch resolves to an inherited pass-through.
     assert isinstance(cb, TrainerCallback)
-
-    # Sanity-check a representative slice of hooks (every documented HF hook
-    # subclass has one, and the isinstance above already proves the rest are
-    # inherited). Calling them with (args, state, control, **kwargs) must
-    # succeed and return None — HF's call_event keeps the incoming control
-    # unchanged when the result is None.
     for name in ["on_init_end", "on_train_begin", "on_epoch_begin", "on_log", "on_save", "on_train_end"]:
         hook = getattr(cb, name)
         assert hook(None, None, "control", model=None) is None, name
+
+
+def test_peak_sampler_records_cuda_current_allocation() -> None:
+    """CUDA polling API: sample_cuda=True → 0.0 float, False → None. Thread
+    starts and stops cleanly with no CUDA hardware present."""
+    from calibrate_advisor import _PeakSampler
+
+    s = _PeakSampler(sample_cuda=True)
+    assert s.peak_cuda_gb == 0.0
+    assert _PeakSampler(sample_cuda=False).peak_cuda_gb is None
+    import time
+    with s:
+        time.sleep(0.15)
+    assert s.peak_cuda_gb == 0.0
