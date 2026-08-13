@@ -122,12 +122,21 @@ def _vram_for_transformer(
 
     Activation accounting differs by mode — training keeps per-layer outputs for
     backward; inference only needs one or two layers in flight.
+
+    Final ``* 1.20`` is a safety margin covering allocator fragmentation,
+    peak transient tensors during backward, and HF-Trainer's eval-loop
+    double-forward that the textbook accounting above misses. Advisor should
+    upper-bound: earlier 15% margin left transformers-light on banking77 at
+    8.12 GB predicted vs 8.75 GB measured (1.08x UNDER — unsafe for an OOM
+    tool). Bumped to 20% + a bigger fixed CUDA baseline (see
+    ``_CUDA_BASELINE_VRAM_GB``) to close the gap on large-batch training runs
+    without over-inflating small ones.
     """
     base = _weights_vram_for_transformer(meta, mode)
     if batch_size <= 0:
         return base
     per_sample = _activations_gb_per_sample(meta, seq_len, is_training=mode != "inference")
-    return base + per_sample * batch_size
+    return (base + per_sample * batch_size) * 1.20
 
 
 def _max_fitting_batch_size(
@@ -151,17 +160,31 @@ def _max_fitting_batch_size(
 
 
 # Sustained TFLOPS per device class — real MFU (model-FLOPs utilization) at
-# training batch sizes, NOT peak spec sheet numbers. Numbers reflect ~30-50%
-# MFU which is typical for BERT-scale training with FA2 / cuDNN kernels.
-# Source: MLPerf training results + community benchmarks (2024-2025).
+# training batch sizes, NOT peak spec sheet numbers. Numbers reflect ~20-30%
+# MFU which is what HF Trainer actually achieves on BERT-scale workloads once
+# you factor in dataloader idle, tokenization warmup, per-epoch eval, and
+# checkpoint saves — all of which the raw FLOPs formula ignores. Earlier
+# values (150 / 45 / 15 for high/mid/low) were closer to peak spec numbers
+# and under-predicted transformers-heavy on banking77 by 1.7x (measured
+# 3.17 h vs predicted 1.88 h, calibration_runs2 2026-08-07); an advisor
+# should upper-bound, so pick sustained numbers that err on the side of
+# over-predicting. Source: MLPerf training results + measured banking77
+# runs where mean_step_s / p95_step_s → 154ms / 246ms for bert-base bs=64.
 _DEVICE_TFLOPS = {
-    "high-gpu": 150.0,  # A100 / H100 fp16
-    "mid-gpu": 45.0,    # V100 / RTX 3090 / A6000
-    "low-gpu": 15.0,    # T4 / RTX 3060 / 8 GB consumer card
-    "apple-silicon": 8.0,  # M1/M2/M3 GPU cores
-    "cpu": 0.1,         # single-thread modern x86 with MKL
+    "high-gpu": 60.0,   # A100 / H100 — sustained ~19% MFU under HF Trainer
+    "mid-gpu": 20.0,    # V100 / RTX 3090 / A6000
+    "low-gpu": 7.0,     # T4 / RTX 3060 / 8 GB consumer card
+    "apple-silicon": 4.0,  # M1/M2/M3 GPU cores
+    "cpu": 0.05,        # single-thread modern x86 with MKL
 }
-_DEFAULT_TFLOPS = 15.0  # unknown device → treat as low-GPU
+_DEFAULT_TFLOPS = 7.0  # unknown device → treat as low-GPU
+
+# HF Trainer overhead — the FLOPs formula only counts optimizer steps; real
+# wall-time also includes per-epoch eval sweeps, save-checkpoint syncs,
+# tokenizer warmup, dataloader queue idle, and gradient-accumulation gaps.
+# Factor calibrated so transformers-heavy predicts ~1.2-1.5x the measured
+# 3.17 h (upper-bound stance).
+_TRAINER_OVERHEAD_MULT = 1.35
 
 
 def _time_for_transformer(
@@ -177,12 +200,14 @@ def _time_for_transformer(
     """Transformer training time in hours, from per-step FLOPs / device TFLOPS.
 
     Per-step FLOPs ≈ 6 x params x batch_size x seq_len (2 for forward mul-add,
-    3-4x for backward). Divided by sustained device TFLOPS to get wall-time per
-    step, then multiplied by (steps x epochs x n_trials).
+    3-4x for backward). Divided by *sustained* device TFLOPS (not peak spec)
+    to get wall-time per step, then multiplied by (steps x epochs x n_trials)
+    x ``_TRAINER_OVERHEAD_MULT`` for HF-Trainer wall-clock overhead.
 
-    Replaces an earlier "1 second per step" heuristic, which was ~10x too high
-    on A100 and identical for MPS vs CUDA (predicted times were the same on
-    both while real times differed ~7x — see interpretation.md 2026-07-19).
+    Advisor contract: err on the side of over-prediction. Under-predicting
+    time makes users blow through wall-clock budgets; over-predicting only
+    biases them toward smaller / cheaper presets. See ``_DEVICE_TFLOPS``
+    docstring for the sustained-MFU calibration.
     """
     steps_per_epoch = max(1, n_samples // max(1, batch_size))
     total_steps = n_trials * epochs * steps_per_epoch
@@ -190,7 +215,7 @@ def _time_for_transformer(
     step_flops = 6.0 * params_millions * 1e6 * batch_size * seq_len
     tflops = _DEVICE_TFLOPS.get(device_class, _DEFAULT_TFLOPS)
     step_seconds = step_flops / (tflops * 1e12)
-    return (total_steps * step_seconds) / 3600.0
+    return (total_steps * step_seconds * _TRAINER_OVERHEAD_MULT) / 3600.0
 
 
 def _n_layers(meta: ModelMeta | None) -> int:
@@ -214,16 +239,29 @@ def _largest_embedder(seen_models: dict[str, ModelMeta]) -> ModelMeta | None:
     return max(seen_models.values(), key=lambda m: m.total_params)
 
 
-def _ram_for_module(meta: ModelMeta, stats: DatasetStats) -> float:
-    """RAM in GB. Loose upper bound: weights + tokenized text in memory.
+def _ram_for_module(meta: ModelMeta, stats: DatasetStats, *, mode: str = "inference") -> float:
+    """RAM in GB. Loose upper bound: weights + optimizer/grads + tokenized text.
 
     Tokenized text is approximated as ``n_samples x avg_tokens x 4 bytes``
-    (BPE/WordPiece token ids fit in int32). The 4 bytes/token bound is tight
-    enough for the report's purposes and intentionally ignores any preprocessing
-    artefacts (attention masks, position ids, etc.) since they're bounded by the
-    same factor.
+    (BPE/WordPiece token ids fit in int32).
+
+    ``mode``-dependent multiplier on the weights term:
+      * ``inference``: 1.3x (weights + intermediate-tensor slack)
+      * ``lora``: 1.5x (frozen base + trainable adapters)
+      * ``full-finetune`` / anything else: 4.5x (weights + grads + Adam m + v
+        + framework slack) — matches the VRAM-side ``4.5W`` accounting so the
+        host-pinned optimizer state (Adam mirrors weights) shows up in the
+        RAM estimate too. Under-predicting RAM lets a training preset OOM the
+        host well before it OOMs the GPU; advisor should upper-bound.
     """
-    return meta.weights_gb + (stats.n_samples * stats.avg_tokens * 4) / _BYTES_PER_GB
+    if mode == "inference":
+        weights_mult = 1.3
+    elif mode == "lora":
+        weights_mult = 1.5
+    else:
+        weights_mult = 4.5
+    tokens_gb = (stats.n_samples * stats.avg_tokens * 4) / _BYTES_PER_GB
+    return meta.weights_gb * weights_mult + tokens_gb
 
 
 def _embedding_cache_disk_gb(n_samples: int, hidden_size: int) -> float:
@@ -301,6 +339,65 @@ def _ram_for_catboost(*, stats: DatasetStats, n_features: int, iterations: int, 
     return float((data_bytes + histograms_bytes + trees_bytes) / _BYTES_PER_GB)
 
 
+def _ram_for_sklearn(
+    *,
+    stats: DatasetStats,
+    embedder_dim: int,
+    n_estimators: int,
+    max_depth: int,
+    n_jobs: int,
+) -> float:
+    """RandomForest/similar RAM upper bound, aware of ``n_jobs`` replication.
+
+    sklearn spawns ``n_jobs`` worker processes with joblib's loky backend by
+    default; each worker holds its own copy of the training feature matrix and
+    the trees it grew, so a preset with ``n_jobs=8`` on a 10 k × 1024 embedder
+    dataset multiplies the base RAM 8x. Previously sklearn was in
+    ``_UNKNOWN_SCORER_MODULES`` and emitted a zero row — classic-heavy's
+    real ~2 GB sklearn contribution slipped through invisibly.
+    """
+    # Per-worker feature matrix (fp64 in sklearn by default).
+    per_worker_data = stats.n_samples * embedder_dim * 8
+    # Per-worker tree storage: n_estimators × n_leaves × ~32 B/node. Cap
+    # n_leaves at n_samples (a tree with max_depth 150 on 10k samples can't
+    # actually have 2**150 leaves).
+    n_leaves = min(2**max_depth, stats.n_samples) if max_depth > 0 else stats.n_samples
+    per_worker_trees = n_estimators * n_leaves * _CATBOOST_BYTES_PER_TREE_NODE
+    per_worker = per_worker_data + per_worker_trees
+    return float((per_worker * max(1, n_jobs)) / _BYTES_PER_GB)
+
+
+def _embedder_load_ram_gb(meta: ModelMeta | None) -> float:
+    """Extra RAM the process holds when an embedder is loaded — separately from
+    any per-driver row that already accounts for it.
+
+    Rationale: classic presets pre-compute embeddings via the embedder, then
+    train sklearn/catboost/linear scorers on top. During and after that
+    forward pass the process holds: the embedder weights on the compute
+    device, a copy in CPU RAM (fp32 from the safetensors load), the tokenizer
+    state, HF Trainer buffers, and the cached embeddings themselves. The
+    per-driver ``_ram_for_module`` already captures weights x 1.3 for the
+    knn/mlknn rows, but the aggregate ``max`` across drivers hides
+    contributions from the other classic scorers that are simultaneously in
+    memory. This term is added *on top* of the max-driver RAM so classic
+    presets like classic-heavy stop under-predicting by ~4x.
+
+    Uses ``total_params × 4`` (fp32) as the weight footprint even when the
+    hub reports fp16 storage (``weight_bytes_per_param=2``) — transformers
+    up-casts to fp32 at load time by default, so the fp16 disk size
+    under-counts real RAM usage by 2x.
+    """
+    if meta is None:
+        return 0.0
+    fp32_weights_gb = (meta.total_params * 4) / _BYTES_PER_GB
+    # 3.5x factor: raw weights + activation buffers + HF/tokenizer/loader
+    # slack. Empirical: real classic-heavy on banking77 (e5-large embedder,
+    # sklearn RF n_jobs=8) measured 10.22 GB RAM. At 3.0x we predicted 9.56
+    # (1.07x under — still unsafe); at 3.5x we predict 10.85 (0.94x — safely
+    # over). Advisor's OOM-avoidance contract requires "err over".
+    return fp32_weights_gb * 3.5
+
+
 def _time_for_catboost(
     *,
     n_trials: int,
@@ -323,6 +420,93 @@ def _time_for_catboost(
         coeff /= _CATBOOST_GPU_SPEEDUP
     seconds = n_trials * iterations * coeff * n_samples * n_features * depth * class_multiplier
     return seconds / 3600.0
+
+
+# === CNN / RNN scorers ===================================================
+#
+# Small torch models (Kim's TextCNN, LSTM classifier) trained from scratch
+# on token ids. The advisor previously emitted a ``not-estimated`` placeholder
+# for these — which read as "free/safe" on nn-heavy / nn-medium (predicted 0h
+# / 0GB, real 0.3 h + 2.3 GB RAM + 0.7 GB VRAM on banking77).
+#
+# Cost model: embedding table + head weights (small) + activations that scale
+# with batch × seq_len × hidden. We assume a bounded vocabulary (~30k) — one
+# HPO trial for TextCNN embeds every token that appears in the training set;
+# banking77 tops out around a few thousand unique tokens so 30k is a safe
+# upper bound.
+_NN_MAX_VOCAB = 30_000
+_NN_DEFAULT_SEQ_LEN = 50  # VocabConfig.max_seq_length default
+_NN_BYTES_PER_PARAM = 4  # fp32 weights
+# fp32 activation storage per (batch, token, hidden) unit, factor absorbs
+# ~4x backward overhead + optimizer + gradient state for these tiny models.
+_NN_TRAIN_ACT_BYTES_PER_UNIT = 16
+
+
+def _cnn_param_count(*, embed_dim: int, num_filters: int, n_kernels: int, n_classes: int) -> int:
+    """Approximate CNN parameter count: embedding + conv + fc layers."""
+    vocab_params = _NN_MAX_VOCAB * embed_dim
+    conv_params = num_filters * embed_dim * n_kernels * 5  # avg kernel width ~5
+    fc_params = num_filters * n_kernels * max(1, n_classes)
+    return vocab_params + conv_params + fc_params
+
+
+def _rnn_param_count(*, embed_dim: int, hidden_dim: int, n_classes: int) -> int:
+    """Approximate LSTM classifier parameter count: embedding + LSTM + fc."""
+    vocab_params = _NN_MAX_VOCAB * embed_dim
+    # LSTM cell has 4 gates, each with (embed+hidden+1) × hidden params.
+    lstm_params = 4 * hidden_dim * (embed_dim + hidden_dim + 1)
+    fc_params = hidden_dim * max(1, n_classes)
+    return vocab_params + lstm_params + fc_params
+
+
+def _vram_for_nn(*, params: int, batch_size: int, hidden_dim: int) -> float:
+    """Weights + activations for a small torch scorer in training mode.
+
+    Activation term uses ``batch × seq_len × hidden × const`` per the same
+    fp32 upper bound as transformers, but with a much smaller effective
+    hidden dim (embed_dim/num_filters, not model dim).
+    """
+    weights_gb = (params * _NN_BYTES_PER_PARAM) / _BYTES_PER_GB
+    # Optimizer state (Adam has 2x weights) + gradients (1x weights) = 4x weights total.
+    optimizer_gb = 3 * weights_gb
+    activations_gb = (
+        batch_size * _NN_DEFAULT_SEQ_LEN * hidden_dim * _NN_TRAIN_ACT_BYTES_PER_UNIT
+    ) / _BYTES_PER_GB
+    return weights_gb + optimizer_gb + activations_gb
+
+
+def _ram_for_nn(*, params: int, stats: DatasetStats) -> float:
+    """CPU-side memory: weights + tokenized text (int32 ids)."""
+    weights_gb = (params * _NN_BYTES_PER_PARAM) / _BYTES_PER_GB
+    tokens_gb = (stats.n_samples * _NN_DEFAULT_SEQ_LEN * 4) / _BYTES_PER_GB
+    return weights_gb + tokens_gb
+
+
+def _time_for_nn(
+    *,
+    n_trials: int,
+    epochs: int,
+    batch_size: int,
+    n_samples: int,
+    params_millions: float,
+    device_class: str,
+) -> float:
+    """Reuse the transformer FLOPs formula for a small torch model.
+
+    Small models are memory-bandwidth-bound, not compute-bound, so the FLOPs
+    formula slightly *under*-predicts wall-time. Empirically for banking77
+    nn-heavy we measured 0.32 h across 55 trials — the formula lands within
+    2x of that, which is enough for a cost-ranking estimate.
+    """
+    return _time_for_transformer(
+        n_trials=n_trials,
+        epochs=epochs,
+        batch_size=batch_size,
+        seq_len=_NN_DEFAULT_SEQ_LEN,
+        n_samples=n_samples,
+        params_millions=params_millions,
+        device_class=device_class,
+    )
 
 
 def _floor_to_power_of_two(n: int) -> int:

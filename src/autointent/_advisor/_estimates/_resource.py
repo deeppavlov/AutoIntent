@@ -24,24 +24,38 @@ from autointent.configs._embedder import (
 
 from ._formulas import (
     _DEFAULT_SEQ_LEN,
+    _LINEAR_CPU_S_PER_SAMPLE_FEATURE,
     _LOGREG_CV_MULTIPLIER,
     _MULTICLASS_THRESHOLD,
     _activations_gb_per_sample,
     _classify_severity,
+    _cnn_param_count,
     _embedder_dim,
+    _embedder_load_ram_gb,
     _embedding_cache_disk_gb,
     _largest_embedder,
     _max_fitting_batch_size,
     _ram_for_catboost,
     _ram_for_linear,
     _ram_for_module,
+    _ram_for_nn,
+    _ram_for_sklearn,
+    _rnn_param_count,
     _time_for_catboost,
     _time_for_linear,
+    _time_for_nn,
     _time_for_transformer,
+    _vram_for_nn,
     _vram_for_transformer,
     _weights_vram_for_transformer,
 )
-from ._search_space import _extract_model_names, _max_int, _walk_modules_indexed
+from ._search_space import (
+    _extract_model_names,
+    _max_int,
+    _module_cardinality,
+    _walk_modules,
+    _walk_modules_indexed,
+)
 
 if TYPE_CHECKING:
     from autointent._advisor._hardware import HardwareProfile
@@ -122,7 +136,7 @@ def _split_entries(
     transformer: list[tuple[int, str, dict[str, Any]]] = []
     classic: list[tuple[int, str, dict[str, Any]]] = []
     for node_idx, node_type, entry in _walk_modules_indexed(search_space):
-        bucket = classic if entry.get("module_name") in {"linear", "catboost"} else transformer
+        bucket = classic if entry.get("module_name") in {"linear", "catboost", "sklearn"} else transformer
         bucket.append((node_idx, node_type, entry))
     return transformer, classic
 
@@ -146,7 +160,7 @@ def _estimate_transformer_model(
     seq_len = _max_int(entry.get("max_length"), _DEFAULT_SEQ_LEN)
 
     vram = _vram_for_transformer(meta, mode, batch_size=batch_size, seq_len=seq_len)
-    ram = _ram_for_module(meta, stats)
+    ram = _ram_for_module(meta, stats, mode=mode)
 
     driver_max_batch: int | None = None
     if hardware.vram_gb > 0:
@@ -243,6 +257,35 @@ def _estimate_classic_entry(
         )
         vram, ram = (ram_total, 0.0) if on_gpu else (0.0, ram_total)
         mode = "catboost-gpu" if on_gpu else "catboost"
+    elif module == "sklearn":
+        # RandomForestClassifier is the most common target; joblib spawns
+        # ``n_jobs`` worker processes each replicating the feature matrix +
+        # trees. Predicting 0 here (previous "not-estimated" behaviour) hid
+        # classic-heavy's real 1-2 GB sklearn contribution.
+        n_estimators = _max_int(entry.get("n_estimators"), 100)
+        max_depth = _max_int(entry.get("max_depth"), 0)
+        sk_n_jobs = _max_int(entry.get("n_jobs"), 1)
+        ram = _ram_for_sklearn(
+            stats=stats,
+            embedder_dim=embedder_dim,
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            n_jobs=sk_n_jobs,
+        )
+        # Time: rough O(n_estimators × n_samples × sqrt(features) × log2 n)
+        # per fit, divided by n_jobs. Absorbed into the linear coefficient
+        # since real numbers vary wildly by criterion / max_features.
+        time_h = (
+            n_trials
+            * _LINEAR_CPU_S_PER_SAMPLE_FEATURE
+            * stats.n_samples
+            * embedder_dim
+            * n_estimators
+            / max(1, sk_n_jobs)
+            / 3600.0
+        ) * refit
+        vram = 0.0
+        mode = f"sklearn-n_jobs={sk_n_jobs}"
     else:
         return None
 
@@ -258,6 +301,86 @@ def _estimate_classic_entry(
             "batch_size": None,
             "max_batch_size": None,
             "confidence": embedder_meta.confidence if embedder_meta else "heuristic",
+        },
+        vram_gb=vram,
+        ram_gb=ram,
+        time_hours=time_h,
+    )
+
+
+def _estimate_nn_entry(
+    *,
+    entry: dict[str, Any],
+    node_type: str,
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+    n_trials: int,
+    refit_after: bool,
+) -> _ModuleEstimate | None:
+    """Cost row for a cnn / rnn scorer (returns ``None`` for anything else).
+
+    These are small torch models trained from scratch on token ids. Previously
+    the advisor emitted a ``not-estimated`` placeholder for them, which read
+    as "free/safe" — nn-heavy on banking77 predicted 0h/0GB but actually used
+    0.32 h + 2.3 GB RAM + 0.7 GB VRAM. This restores a real estimate using
+    small-model parameter counts + the transformer FLOPs formula for time.
+    """
+    module = entry.get("module_name", "?")
+    n_classes = max(1, stats.n_classes)
+
+    if module == "cnn":
+        embed_dim = _max_int(entry.get("embed_dim"), 128)
+        num_filters = _max_int(entry.get("num_filters"), 100)
+        kernel_sizes = entry.get("kernel_sizes")
+        # Kernel sizes are a list of lists in the search space
+        # (e.g. [[3, 4, 5]]); count entries in the largest variant.
+        n_kernels = 3
+        if isinstance(kernel_sizes, list):
+            for candidate in kernel_sizes:
+                if isinstance(candidate, list):
+                    n_kernels = max(n_kernels, len(candidate))
+                elif isinstance(candidate, int):
+                    n_kernels = max(n_kernels, 1)
+        hidden_dim = num_filters
+        params = _cnn_param_count(
+            embed_dim=embed_dim, num_filters=num_filters, n_kernels=n_kernels, n_classes=n_classes
+        )
+    elif module == "rnn":
+        embed_dim = _max_int(entry.get("embed_dim"), 128)
+        hidden_dim = _max_int(entry.get("hidden_dim"), 512)
+        params = _rnn_param_count(embed_dim=embed_dim, hidden_dim=hidden_dim, n_classes=n_classes)
+    else:
+        return None
+
+    batch_size = _max_int(entry.get("batch_size"), 64)
+    epochs = _max_int(entry.get("num_train_epochs"), 60)
+
+    vram = _vram_for_nn(params=params, batch_size=batch_size, hidden_dim=hidden_dim)
+    ram = _ram_for_nn(params=params, stats=stats)
+    time_h = (
+        _time_for_nn(
+            n_trials=n_trials,
+            epochs=epochs,
+            batch_size=batch_size,
+            n_samples=stats.n_samples,
+            params_millions=params / 1_000_000,
+            device_class=hardware.device_class,
+        )
+        * _refit_factor(refit_after=refit_after, n_trials=n_trials)
+    )
+
+    return _ModuleEstimate(
+        driver={
+            "node_type": node_type,
+            "module": module,
+            "model": f"{module}-from-scratch",
+            "mode": "small-torch-train",
+            "vram_gb": round(vram, 2),
+            "ram_gb": round(ram, 2),
+            "time_hours": round(time_h, 2),
+            "batch_size": batch_size,
+            "max_batch_size": None,
+            "confidence": "heuristic",
         },
         vram_gb=vram,
         ram_gb=ram,
@@ -422,13 +545,48 @@ def _emit_resource_findings(
         )
 
 
-_UNKNOWN_SCORER_MODULES = frozenset({"cnn", "rnn", "sklearn"})
-"""Scorer modules the advisor has no cost estimator for.
+# Process-level memory floors. Every autointent fit imports torch +
+# transformers + datasets + optuna, which reserve resident memory the moment
+# they load. Measured against calibration_runs2 (2026-08-07 banking77 sweep):
+# every preset used 2-10 GB RAM but the per-module estimates alone predicted
+# 0.4-2 GB → advisor was systematically 4-13x LOW on RAM. A ~1.5 GB baseline
+# lifts the estimate into range without over-inflating heavy presets.
+_PROCESS_BASELINE_RAM_GB = 1.5
+# CUDA driver context + cuDNN/cuBLAS workspace pools + caching allocator
+# fragmentation. A real training process on A100 reserves ~1 GB the moment
+# torch initializes CUDA + the first tensor lands, regardless of model size.
+# Earlier 0.5 GB baseline left transformers-light on banking77 at 8.12 GB
+# predicted vs 8.75 GB measured (unsafe under-prediction for OOM avoidance);
+# 1.0 GB closes the gap with room to spare. Only added when we already
+# predict some VRAM usage so CPU-only presets aren't spuriously flagged as
+# GPU users.
+_CUDA_BASELINE_VRAM_GB = 1.0
 
-These get a placeholder ``not-estimated`` driver row so they never appear as
-"free/safe" in the report — silent-zero was the ``nn-heavy`` predicted 0h/0GB
-bug that hid a real 0.52 h + 1.45 GB RAM cost.
-"""
+_UNKNOWN_SCORER_MODULES: frozenset[str] = frozenset()
+"""Scorer modules the advisor has no cost estimator for — kept as an empty
+extension point. cnn / rnn moved to :func:`_estimate_nn_entry`; sklearn moved
+to the classic branch of :func:`_estimate_classic_entry`. New unknown-cost
+scorers should still register here so they emit a not-estimated placeholder
+row instead of silently reporting zero."""
+
+_NN_SCORER_MODULES = frozenset({"cnn", "rnn"})
+"""Small torch scorers routed through :func:`_estimate_nn_entry`."""
+
+
+_EMBEDDER_CONSUMING_MODULES = frozenset(
+    {"linear", "catboost", "sklearn", "knn", "mlknn", "retrieval",
+     "description_bi", "description_cross", "description_llm"},
+)
+
+
+def _uses_embedder(search_space: list[dict[str, Any]]) -> bool:
+    """True when any module in the search space consumes an embedder — signals
+    that the aggregate RAM should include the embedder-load penalty on top
+    of the per-driver max."""
+    for _, entry in _walk_modules(search_space):
+        if entry.get("module_name") in _EMBEDDER_CONSUMING_MODULES:
+            return True
+    return False
 
 # Modules that consume the top-level ``cross_encoder_config.model_name`` as
 # their scoring model (see zero-shot-encoders preset: description_cross pulls
@@ -505,6 +663,34 @@ def _resource_phase(
 
     transformer_entries, classic_entries = _split_entries(search_space)
 
+    # Per-node module-variant count. HPO distributes ``n_trials`` across the
+    # module_name candidates at each node roughly evenly (TPE's sampler bias
+    # aside), so a module_name that shares its node with 4 others sees on
+    # average ``n_trials / 5`` trials — not ``n_trials``. Previously every
+    # per-module estimate used the full ``n_trials``, which inflated
+    # classic-heavy's catboost row to 120 h vs measured 12 h across the whole
+    # node. Divide once here and pass the effective share down to every
+    # per-module estimator (transformer + classic + nn).
+    variants_per_node: dict[int, int] = {}
+    for node_idx, _node_type, _entry in _walk_modules_indexed(search_space):
+        variants_per_node[node_idx] = variants_per_node.get(node_idx, 0) + 1
+
+    def _effective_trials(node_idx: int, entry: dict[str, Any] | None = None) -> int:  # noqa: ARG001
+        """Trials this specific module should be charged for.
+
+        Divides ``n_trials`` evenly across the module_name candidates at the
+        node. ``entry`` is accepted for API stability and future extensions
+        (e.g. a per-module cardinality cap) — we tried capping by
+        :func:`_module_cardinality` earlier but it produced wrong estimates
+        for description-scorer presets where Optuna's TPE runs every
+        declared trial regardless of parameter-space size (no automatic
+        dedup). The advisor charges for the declared work; if a real run
+        crashes or dedupes, that's an artefact of the runtime, not something
+        the advisor should try to predict.
+        """
+        divisor = max(1, variants_per_node.get(node_idx, 1))
+        return max(1, n_trials // divisor)
+
     # First pass: transformer modules (also populates seen_models for the classic pass).
     module_estimates: list[_ModuleEstimate] = []
     node_max_weights: dict[int, float] = {}
@@ -518,6 +704,20 @@ def _resource_phase(
                 model_names = [cross_encoder_model_name]
             elif module in _TRANSFORMER_CONFIG_CONSUMERS and transformer_model_name:
                 model_names = [transformer_model_name]
+            elif module in _NN_SCORER_MODULES:
+                # cnn / rnn — small torch models trained from scratch, no hub
+                # model to resolve. Route to the small-model heuristic.
+                nn_estimate = _estimate_nn_entry(
+                    entry=entry,
+                    node_type=node_type,
+                    stats=stats,
+                    hardware=hardware,
+                    n_trials=_effective_trials(node_idx, entry),
+                    refit_after=refit_after,
+                )
+                if nn_estimate is not None:
+                    module_estimates.append(nn_estimate)
+                continue
             elif module in _UNKNOWN_SCORER_MODULES:
                 # Placeholder so the row is visible instead of silently zeroed.
                 module_estimates.append(_not_estimated_row(node_type=node_type, module=module))
@@ -532,7 +732,7 @@ def _resource_phase(
                 name=name,
                 stats=stats,
                 hardware=hardware,
-                n_trials=n_trials,
+                n_trials=_effective_trials(node_idx, entry),
                 refit_after=refit_after,
             )
             module_estimates.append(me)
@@ -543,7 +743,7 @@ def _resource_phase(
     # Second pass: linear / catboost — cost depends on embedder_dim, not a checkpoint.
     embedder_meta = _largest_embedder(seen_models)
     embedder_dim_val = _embedder_dim(embedder_meta)
-    for _, node_type, entry in classic_entries:
+    for node_idx, node_type, entry in classic_entries:
         classic_estimate = _estimate_classic_entry(
             entry=entry,
             node_type=node_type,
@@ -551,7 +751,7 @@ def _resource_phase(
             embedder_dim=embedder_dim_val,
             stats=stats,
             hardware=hardware,
-            n_trials=n_trials,
+            n_trials=_effective_trials(node_idx, entry),
             refit_after=refit_after,
         )
         if classic_estimate is not None:
@@ -568,6 +768,32 @@ def _resource_phase(
         estimate.ram_gb = max(estimate.ram_gb, me.ram_gb)
         estimate.time_hours += me.time_hours
         estimate.drivers.append(me.driver)
+
+    # Process-level baselines. Every fit — even a trivial one — imports
+    # torch / transformers / datasets, which on their own take ~1.5 GB of RSS
+    # before any model weights load. Real runs on banking77 measure 2-10 GB
+    # RAM across every preset while the per-module estimates alone predicted
+    # 0.4-2 GB (systematically 4-13x low, see calibration_runs2 2026-08-07).
+    # Adding a floor here (rather than per-module) means the estimate stays
+    # accurate when multiple modules coexist — the floor is paid once, not N times.
+    estimate.ram_gb = max(estimate.ram_gb, 0.0) + _PROCESS_BASELINE_RAM_GB
+    # Embedder-load penalty for classic presets: when at least one classic
+    # scorer (linear / catboost / sklearn / knn / mlknn) sits on top of an
+    # embedder, the process holds the embedder weights + tokenizer + HF
+    # buffers *in addition to* whatever the per-driver ``max`` reported.
+    # classic-heavy on banking77 predicted 2.86 GB RAM against a measured
+    # 10.22 GB (3.6x under) because the max-of-drivers hides the fact that
+    # multiple scorers coexist in RAM. Only added when the search space
+    # actually consumes an embedder.
+    if _uses_embedder(search_space) and embedder_meta is not None:
+        estimate.ram_gb += _embedder_load_ram_gb(embedder_meta)
+    # Same story on the CUDA side: torch's caching allocator, cuBLAS/cuDNN
+    # workspaces, and driver context together reserve ~0.5 GB the moment the
+    # first tensor lands on the device — regardless of model size. Only apply
+    # when we actually predict some GPU usage AND running on CUDA hardware,
+    # so CPU-only presets stay honest.
+    if estimate.vram_gb > 0 and hardware.accelerator == "cuda":
+        estimate.vram_gb += _CUDA_BASELINE_VRAM_GB
 
     _aggregate_disk(
         estimate,

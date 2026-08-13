@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, Callable
 from pydantic import ValidationError
 
 from autointent._advisor._estimates._resource import _resource_phase
-from autointent._advisor._estimates._search_space import _max_int, _walk_modules
+from autointent._advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
 from autointent._advisor._report import PreflightReport, Severity
 from autointent._optimization_config import OptimizationConfig
 
@@ -91,7 +91,7 @@ def run_preflight(
         cache_probe=embedding_cache_probe,
     )
     _data_phase(cfg.search_space, stats, report)
-    _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, hardware, report)
+    _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, cfg.hpo_config.n_trials, hardware, report)
 
     return report
 
@@ -114,10 +114,11 @@ def _validated_config(config: dict[str, Any]) -> OptimizationConfig:
 def _config_phase(
     search_space: list[dict[str, Any]],
     n_jobs: int,
+    n_trials: int,
     hardware: HardwareProfile,
     report: PreflightReport,
 ) -> None:
-    """Config-phase checks: parallelism vs. hardware mismatches."""
+    """Config-phase checks: parallelism vs. hardware mismatches + no-op HPO."""
     if n_jobs > 1 and hardware.accelerator in {"cuda", "mps"}:
         report.add(
             "config",
@@ -135,6 +136,32 @@ def _config_phase(
             Severity.TIGHT,
             "CatBoost task_type=GPU configured but no CUDA detected - will fall back to CPU.",
         )
+
+    # No-op HPO detector: n_trials >> search-space cardinality means most
+    # trials will be exact duplicates of previous ones. Optuna's TPE sampler
+    # doesn't auto-dedupe, so real runtime = n_trials × per-trial cost — the
+    # advisor charges honestly for that. But the user probably didn't intend
+    # this, so surface it as a finding: transformers-no-hpo on banking77
+    # declares n_trials=40 with a single-value grid → 40x the useful work.
+    for _, entry in _walk_modules(search_space):
+        module = entry.get("module_name", "?")
+        # Skip decision-node entries; they're cheap and often intentionally
+        # singleton-configured.
+        if module in {"argmax", "threshold", "jinoos", "tunable", "adaptive"}:
+            continue
+        cardinality = _module_cardinality(entry)
+        if cardinality is not None and cardinality < n_trials and n_trials // max(1, cardinality) >= 4:
+            report.add(
+                "config",
+                Severity.TIGHT,
+                f"'{module}' entry has {cardinality} unique configurations but "
+                f"hpo_config.n_trials={n_trials} — expect ~{n_trials - cardinality} "
+                f"duplicate trials unless the sampler dedupes. Reduce n_trials or "
+                f"widen the search space.",
+            )
+            # Emit at most one warning per preset — otherwise multi-module
+            # presets with several singleton entries flood the report.
+            break
 
 
 def _data_phase(
