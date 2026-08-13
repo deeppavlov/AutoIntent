@@ -35,6 +35,7 @@ def _patch_metadata(
     requires_map: {dist_name: [PEP 508 requirement string, ...]}
     versions:     {dist_name: installed_version_string}  (absent key => not installed)
     """
+
     def fake_requires(dist: str) -> list[str]:
         # Mirror the real importlib.metadata.requires: a dist with no metadata
         # (i.e. not installed) raises PackageNotFoundError rather than returning [].
@@ -81,12 +82,14 @@ def test_check_reports_outdated(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_iter_extra_reqs_selects_only_extra_members(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
-        {"autointent": [
-            "numpy>=1.0 ; python_version >= '3.0'",          # base dep w/ env marker -> excluded
-            "torch>=2.0",                                     # base dep, no marker -> excluded
-            "catboost>=1.2.8,<2.0.0 ; extra == 'catboost'",  # extra member -> included
-            "peft>=0.10.0 ; extra == 'peft'",                # different extra -> excluded
-        ]},
+        {
+            "autointent": [
+                "numpy>=1.0 ; python_version >= '3.0'",  # base dep w/ env marker -> excluded
+                "torch>=2.0",  # base dep, no marker -> excluded
+                "catboost>=1.2.8,<2.0.0 ; extra == 'catboost'",  # extra member -> included
+                "peft>=0.10.0 ; extra == 'peft'",  # different extra -> excluded
+            ]
+        },
         {},
     )
     reqs = deps._iter_extra_reqs("autointent", "catboost")
@@ -119,10 +122,12 @@ def test_resolve_recurses_into_nested_extra(monkeypatch: pytest.MonkeyPatch) -> 
 def test_resolve_terminates_on_cycle(monkeypatch: pytest.MonkeyPatch) -> None:
     _patch_metadata(
         monkeypatch,
-        {"pkg": [
-            "pkg[b]>=1.0 ; extra == 'a'",
-            "pkg[a]>=1.0 ; extra == 'b'",
-        ]},
+        {
+            "pkg": [
+                "pkg[b]>=1.0 ; extra == 'a'",
+                "pkg[a]>=1.0 ; extra == 'b'",
+            ]
+        },
         {},
     )
     reqs = deps._resolve("pkg", "a", set())
