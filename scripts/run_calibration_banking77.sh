@@ -134,7 +134,9 @@ else
     while IFS= read -r preset; do
         PRESET_ARR+=("$preset")
     done < <(
-python - <<'PY'
+# Must go through `uv run` — the bare interpreter has no autointent on its
+# path, which made the no-PRESETS default invocation die with an empty list.
+uv run --no-sync python - <<'PY'
 from autointent._advisor import BUNDLED_PRESETS
 for name in BUNDLED_PRESETS:
     print(name)

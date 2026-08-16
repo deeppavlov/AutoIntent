@@ -52,6 +52,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("calibrate_advisor")
 
 _BYTES_PER_GB = 1024**3
+# Anything above this still allocated after a preset finishes means references
+# outlived the run and the next preset's measurement can't be trusted.
+_LEAK_WARN_GB = 0.25
 
 
 @dataclass
@@ -63,6 +66,18 @@ class CalibrationRow:
     actual: dict[str, float | None] = field(default_factory=dict)
     findings: int = 0
     findings_over: int = 0
+    # Top-line advisor verdict. ``headroom`` is the worst severity across all
+    # findings ("ample" / "tight" / "over"); ``is_feasible`` is ``headroom !=
+    # over``. Both live on ``PreflightReport`` but were previously dropped on
+    # the floor here, so a calibration JSON could not answer the one question
+    # the advisor exists to answer. ``severity_by_metric`` keeps the per-metric
+    # breakdown (vram / ram / disk / time) so a RED can be attributed.
+    headroom: str | None = None
+    is_feasible: bool | None = None
+    severity_by_metric: dict[str, str] = field(default_factory=dict)
+    # Resolved model name per driver, e.g. {"scoring/bert": "microsoft/deberta-v3-large"}.
+    # Recorded so a local preset swap can never masquerade as "transformers-heavy".
+    models: dict[str, str] = field(default_factory=dict)
     # Per-module records from _ModuleTracker: [{module, num, config, duration_s, peak_vram_gb?}, ...]
     modules: list[dict[str, Any]] = field(default_factory=list)
     cache_policy: str = "unknown"  # "cold" (embeddings cache cleared) | "warm" (kept as-is)
@@ -816,6 +831,15 @@ def _calibrate_one(
     }
     row.findings = len(report.findings)
     row.findings_over = sum(1 for f in report.findings if f.severity.value == "over")
+    row.headroom = report.headroom.value
+    row.is_feasible = report.is_feasible
+    # Last writer wins per metric; the resource phase emits at most one finding
+    # per metric so there is nothing to collapse in practice.
+    row.severity_by_metric = {f.metric: f.severity.value for f in report.findings if f.metric}
+    for driver in report.resource.drivers:
+        model = driver.get("model")
+        if model:
+            row.models[f"{driver.get('node_type', '?')}/{driver.get('module', '?')}"] = str(model)
     row.low_confidence = report.low_confidence
     if report.low_confidence:
         row.notes.append("low-confidence (heuristic HF metadata fallback in use)")
@@ -849,7 +873,22 @@ def _calibrate_one(
                 f"cli-smoke VERDICT MISMATCH: cli.is_feasible={cli_feasible} vs direct={report.is_feasible}"
             )
         elif divergence:
-            row.notes.append(f"cli-smoke numeric drift on {sorted(divergence)} (see cli_smoke.divergence)")
+            # ``autointent-advisor inspect`` has no n_trials flag, so under
+            # --max-trials the CLI necessarily costs the preset's bundled
+            # n_trials while the direct path costs the override. That is an
+            # apples-to-oranges comparison, not a wrapper regression — the
+            # historical "the two paths differ ~10x" reading of this field was
+            # this artifact. Only time_hours scales with n_trials, so a drift
+            # confined to that key under an override is expected.
+            expected_trials_artifact = max_trials is not None and set(divergence) == {"time_hours"}
+            smoke["divergence_expected"] = expected_trials_artifact
+            if expected_trials_artifact:
+                row.notes.append(
+                    f"cli-smoke time differs (cli n_trials={_preset_n_trials(raw_cfg)} vs "
+                    f"--max-trials {max_trials}); expected, not a wrapper regression"
+                )
+            else:
+                row.notes.append(f"cli-smoke numeric drift on {sorted(divergence)} (see cli_smoke.divergence)")
     row.cli_smoke = smoke
 
     if skip_fit:
@@ -978,6 +1017,12 @@ def _print_summary(rows: list[CalibrationRow]) -> None:
             print(f"    {marker} {row.error}")
         if row.low_confidence:
             print(f"    ! LOW-CONFIDENCE — advisor used heuristic HF metadata (exclude from prediction-accuracy stats)")
+        if row.headroom is not None:
+            verdict = "FEASIBLE" if row.is_feasible else "INFEASIBLE"
+            by_metric = " ".join(f"{m}={s}" for m, s in sorted(row.severity_by_metric.items()))
+            print(f"    · verdict={verdict} headroom={row.headroom} over={row.findings_over}  [{by_metric}]")
+        if row.models:
+            print(f"    · models: {', '.join(f'{k}={v}' for k, v in sorted(row.models.items()))}")
         print(f"    · cache-policy={row.cache_policy}")
         role_totals = _sum_time_by_role(row.modules)
         if role_totals:
@@ -1118,6 +1163,37 @@ def _load_dataset(dataset_arg: str, parser: argparse.ArgumentParser) -> tuple[Da
     except Exception as e:  # noqa: BLE001
         parser.error(f"Could not load '{dataset_arg}' as a local JSON file or as a Hub repo id: {e}")
     return dataset, f"hub:{dataset_arg}"
+
+
+def _preset_n_trials(raw_cfg: dict[str, Any]) -> int | None:
+    """``hpo_config.n_trials`` as written in the preset, before any override."""
+    hpo = raw_cfg.get("hpo_config")
+    return hpo.get("n_trials") if isinstance(hpo, dict) else None
+
+
+def _release_accelerator_memory() -> float:
+    """Drop cached accelerator memory between presets; return GB still allocated.
+
+    Without this the sweep is not measuring what it thinks it is on a small
+    GPU: a preset that OOMs leaves its model, optimizer state and HPO trial
+    objects alive, so the *next* preset starts with several GB already gone and
+    OOMs too — an AMPLE preset then gets recorded as a failure it would never
+    hit on its own. A non-zero return value means references survived the
+    collection and the remaining presets in this process are suspect.
+    """
+    import gc
+
+    gc.collect()
+    try:
+        import torch
+    except ImportError:
+        return 0.0
+    if not torch.cuda.is_available():
+        return 0.0
+    torch.cuda.empty_cache()
+    still_allocated = torch.cuda.memory_allocated() / _BYTES_PER_GB
+    torch.cuda.reset_peak_memory_stats()
+    return still_allocated
 
 
 def _subsample_per_class(dataset: Dataset, cap: int) -> Dataset:
@@ -1278,6 +1354,18 @@ def main(argv: list[str] | None = None) -> int:
                 )
                 row.repeat_idx = repeat_idx
                 row.notes.insert(0, f"dataset={dataset_source}")
+                leaked_gb = _release_accelerator_memory()
+                if leaked_gb > _LEAK_WARN_GB:
+                    row.notes.append(
+                        f"accelerator memory still held after cleanup: {leaked_gb:.2f} GB — "
+                        f"later presets in this sweep may report a contaminated OOM"
+                    )
+                    logger.warning(
+                        "%s left %.2f GB of VRAM allocated after cleanup; "
+                        "run presets in separate processes for trustworthy numbers",
+                        preset,
+                        leaked_gb,
+                    )
                 rows.append(row)
                 _write_payload()
 
