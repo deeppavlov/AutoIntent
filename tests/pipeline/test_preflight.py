@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from autointent import Pipeline
-from autointent.advisor import HardwareProfile, detect_hardware, run_preflight, stats_from_dataset_obj
+from autointent.advisor import HardwareProfile, dataset_stats, detect_hardware, run_preflight
 from autointent._pipeline import PreflightError
 from autointent.configs import LoggingConfig
 
@@ -96,7 +96,7 @@ def test_pipeline_advisor_config_round_trip(dataset: Dataset) -> None:
     """
     p = _classic_light_pipeline()
     config = p._build_advisor_config()
-    stats = stats_from_dataset_obj(dataset)
+    stats = dataset_stats(dataset)
     hardware = detect_hardware()
 
     report = run_preflight(config, stats, hardware, preset_name="classic-light")

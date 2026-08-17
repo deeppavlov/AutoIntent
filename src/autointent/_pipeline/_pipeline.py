@@ -13,10 +13,11 @@ from typing_extensions import assert_never
 
 from autointent import Context, OptimizationConfig
 from autointent.advisor import (
+    PreflightError,
     Severity,
+    dataset_stats,
     detect_hardware,
     run_preflight,
-    stats_from_dataset_obj,
 )
 from autointent.configs import (
     CrossEncoderConfig,
@@ -46,15 +47,6 @@ if TYPE_CHECKING:
 
 
 PreflightMode = Literal["off", "warn", "strict"]
-
-
-class PreflightError(RuntimeError):
-    """Raised when ``Pipeline.fit(preflight="strict")`` finds OVER-budget resources."""
-
-    def __init__(self, findings: list[Any]) -> None:
-        self.findings = findings
-        lines = "\n".join(f"  [{f.phase}] {f.message}" for f in findings)
-        super().__init__(f"Preflight check failed with {len(findings)} OVER finding(s):\n{lines}")
 
 
 class Pipeline:
@@ -195,7 +187,7 @@ class Pipeline:
         ``"strict"`` and any OVER finding is produced, raises ``PreflightError``.
         """
         config = self._build_advisor_config()
-        stats = stats_from_dataset_obj(dataset)
+        stats = dataset_stats(dataset)
         hardware = detect_hardware()
         report = run_preflight(config, stats, hardware, refit_after=refit_after)
         _log_preflight_report(report, self._logger)

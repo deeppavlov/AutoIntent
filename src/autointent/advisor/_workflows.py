@@ -1,4 +1,4 @@
-"""High-level advisor workflows: ``inspect`` and ``recommend``.
+"""High-level advisor workflows: ``estimate``, ``recommend``, and ``reduce_to_fit``.
 
 Each workflow orchestrates the lower-level pieces (``load_config``,
 ``detect_hardware``, ``stats_from_dataset``, ``run_preflight``) into a single
@@ -99,7 +99,7 @@ def stats_from_dataset(path: str, *, multilabel: bool = False) -> DatasetStats:
     )
 
 
-def stats_from_dataset_obj(dataset: Dataset) -> DatasetStats:
+def dataset_stats(dataset: Dataset) -> DatasetStats:
     """Build :class:`DatasetStats` straight from an in-memory ``Dataset``.
 
     Counterpart of :func:`stats_from_dataset` that skips HF ``load_dataset``
@@ -186,13 +186,13 @@ def _class_counts(
     return counts
 
 
-def inspect(
+def estimate(
     target: str,
     *,
     stats: DatasetStats | None = None,
     budget_vram_gb: float | None = None,
 ) -> PreflightReport:
-    """Inspect a preset (or YAML config path) against the local hardware.
+    """Estimate what a preset (or YAML config path) will cost on the local hardware.
 
     Args:
         target: Bundled preset name (e.g. ``'transformers-light'``) or a YAML

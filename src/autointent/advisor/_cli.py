@@ -10,7 +10,7 @@ csv/json/jsonl/parquet path loaded via ``datasets.load_dataset``) or
 ``--n-samples / --n-classes / --avg-tokens`` placeholders so the script is
 useful before the user has built a dataset.
 
-The CLI is a thin wrapper around :func:`autointent.advisor.inspect` and
+The CLI is a thin wrapper around :func:`autointent.advisor.estimate` and
 :func:`autointent.advisor.recommend`; callers that don't need argparse can
 import those helpers directly.
 """
@@ -22,10 +22,9 @@ import json
 import logging
 import sys
 
-from autointent.advisor import inspect, recommend, stats_from_dataset
-
 from ._render import render_json, render_recommendation, render_text
 from ._report import DatasetStats
+from ._workflows import estimate, recommend, stats_from_dataset
 
 logger = logging.getLogger("autointent.advisor")
 
@@ -56,7 +55,7 @@ def _add_common_dataset_args(p: argparse.ArgumentParser) -> None:
 
 
 def cmd_inspect(args: argparse.Namespace) -> int:
-    report = inspect(
+    report = estimate(
         args.target,
         stats=_stats_from_args(args),
         budget_vram_gb=args.budget_vram_gb,
