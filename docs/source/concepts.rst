@@ -124,3 +124,21 @@ AutoIntent's design emphasizes modularity and extensibility:
    Framework can be extended with custom embedding models, scoring algorithms, and decision strategies while maintaining compatibility with the AutoML optimization pipeline.
 
 This modular design ensures that AutoIntent can evolve with advances in NLP research while maintaining stability and backward compatibility for existing users.
+
+Vector Index Lifecycle
+======================
+
+All vector-index backends follow one contract: the **live index a module fits into is transient training scratch**, owned by whichever instance is currently fitting (each ``fit()`` replaces its contents); **durability comes from** ``dump()`` **artifacts**. During hyperparameter search only the best module of each node is dumped, and trials keep rewriting the scratch index after the best one — so never serve from the live index; serve from a loaded dump.
+
+How ``dump()`` achieves durability differs by backend:
+
+- **Faiss** writes a self-contained directory (documents + binary index).
+- **OpenSearch** performs *copy-on-dump*: the live index is copied server-side (``_reindex``) into a write-blocked *generation* index named ``{base}-best-{id}``, and the dump directory records it in ``remote_manifest.json``. The corpus never leaves the cluster. ``Pipeline.load`` binds to that immutable generation, verifies its identity, and never writes; it fails loudly if the generation was deleted or recreated.
+
+Notes specific to the OpenSearch backend:
+
+- **Cleanup.** Delete dumps with :func:`autointent.remove_module_dump` — it removes the referenced generation index from the cluster along with the directory. A plain ``rm -rf`` strands the generation (recoverable: generations are pattern-named ``*-best-*``, so ops can also enforce an ISM age policy). AutoIntent's optimizer uses this helper automatically when a new best trial replaces the previous one, so during optimization the steady-state cluster footprint is the live scratch index plus one generation per node type; a later ``Pipeline.dump()`` re-dump of an already-optimized pipeline adds one more generation per node, which lingers until the corresponding dump directory is deleted.
+- **Naming.** Avoid naming your own live indices with a ``-best-`` infix — ``{base}-best-*`` is the namespace AutoIntent uses for generations and the serving alias.
+- **Portability.** A dumped OpenSearch pipeline is portable only as far as the cluster: copying the dump directory to an environment that cannot reach the same cluster carries a dangling reference. This is inherent to keeping the corpus in the engine.
+- **Querying an existing collection.** Do not point ``OpenSearchConfig.index_name`` at a collection you want to keep — ``fit()`` clears it (fit-replaces). To serve an existing corpus read-only, fit and dump once, then use ``Pipeline.load`` + ``predict``: loaded pipelines only ever read their immutable generation.
+- **Parallel trials.** Hyperparameter search with ``n_jobs > 1`` would share one live scratch index across concurrently fitting trials; keep ``n_jobs = 1`` when using the OpenSearch backend.

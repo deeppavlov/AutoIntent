@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
-import sys
 import tempfile
 import uuid
+from importlib import metadata
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -12,6 +13,7 @@ import numpy as np
 import pytest
 
 from autointent import VectorIndex
+from autointent._wrappers.vector_index.faiss import FaissBackend
 from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
 from autointent.configs import (
     FaissConfig,
@@ -24,7 +26,7 @@ from autointent.custom_types import Document
 from tests.conftest import get_test_embedder_config
 
 if TYPE_CHECKING:
-    from types import ModuleType
+    import numpy.typing as npt
 
 
 def _docker_available() -> bool:
@@ -143,6 +145,26 @@ class TestVectorIndex:
         embeddings = vector_index.get_all_embeddings()
         assert embeddings.shape[0] == 4
 
+    def test_first_add_of_new_instance_replaces_index_contents(
+        self,
+        vector_index: VectorIndex,
+        embedder_config: HashingVectorizerEmbeddingConfig,
+        sample_texts: list[str],
+        sample_labels: list[int],
+    ) -> None:
+        """A fresh instance's first add() starts from an empty index (issue #342, CV fold isolation).
+
+        Mirrors cross-validation: each fold's fit() constructs a new VectorIndex over the
+        same backend config. The previous fold's documents must not survive into this one.
+        """
+        vector_index.add(sample_texts, sample_labels)
+
+        second_index = VectorIndex(embedder_config=embedder_config, config=vector_index.config)
+        fold_texts, fold_labels = sample_texts[1:4], sample_labels[1:4]
+        second_index.add(fold_texts, fold_labels)
+
+        assert second_index.get_all_embeddings().shape[0] == len(fold_texts)
+
     def test_query_by_text(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test querying the index with text."""
         vector_index.add(sample_texts, sample_labels)
@@ -210,20 +232,48 @@ class TestVectorIndex:
             assert len(documents[0]) <= 1
 
     def test_clear_ram(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
-        """Test clearing the index from RAM."""
+        """clear_ram() releases local resources and must not destroy durable state (issue #342)."""
         vector_index.add(sample_texts, sample_labels)
 
-        # Clear RAM
         vector_index.clear_ram()
 
-        # For FaissBackend, index should be reset
-        # For OpenSearchBackend, documents should be deleted
-        # Both should handle this gracefully
         if isinstance(vector_index.config, FaissConfig):
-            # Faiss index should be reset but still exist
-            assert hasattr(vector_index, "index")
-            embeddings = vector_index.get_all_embeddings()
-            assert embeddings.shape[0] == 0
+            # everything is local: the in-RAM vectors are dropped
+            assert vector_index.get_all_embeddings().shape[0] == 0
+        else:
+            # documents live remotely; releasing local resources must not delete them
+            assert vector_index.get_all_embeddings().shape[0] == len(sample_texts)
+
+    def test_dump_survives_clear_ram(
+        self,
+        vector_index: VectorIndex,
+        sample_texts: list[str],
+        sample_labels: list[int],
+        tmp_path: Path,
+    ) -> None:
+        """The optimizer dumps the best module, then clear_ram()s it; the dump must stay servable (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+        dump_dir = tmp_path / "dump"
+        vector_index.dump(dump_dir)
+
+        vector_index.clear_ram()
+
+        loaded = VectorIndex.load(dump_dir)
+        _distances, documents = loaded.query(["password reset"], k=2)
+        assert len(documents[0]) == 2
+
+    def test_reset_drops_all_documents(
+        self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]
+    ) -> None:
+        """reset() drops every indexed document, including durable state (issue #342)."""
+        vector_index.add(sample_texts, sample_labels)
+
+        vector_index.index.reset()
+
+        assert vector_index.get_all_embeddings().shape[0] == 0
+        if isinstance(vector_index.index, FaissBackend):
+            # reset() must clear the documents store too, not only the vectors
+            assert vector_index.index._documents == []
 
     def test_dump_and_load(self, vector_index: VectorIndex, sample_texts: list[str], sample_labels: list[int]) -> None:
         """Test dumping and loading the vector index."""
@@ -319,33 +369,394 @@ class TestVectorIndexEdgeCases:
             vector_index.add(["test"], [0])
 
     def test_opensearch_dependency_error(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """Test OpenSearch dependency error handling."""
-        # Mock opensearchpy import to fail
+        """require('opensearch') surfaces a clear ImportError when opensearch-py isn't installed."""
+        original_version = metadata.version
 
-        original_modules = sys.modules.copy()
+        def fake_version(name: str) -> str:
+            if name == "opensearch-py":
+                raise metadata.PackageNotFoundError(name)
+            return original_version(name)
 
-        try:
-            # Remove opensearchpy from sys.modules if it exists
-            if "opensearchpy" in sys.modules:
-                del sys.modules["opensearchpy"]
+        monkeypatch.setattr(metadata, "version", fake_version)
 
-            # Mock import to raise ImportError
-            def mock_import(name: str, *args: object, **kwargs: object) -> ModuleType | None:
-                if name == "opensearchpy":
-                    msg = "No module named opensearchpy"
-                    raise ImportError(msg)
-                return original_modules.get(name)
+        config = OpenSearchConfig(hosts=[{"host": "localhost", "port": 9200}])
 
-            monkeypatch.setattr("builtins.__import__", mock_import)
+        with pytest.raises(ImportError, match="opensearch-py"):
+            OpenSearchBackend(config=config, vector_size=384)
 
-            # Import the backend module fresh to trigger the import error
-            from autointent._wrappers.vector_index.opensearch import OpenSearchBackend
 
-            config = OpenSearchConfig(hosts=[{"host": "localhost", "port": 9200}])
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_empty_index_query_raises_actionable_error(opensearch_container: tuple[str, int]) -> None:
+    """Querying an empty index names the problem instead of failing later with a numpy cast error (issue #342)."""
+    host, port = opensearch_container
+    config = OpenSearchConfig(
+        hosts=[{"host": host, "port": port}],
+        index_name=f"test_empty_{uuid.uuid4().hex[:8]}",
+    )
+    backend = OpenSearchBackend(config=config, vector_size=8)
+    backend._init_index()
 
-            with pytest.raises(RuntimeError, match="Install opensearch-py python package first"):
-                OpenSearchBackend(config=config, vector_size=384)
+    with pytest.raises(RuntimeError, match="empty"):
+        backend.query(np.zeros((1, 8)), k=3)
 
-        finally:
-            # Restore original modules
-            sys.modules.update(original_modules)
+
+def _os_backend(host: str, port: int, index_name: str | None, vector_size: int = 8) -> OpenSearchBackend:
+    config = OpenSearchConfig(hosts=[{"host": host, "port": port}], index_name=index_name)
+    return OpenSearchBackend(config=config, vector_size=vector_size)
+
+
+def _one_hot_docs(prefix: str, n: int = 4, label: int = 0) -> tuple[npt.NDArray[np.float32], list[Document]]:
+    """One-hot embeddings make nearest-neighbor assertions exact: query eye[i] -> doc i."""
+    return np.eye(8, dtype="float32")[:n], [Document(text=f"{prefix} {i}", label=label) for i in range(n)]
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_creates_write_blocked_generation(opensearch_container: tuple[str, int]) -> None:
+    """dump() copies the live index into an immutable generation and records a manifest (issue #343)."""
+    import opensearchpy
+
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    manifest = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["engine"] == "opensearch"
+    generation = manifest["index"]
+    assert generation.startswith(f"{live_name}-best-")
+    assert generation.endswith(manifest["dump_id"])
+
+    client = backend._client
+    assert client.indices.exists(index=generation)
+    assert client.count(index=generation)["count"] == 4
+
+    meta = client.indices.get_mapping(index=generation)[generation]["mappings"]["_meta"]
+    assert meta["dump_id"] == manifest["dump_id"]
+
+    with pytest.raises(opensearchpy.exceptions.TransportError):
+        client.index(index=generation, body={"values": [0.0] * 8, "text": "stray write", "label": 0})
+
+    # the pre-existing reference files are still written
+    assert (dump_dir / "config.json").exists()
+    assert (dump_dir / "vector_size.txt").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_before_fit_writes_no_manifest(opensearch_container: tuple[str, int]) -> None:
+    """A never-fitted backend dumps a plain reference (no generation to copy)."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, index_name=None)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    assert not (dump_dir / "remote_manifest.json").exists()
+    assert (dump_dir / "config.json").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dumped_pipeline_survives_later_writes(opensearch_container: tuple[str, int]) -> None:
+    """THE regression test for issue #343: a dump serves the data present at dump time,
+    even after later trials rewrite — or someone deletes — the live index."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+
+    best = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    best.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(dump_dir)
+
+    later = _os_backend(host, port, live_name)  # next trial: fresh instance, fit-replaces
+    later_embeddings, later_documents = _one_hot_docs("later", label=1)
+    later.add(later_embeddings, later_documents)
+
+    best._client.indices.delete(index=live_name)  # even destroying the live index is fine
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_when_generation_missing(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+    backend._client.indices.delete(index=generation)
+
+    with pytest.raises(RuntimeError, match="no longer exists or was recreated"):
+        OpenSearchBackend.load(dump_dir)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_when_generation_recreated(opensearch_container: tuple[str, int]) -> None:
+    """A same-named index without our dump_id is somebody else's index — refuse, don't serve it."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+    backend._client.indices.delete(index=generation)
+    backend._client.indices.create(index=generation)  # recreated, no _meta.dump_id
+
+    with pytest.raises(RuntimeError, match="no longer exists or was recreated"):
+        OpenSearchBackend.load(dump_dir)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_loaded_instance_rejects_writes(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    with pytest.raises(RuntimeError, match="immutable"):
+        loaded.add(embeddings, documents)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_manifestless_dump_loads_as_reference(opensearch_container: tuple[str, int]) -> None:
+    """Backward compatibility: dumps created before #343 (no manifest) keep today's semantics."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    (dump_dir / "remote_manifest.json").unlink()  # simulate a pre-#343 dump
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    assert loaded.index_name == live_name
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_delete_dumped_generation_removes_index(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)
+    assert not backend._client.indices.exists(index=generation)
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)  # idempotent: already gone is fine
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_delete_dumped_generation_spares_recreated_index(opensearch_container: tuple[str, int]) -> None:
+    """Never delete an index we don't own: dump_id mismatch means someone recreated it."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    backend._client.indices.delete(index=generation)
+    backend._client.indices.create(index=generation)  # recreated by "someone else", no _meta
+
+    OpenSearchBackend.delete_dumped_generation(dump_dir)
+    assert backend._client.indices.exists(index=generation)
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_redump_after_live_overwrite_serves_original_data(opensearch_container: tuple[str, int]) -> None:
+    """Pipeline.dump() path: re-dumping the best module after later trials rewrote the live
+    index must snapshot the module's own fitted data (sourced from its earlier generation)."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+
+    best = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    best.add(embeddings, documents)
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(first_dump)  # what log_module_optimization does at is_new_best time
+
+    later = _os_backend(host, port, live_name)
+    later_embeddings, later_documents = _one_hot_docs("later", label=1)
+    later.add(later_embeddings, later_documents)  # last trial rewrites the live index
+
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    best.dump(second_dump)  # what Pipeline.dump() does afterwards
+
+    loaded = OpenSearchBackend.load(second_dump)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_add_after_dump_makes_live_index_source_again(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    backend.dump(Path(tempfile.mkdtemp()) / "vector_index")
+
+    more_embeddings, more_documents = _one_hot_docs("more", label=2)
+    backend.add(more_embeddings, more_documents)  # second add on same instance appends to live
+
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(second_dump)
+
+    loaded = OpenSearchBackend.load(second_dump)
+    assert loaded._client.count(index=loaded.index_name)["count"] == 8  # 4 "best" + 4 "more"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_twice_to_same_path_replaces_generation(opensearch_container: tuple[str, int]) -> None:
+    """A dump directory owns exactly one generation: re-dumping replaces it in the cluster."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+    first_generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    backend.dump(dump_dir)
+    second_generation = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    assert first_generation != second_generation
+    assert not backend._client.indices.exists(index=first_generation)
+    assert backend._client.indices.exists(index=second_generation)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_dump_swaps_serving_alias_to_latest_generation(opensearch_container: tuple[str, int]) -> None:
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(first_dump)
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(second_dump)
+    latest_generation = json.loads((second_dump / "remote_manifest.json").read_text(encoding="utf-8"))["index"]
+
+    alias_targets = backend._client.indices.get_alias(name=f"{live_name}-best")
+    assert list(alias_targets) == [latest_generation]
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_failed_dump_leaves_no_stranded_generation(
+    opensearch_container: tuple[str, int], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """If copying data into the new generation fails, the generation must not be left
+    dangling in the cluster (issue #343 follow-up): nothing references it, nothing can
+    ever clean it up."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    def _raise_boom(source: str, dest: str) -> None:
+        msg = "boom"
+        raise RuntimeError(msg)
+
+    monkeypatch.setattr(backend, "_copy_index", _raise_boom)
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    with pytest.raises(RuntimeError, match="boom"):
+        backend.dump(dump_dir)
+
+    assert backend._client.indices.get(index=f"{live_name}-best-*") == {}
+    assert not (dump_dir / "remote_manifest.json").exists()
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_alias_conflict_does_not_fail_dump(opensearch_container: tuple[str, int]) -> None:
+    """The serving alias is operator convenience, not load-bearing: a naming conflict
+    on the alias swap must not fail the dump itself."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    # A real INDEX (not an alias) already occupies the name the alias would need.
+    backend._client.indices.create(index=f"{live_name}-best")
+
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)  # must not raise despite the alias conflict
+
+    manifest = json.loads((dump_dir / "remote_manifest.json").read_text(encoding="utf-8"))
+    generation = manifest["index"]
+    assert backend._client.indices.exists(index=generation)
+
+    loaded = OpenSearchBackend.load(dump_dir)
+    _, results = loaded.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_redump_of_loaded_instance(opensearch_container: tuple[str, int]) -> None:
+    """Production path: Pipeline.fit(clear_ram=True) then Pipeline.dump() loads the module
+    back from its own dump before re-dumping it; the re-dump must still work and must not
+    accumulate a nested '-best-' infix in the generation name."""
+    host, port = opensearch_container
+    live_name = f"test_gen_{uuid.uuid4().hex[:8]}"
+    backend = _os_backend(host, port, live_name)
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+
+    first_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(first_dump)
+
+    loaded = OpenSearchBackend.load(first_dump)
+    second_dump = Path(tempfile.mkdtemp()) / "vector_index"
+    loaded.dump(second_dump)
+
+    served = OpenSearchBackend.load(second_dump)
+    _, results = served.query(np.eye(8, dtype="float32")[:1], k=1)
+    assert results[0][0].text == "best 0"
+
+    manifest = json.loads((second_dump / "remote_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["index"].count("-best-") == 1
+
+
+@pytest.mark.skipif(not _DOCKER_AVAILABLE, reason="Docker not available; testcontainers cannot boot OpenSearch")
+def test_opensearch_load_raises_on_malformed_manifest(opensearch_container: tuple[str, int]) -> None:
+    """A manifest missing the expected keys must fail loudly and specifically, not with
+    an opaque KeyError."""
+    host, port = opensearch_container
+    backend = _os_backend(host, port, f"test_gen_{uuid.uuid4().hex[:8]}")
+    embeddings, documents = _one_hot_docs("best")
+    backend.add(embeddings, documents)
+    dump_dir = Path(tempfile.mkdtemp()) / "vector_index"
+    backend.dump(dump_dir)
+
+    (dump_dir / "remote_manifest.json").write_text(json.dumps({"engine": "opensearch"}), encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="malformed"):
+        OpenSearchBackend.load(dump_dir)

@@ -62,6 +62,11 @@ class FaissBackend(BaseIndexBackend):
     def clear_ram(self) -> None:
         self._index.reset()
 
+    def reset(self) -> None:
+        """Drop all indexed documents: the vectors and the documents store."""
+        self._index.reset()
+        self._documents.clear()
+
     def get_all_embeddings(self) -> NDArray[Any]:
         return np.asarray(self._index.reconstruct_n(0, self._index.ntotal))
 

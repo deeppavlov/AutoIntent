@@ -125,7 +125,7 @@ class Context:
         inference_config = self.optimization_info.get_inference_nodes_config(asdict=True)
         inference_config_path = logs_dir / "inference_config.yaml"
         with inference_config_path.open("w") as file:
-            yaml.dump(inference_config, file)
+            yaml.safe_dump(inference_config, file)
 
     def load_optimization_info(self) -> None:
         """Restore the context state to resume the optimization process.

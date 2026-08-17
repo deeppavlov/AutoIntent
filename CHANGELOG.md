@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file. Release notes are grouped by theme rather than listing every commit.
 
+## [0.3.3.dev0] — 2026-08-13
+
+Compared to [0.3.2](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.2). A development pre-release focused on OpenSearch vector-index correctness and a stricter optional-dependency guard.
+
+### Vector index (OpenSearch)
+
+- **Dumps are now self-contained snapshots.** `OpenSearchBackend.dump()` copies the live index server-side into a write-blocked, immutable generation index (`{base}-best-{uuid}`) recorded in `remote_manifest.json`, instead of writing a bare reference to the live index that every subsequent HPO trial rewrites. `load()` binds read-only to the verified generation and fails loudly when it is missing, was recreated, or the manifest is malformed; manifest-less dumps written by earlier versions keep the old reference semantics. Data never leaves the cluster. New public `remove_module_dump()` deletes a dump tree together with the cluster indices its manifests reference, and the HPO best-trial replacement now goes through it (#346, closes #343).
+- **`clear_ram()` no longer destroys durable state.** The `BaseIndexBackend` contract is split: `clear_ram()` releases local resources only, and a new `reset()` drops all indexed documents. `OpenSearchBackend.clear_ram()` is now a documented no-op — it previously issued `delete_by_query(match_all)` against the durable index a dumped pipeline serves, so `LoggingConfig(clear_ram=True)` emptied it. `OpenSearchBackend.add()` also restores *fit-replaces* semantics, so CV folds and trials no longer accumulate documents and validation folds are no longer retrievable while being scored. `FaissBackend.reset()` now clears `_documents` too, closing a latent index/documents misalignment, and querying an empty OpenSearch index raises an actionable `RuntimeError` instead of a downstream numpy cast error (#345, closes #342).
+
+### Bug fixes
+
+- **Pipelines with tuple-valued config fields reload again.** `Pipeline.dump` and `Context.dump` write `inference_config.yaml` with `yaml.safe_dump`, so tuples are serialized as plain YAML sequences rather than `!!python/tuple` tags that `yaml.safe_load` refuses to construct at load time. Any pipeline using `HashingVectorizerEmbeddingConfig` (whose `ngram_range` is a `tuple[int, int]`) was previously broken end-to-end (#344).
+
+### Dependencies
+
+- **`require(extra)` is now metadata-driven.** The optional-dependency guard reads installed distribution metadata and verifies that *every* dependency of an `autointent` extra — recursively, including nested third-party extras such as `transformers[torch] → accelerate` — is both installed and version-satisfied, raising a single aggregated, actionable `ImportError` instead of a raw deep import failure. `packaging (>=23.2)` is promoted to a core dependency (#339, closes #322).
+
+---
+
 ## [0.3.2] — 2026-06-22
 
 Compared to [0.3.1](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.1). A maintenance release focused on caching correctness and CI/test coverage. No breaking changes.

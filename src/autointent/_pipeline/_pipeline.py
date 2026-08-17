@@ -367,7 +367,7 @@ class Pipeline:
 
         inference_nodes_configs = [cfg.asdict() for cfg in self._nodes_configs.values()]
         with (path / "inference_config.yaml").open("w") as file:
-            yaml.dump(inference_nodes_configs, file)
+            yaml.safe_dump(inference_nodes_configs, file)
 
     def validate_modules(self, dataset: Dataset, mode: SearchSpaceValidationMode) -> None:
         """Validate modules with dataset.
