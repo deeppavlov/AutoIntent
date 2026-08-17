@@ -1,8 +1,7 @@
 """Pre-flight compute feasibility advisor.
 
 Exposes a small surface used by both ``Pipeline.fit()`` (see the ``preflight=``
-kwarg) and the ``autointent-advisor`` CLI script. See
-``compute-feasibility-advisor-proposal.md`` at the repo root for the design.
+kwarg) and the ``autointent-advisor`` CLI script.
 """
 
 from __future__ import annotations
