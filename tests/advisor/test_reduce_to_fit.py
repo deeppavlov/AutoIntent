@@ -31,13 +31,13 @@ def _force_offline(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(_hub, "_hub_metadata", lambda _name: None)
 
 
-def _profile(vram_gb: float = 16.0) -> HardwareProfile:
+def _profile(vram_gb: float = 16.0, ram_gb: float = 32.0, free_disk_gb: float = 200.0) -> HardwareProfile:
     return HardwareProfile(
         accelerator="cuda" if vram_gb > 0 else "cpu",
         device_name="test-gpu" if vram_gb > 0 else "test-cpu",
         vram_gb=vram_gb,
-        ram_gb=32.0,
-        free_disk_gb=200.0,
+        ram_gb=ram_gb,
+        free_disk_gb=free_disk_gb,
         cpu_count=8,
     )
 

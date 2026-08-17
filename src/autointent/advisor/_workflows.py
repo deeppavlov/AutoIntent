@@ -305,19 +305,32 @@ def _drop_module_from_search_space(
     return out
 
 
-def _pick_module_to_drop(report: PreflightReport) -> tuple[str, str] | None:
-    """Pick the (node_type, module_name) that contributes the most to whichever
-    budget is over. Returns ``None`` when no droppable driver exists (all
-    remaining rows are decision-node entries or unknown-cost placeholders).
+# ``Finding.metric`` uses short names ("vram"); driver rows use suffixed keys
+# ("vram_gb"). Mapping the two is what makes the priority walk below work — a
+# previous version compared the two namespaces directly, so the lookup never
+# matched and every prune silently fell back to VRAM (experiments #40 #3).
+_DRIVER_KEY_BY_METRIC = {"vram": "vram_gb", "time": "time_hours", "ram": "ram_gb"}
+# Preference order when several budgets are over at once.
+_METRIC_PRIORITY = ("vram", "time", "ram")
 
-    Preference order: VRAM > time > RAM > disk. We drop the driver with the
-    largest cost along the *first* dimension that has at least one OVER
-    finding — otherwise (edge case: is_feasible False without an OVER, which
-    shouldn't happen) fall back to VRAM.
+
+def _pick_module_to_drop(report: PreflightReport) -> tuple[str, str] | None:
+    """Pick the (node_type, module_name) contributing most to whichever budget is over.
+
+    Drops the driver with the largest cost along the first dimension that has an
+    OVER finding, preferring VRAM > time > RAM. Disk is deliberately absent from
+    that walk: driver rows carry no per-module disk figure, so disk pressure
+    reduces by the VRAM proxy (download size tracks model size). Falls back to
+    VRAM when nothing is OVER.
+
+    Returns ``None`` when no droppable driver exists — all remaining rows are
+    decision-node entries or unknown-cost placeholders.
     """
-    findings_by_metric = {f.metric for f in report.findings if f.severity == Severity.OVER}
-    priority = ["vram_gb", "time_hours", "ram_gb", "disk_download_gb"]
-    driver_key = next((k for k in priority if k in findings_by_metric), None) or "vram_gb"
+    over_metrics = {f.metric for f in report.findings if f.severity == Severity.OVER}
+    driver_key = next(
+        (_DRIVER_KEY_BY_METRIC[m] for m in _METRIC_PRIORITY if m in over_metrics),
+        "vram_gb",
+    )
 
     drivers = report.resource.drivers or []
     # Only drop scoring-node drivers — decision modules are lightweight and
