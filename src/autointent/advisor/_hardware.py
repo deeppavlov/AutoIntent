@@ -32,6 +32,15 @@ _BYTES_PER_GB = 1024**3  # binary GiB convention; matches all advisor byte->GB c
 
 @dataclass
 class HardwareProfile:
+    """The machine budget every estimate is scored against.
+
+    Produced by :func:`~autointent.advisor.detect_hardware`, or built by hand to
+    size a search space for a machine you are not currently on. All sizes are in
+    binary gigabytes (GiB). ``vram_gb`` is 0.0 on CPU-only hosts, and on Apple
+    silicon it is a fraction of unified memory rather than dedicated VRAM.
+    ``notes`` carries such caveats and any manual VRAM override that was applied.
+    """
+
     accelerator: Accelerator
     device_name: str
     vram_gb: float

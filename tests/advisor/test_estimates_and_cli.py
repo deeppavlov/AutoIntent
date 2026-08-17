@@ -13,13 +13,21 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
 from autointent.advisor import DatasetStats, HardwareProfile, run_preflight
-from autointent.advisor._cli import main
+from autointent.advisor._cli import build_parser, main
 from autointent.advisor._workflows import PRESET_COST_ORDER
 from autointent.utils import load_preset
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:  # pytest depends on tomli below 3.11, so this import is always satisfiable here
+    import tomli as tomllib
+
+_PYPROJECT = Path(__file__).resolve().parents[2] / "pyproject.toml"
 
 
 @pytest.fixture(autouse=True)
@@ -242,6 +250,24 @@ def test_cli_recommend_budget_time_flags_red_for_overbudget_presets(
     # Any preset above the budget must be marked infeasible.
     for r in flagged:
         assert r["report"]["is_feasible"] is False
+
+
+def test_console_script_name_matches_cli_prog() -> None:
+    """The installed command and the name the CLI prints must be the same string.
+
+    They were not: pyproject registered ``advisor`` while the parser called
+    itself ``autointent-advisor``, so every usage/error message named a command
+    that did not exist. Both sides are now asserted against each other.
+    """
+    with _PYPROJECT.open("rb") as f:
+        scripts = tomllib.load(f)["project"]["scripts"]
+
+    advisor_scripts = {name: target for name, target in scripts.items() if target.startswith("autointent.advisor.")}
+    assert len(advisor_scripts) == 1, f"expected exactly one advisor console script, got {advisor_scripts}"
+
+    script_name, target = next(iter(advisor_scripts.items()))
+    assert target == "autointent.advisor._cli:main"
+    assert script_name == build_parser().prog
 
 
 if __name__ == "__main__":

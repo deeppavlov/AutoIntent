@@ -262,6 +262,13 @@ class Pipeline:
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
 
+        # Filter the search space first: ``validate_modules`` drops modules this
+        # dataset cannot use (e.g. ``mlknn`` on multiclass, ``dnnc`` and its ~6.4 GB
+        # reranker on multilabel), and preflight must price what will actually run
+        # rather than what was requested. It takes ``dataset`` only, so it does not
+        # depend on the ``Context`` built below.
+        self.validate_modules(dataset, mode=incompatible_search_space)
+
         if preflight != "off":
             self._run_preflight(dataset, refit_after=refit_after, mode=preflight)
 
@@ -273,8 +280,6 @@ class Pipeline:
         context.configure_transformer(self.transformer_config)
         context.configure_hpo(self.hpo_config)
         context.configure_vector_index(self.vector_index_config)
-
-        self.validate_modules(dataset, mode=incompatible_search_space)
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
@@ -532,6 +537,9 @@ def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
 
 def _log_preflight_report(report: PreflightReport, logger: logging.Logger) -> None:
     """Log each preflight finding at the appropriate level."""
+    # Imported lazily for the same reason as in ``Pipeline._run_preflight``: the
+    # advisor probes the HF Hub, so it must stay off the ``import autointent``
+    # path. Do not hoist to module scope.
     from autointent.advisor import Severity
 
     level_for = {

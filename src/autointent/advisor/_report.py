@@ -8,6 +8,18 @@ from typing import Any, Literal
 
 
 class Severity(str, Enum):
+    """How much headroom a finding leaves against the detected budget.
+
+    * ``AMPLE`` — comfortably within budget; informational only.
+    * ``TIGHT`` — expected to fit, but with little margin; the estimate is
+      heuristic, so treat this as "may not fit".
+    * ``OVER`` — the budget is expected to be exceeded.
+
+    A single ``OVER`` finding makes the whole report infeasible
+    (:attr:`PreflightReport.is_feasible` is ``False``) and is what
+    ``Pipeline.fit(preflight="strict")`` raises on.
+    """
+
     AMPLE = "ample"
     TIGHT = "tight"
     OVER = "over"
@@ -70,6 +82,21 @@ class DatasetStats:
         avg_tokens: int = 32,
         multilabel: bool = False,
     ) -> DatasetStats:
+        """Build stats for a hypothetical dataset, for sizing a search space without data.
+
+        ``p95_tokens`` is derived as ``avg_tokens * 2.5`` and ``class_counts`` is
+        left empty. Use :func:`~autointent.advisor.dataset_stats` instead when a
+        real ``Dataset`` is available.
+
+        Args:
+            n_samples: number of training utterances to assume.
+            n_classes: number of intent classes to assume.
+            avg_tokens: average utterance length in whitespace-separated tokens.
+            multilabel: whether to assume a multilabel task.
+
+        Returns:
+            Stats with ``source="placeholder"``.
+        """
         return cls(
             n_samples=n_samples,
             n_classes=n_classes,
@@ -92,6 +119,15 @@ class PreflightReport:
     notes: list[str] = field(default_factory=list)
 
     def add(self, phase: Phase, severity: Severity, message: str, metric: str | None = None) -> None:
+        """Append a :class:`Finding` to this report.
+
+        Args:
+            phase: which check produced it — ``"resource"``, ``"data"`` or ``"config"``.
+            severity: headroom level; a single ``OVER`` makes the report infeasible.
+            message: one-line human-readable explanation, shown as-is in reports.
+            metric: short budget name the finding is about (``"vram"``, ``"ram"``,
+                ``"disk"``, ``"time"``), or ``None`` for findings not tied to a budget.
+        """
         self.findings.append(Finding(phase=phase, severity=severity, message=message, metric=metric))
 
     @property
@@ -104,9 +140,20 @@ class PreflightReport:
 
     @property
     def is_feasible(self) -> bool:
+        """Whether the run is expected to fit: True unless some finding is OVER."""
         return self.headroom != Severity.OVER
 
     def to_dict(self) -> dict[str, Any]:
+        """Render the report as JSON-serializable data.
+
+        Severities become their string values, and the derived ``headroom`` and
+        ``is_feasible`` properties are included as keys. This is what the CLI's
+        ``--json`` output emits.
+
+        Returns:
+            A plain dict of the report, its findings, resource estimate,
+            hardware and dataset summaries.
+        """
         d = asdict(self)
         d["findings"] = [{**asdict(f), "severity": f.severity.value} for f in self.findings]
         d["headroom"] = self.headroom.value

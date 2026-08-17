@@ -1,5 +1,13 @@
-"""Hardware detection has to be safe on every machine — broken CUDA, no GPU,
-no psutil. Verify the fallbacks work without raising.
+"""Accelerator selection in ``detect_hardware``: CUDA -> MPS -> CPU.
+
+Each test patches ``_detect_cuda`` / ``_detect_mps`` (and sometimes
+``_detect_ram_gb``) to force one branch, then checks the resulting profile —
+the CPU fallback when nothing is available, the device_class thresholds, the
+MPS unified-memory budget, and the manual VRAM override.
+
+These do *not* cover a missing ``psutil``: it is a core dependency, imported
+unguarded at ``_hardware.py`` module level, and no psutil-absent fallback
+exists. The RAM and disk probes are therefore always the real ones.
 """
 
 from __future__ import annotations

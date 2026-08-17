@@ -411,7 +411,7 @@ def _mark_cache_hit(me: _ModuleEstimate, module: str, *, suffix: str) -> None:
         me.driver["mode"] = f"{me.driver['mode']}+{suffix}"
 
 
-def _charge_first_forward(
+def _charge_first_forward_if_classic(
     me: _ModuleEstimate,
     module: str,
     model: str,
@@ -420,11 +420,13 @@ def _charge_first_forward(
     stats: DatasetStats,
     hardware: HardwareProfile,
 ) -> None:
-    """Add a synthetic embedder forward to the entry that first pays for ``model``.
+    """Add a synthetic embedder forward to a classic entry that first pays for ``model``.
 
-    Per unique embedder the first cache-honoring entry pays the forward; later
-    transformer entries hit the cache, and classic entries need a forward added
-    because their own cost model assumes embeddings already exist.
+    Per unique embedder the first cache-honoring entry pays the forward. Only
+    classic entries (linear / catboost) need it added, because their own cost
+    model assumes embeddings already exist; a transformer entry's ``time_hours``
+    already bundles the forward, so for those this is deliberately a no-op —
+    hence the guard and the ``_if_classic`` in the name.
     """
     if module in {"linear", "catboost"}:
         embedder_meta = seen_models.get(model)
@@ -482,7 +484,9 @@ def _apply_embedding_cache(
             _mark_cache_hit(me, module, suffix="cached")
         else:
             paid.add(model)
-            _charge_first_forward(me, module, model, seen_models=seen_models, stats=stats, hardware=hardware)
+            _charge_first_forward_if_classic(
+                me, module, model, seen_models=seen_models, stats=stats, hardware=hardware
+            )
     return paid
 
 
@@ -642,16 +646,22 @@ def _not_estimated_row(*, node_type: str, module: str) -> _ModuleEstimate:
 class _ResourceInputs:
     """Configuration-shaped inputs to the resource phase.
 
-    Bundled because these travel together through both estimation passes and
-    passing nine keyword arguments down each one is unreadable.
+    Bundled by provenance rather than by use: every field is derived from one
+    validated ``OptimizationConfig``, plus the caller-injected ``cache_probe``.
+    Individual passes read only what they need — the classic pass reads
+    ``refit_after`` alone, and ``search_space`` / ``n_trials`` / ``n_jobs`` /
+    ``dump_modules`` never leave ``_resource_phase`` — but threading them
+    separately would mean a dozen keyword arguments down each call.
 
     ``cross_encoder_model_name`` and ``transformer_model_name`` come from the
     pipeline's top-level configs and act as the fallback model for modules that
     don't declare a per-entry ``classification_model_config`` but still consume
     one at runtime (``description_cross`` / ``dnnc`` / ``retrieval`` pull from
     ``cross_encoder_config``; ``bert`` falls back to ``transformer_config``).
-    Seeding them here fixes the disk-download under-count called out in the
-    follow-up review (missing 6.4 GB reranker in ``zero-shot-encoders``).
+    Carrying them is what fixes the disk-download under-count called out in the
+    follow-up review (missing 6.4 GB reranker in ``zero-shot-encoders``); they
+    are applied in :func:`_estimate_transformer_entries`, where an entry with no
+    model of its own falls back to them.
     """
 
     embedder_config: EmbedderConfig

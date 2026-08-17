@@ -16,10 +16,19 @@ from typing import TYPE_CHECKING
 import pytest
 
 from autointent import Pipeline
-from autointent.advisor import HardwareProfile, PreflightError, dataset_stats, detect_hardware, run_preflight
+from autointent.advisor import (
+    HardwareProfile,
+    PreflightError,
+    PreflightReport,
+    dataset_stats,
+    detect_hardware,
+    run_preflight,
+)
 from autointent.configs import LoggingConfig
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from autointent import Dataset
 
 _PIPELINE_LOGGER = "autointent._pipeline._pipeline"
@@ -49,6 +58,16 @@ def _classic_light_pipeline() -> Pipeline:
     return p
 
 
+def _module_names(config: dict[str, Any]) -> set[str]:
+    """Every ``module_name`` in an advisor-shaped config's search space."""
+    return {
+        entry["module_name"]
+        for node in config["search_space"]
+        for entry in node["search_space"]
+        if "module_name" in entry
+    }
+
+
 def test_fit_does_not_run_preflight_by_default(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
     """The default is opt-out: no preflight, no Hub round-trips, no log line."""
     p = _classic_light_pipeline()
@@ -58,6 +77,11 @@ def test_fit_does_not_run_preflight_by_default(dataset: Dataset, caplog: pytest.
 
 
 def test_preflight_off_skips_advisor(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
+    """Asking for ``preflight="off"`` explicitly is honoured, not just the default.
+
+    The previous test pins the default value; this one pins the ``"off"`` branch
+    of the gate itself, so a change to the default cannot mask a regression here.
+    """
     p = _classic_light_pipeline()
     with caplog.at_level(logging.INFO, logger=_PIPELINE_LOGGER):
         p.fit(dataset, preflight="off")
@@ -90,6 +114,37 @@ def test_preflight_warn_does_not_raise_on_infeasible(
     with caplog.at_level(logging.ERROR, logger=_PIPELINE_LOGGER):
         p.fit(dataset, preflight="warn")
     assert any(r.levelno == logging.ERROR for r in caplog.records)
+
+
+def test_preflight_prices_the_filtered_search_space(dataset: Dataset, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The gate runs after validate_modules, so it never charges for discarded modules.
+
+    ``classic-light`` ships ``mlknn``, which does not support multiclass, so
+    ``fit()`` drops it from the search space. Pricing the unfiltered space
+    inflates the estimate — badly so for ``dnnc``'s ~6.4 GB reranker on
+    multilabel data, where it can flip a strict verdict to OVER.
+    """
+    import autointent.advisor as advisor_pkg
+
+    captured: list[dict[str, Any]] = []
+
+    def _spy(config: dict[str, Any], *_args: object, **_kwargs: object) -> PreflightReport:
+        captured.append(config)
+        return PreflightReport()
+
+    monkeypatch.setattr(advisor_pkg, "run_preflight", _spy)
+
+    p = _classic_light_pipeline()
+    assert not dataset.multilabel, "fixture must be multiclass for mlknn to be filtered out"
+    requested = _module_names(p._build_advisor_config())
+    assert "mlknn" in requested, f"classic-light should offer mlknn: {requested}"
+
+    p.fit(dataset, preflight="warn")
+
+    assert captured, "preflight did not run"
+    priced = _module_names(captured[0])
+    assert "mlknn" not in priced, f"preflight priced a module fit() discards: {priced}"
+    assert "linear" in priced, f"preflight lost compatible modules too: {priced}"
 
 
 def test_importing_autointent_does_not_import_the_advisor() -> None:

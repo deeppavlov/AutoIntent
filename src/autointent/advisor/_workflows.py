@@ -115,11 +115,24 @@ def stats_from_dataset(path: str, *, multilabel: bool = False) -> DatasetStats:
 
 
 def dataset_stats(dataset: Dataset) -> DatasetStats:
-    """Build :class:`DatasetStats` straight from an in-memory ``Dataset``.
+    """Summarize an in-memory :class:`~autointent.Dataset` for the advisor.
 
-    Counterpart of :func:`stats_from_dataset` that skips HF ``load_dataset``
-    and reads the train split + autointent-specific attributes (``n_classes``,
-    ``multilabel``, ``has_descriptions``) directly.
+    Reads the train split (``train``, or ``train_0`` once the dataset has been
+    split) to count samples and measure utterance length — average and 95th
+    percentile word counts, over at most the first 1000 rows — and takes
+    ``n_classes``, ``multilabel`` and ``has_descriptions`` from the dataset
+    itself. Returns a placeholder when no train split is present.
+
+    This is how a caller gets from a ``Dataset`` to the ``DatasetStats`` that
+    :func:`run_preflight` and :func:`reduce_to_fit` require. Use
+    :meth:`DatasetStats.placeholder` instead when no dataset exists yet and you
+    only want to size a search space against hypothetical numbers.
+
+    Args:
+        dataset: the dataset the pipeline would be fitted on.
+
+    Returns:
+        Stats describing that dataset, with ``source="dataset:in-memory"``.
     """
     from autointent.custom_types import Split
 
@@ -406,8 +419,10 @@ def reduce_to_fit(
     Behavior:
       * If ``config`` is already feasible, returns ``(config, report)`` unchanged.
       * Otherwise picks the OVER-driving scoring-node module with the largest
-        cost along whichever budget breached (VRAM > time > RAM > disk) and
-        removes it from the search_space, then re-runs preflight.
+        cost along whichever budget breached (VRAM > time > RAM) and removes it
+        from the search_space, then re-runs preflight. Disk is deliberately not
+        in that order: driver rows carry no per-module disk figure, so disk
+        pressure reduces by the VRAM proxy — download size tracks model size.
       * Repeats until feasible, ``max_iters`` reached, or no droppable module
         remains — in the last two cases raises :class:`ReduceToFitError`
         carrying the pruned config and final report.
