@@ -18,7 +18,7 @@ import pytest
 
 from autointent.advisor import DatasetStats, HardwareProfile, run_preflight
 from autointent.advisor._cli import main
-from autointent.advisor._workflows import BUNDLED_PRESETS
+from autointent.advisor._workflows import PRESET_COST_ORDER
 from autointent.utils import load_preset
 
 
@@ -42,7 +42,7 @@ def _profile(vram_gb: float = 16.0) -> HardwareProfile:
     )
 
 
-@pytest.mark.parametrize("preset", BUNDLED_PRESETS)
+@pytest.mark.parametrize("preset", PRESET_COST_ORDER)
 def test_every_preset_inspects_without_raising(preset: str) -> None:
     cfg = load_preset(preset)  # type: ignore[arg-type]
     stats = DatasetStats.placeholder(n_samples=500, n_classes=10, avg_tokens=24)

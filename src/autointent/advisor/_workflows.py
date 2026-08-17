@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, get_args
+from typing import TYPE_CHECKING, Any
 
 import yaml
 from datasets import ClassLabel, Sequence, load_dataset
@@ -36,7 +36,22 @@ logger = logging.getLogger("autointent.advisor")
 
 _SAMPLE_LIMIT = 1000
 _P95_PERCENTILE = 0.95
-BUNDLED_PRESETS: tuple[str, ...] = get_args(SearchSpacePreset)
+# Descending resource cost. Declared explicitly rather than derived from
+# get_args(SearchSpacePreset) so that reordering a public type alias cannot
+# silently change what `recommend` picks. Kept in sync by
+# tests/advisor/test_preset_cost_order.py.
+PRESET_COST_ORDER: tuple[SearchSpacePreset, ...] = (
+    "transformers-heavy",
+    "transformers-light",
+    "nn-heavy",
+    "zero-shot-llm",
+    "nn-medium",
+    "classic-heavy",
+    "transformers-no-hpo",
+    "classic-medium",
+    "zero-shot-encoders",
+    "classic-light",
+)
 
 
 def load_config(target: str) -> tuple[dict[str, Any], str]:
@@ -221,7 +236,7 @@ def recommend(
 
     Args:
         stats: Dataset stats to score against. Defaults to a placeholder if ``None``.
-        presets: Override of the preset list (defaults to ``BUNDLED_PRESETS``).
+        presets: Override of the preset list (defaults to ``PRESET_COST_ORDER``).
         budget_vram_gb: Optional VRAM-budget override for the hardware probe.
         budget_time_h: Optional wall-time ceiling in hours; presets exceeding it
             get an extra ``Severity.OVER`` finding so they drop out of the
@@ -239,7 +254,7 @@ def recommend(
     """
     hardware = detect_hardware(vram_budget_gb=budget_vram_gb)
     stats = stats or DatasetStats.placeholder()
-    preset_iter = list(presets) if presets is not None else BUNDLED_PRESETS
+    preset_iter = list(presets) if presets is not None else list(PRESET_COST_ORDER)
 
     results: list[tuple[str, PreflightReport]] = []
     for preset in preset_iter:
@@ -257,9 +272,9 @@ def recommend(
             )
         results.append((preset, report))
 
-    cost_rank = {name: i for i, name in enumerate(BUNDLED_PRESETS)}
+    cost_rank: dict[str, int] = {name: i for i, name in enumerate(PRESET_COST_ORDER)}
     feasible = [(name, r) for name, r in results if r.is_feasible]
-    feasible.sort(key=lambda pair: (cost_rank.get(pair[0], len(BUNDLED_PRESETS)), pair[0]))
+    feasible.sort(key=lambda pair: (cost_rank.get(pair[0], len(PRESET_COST_ORDER)), pair[0]))
     chosen = feasible[0][0] if feasible else None
 
     return RecommendationResult(chosen=chosen, results=results)

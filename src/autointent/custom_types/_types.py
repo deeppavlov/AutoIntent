@@ -117,25 +117,26 @@ SearchSpaceValidationMode = Literal["raise", "warning", "filter"]
 """
 
 SearchSpacePreset = Literal[
+    "classic-heavy",
+    "classic-light",
+    "classic-medium",
+    "nn-heavy",
+    "nn-medium",
     "transformers-heavy",
     "transformers-light",
-    "nn-heavy",
-    "zero-shot-llm",
-    "nn-medium",
-    "classic-heavy",
     "transformers-no-hpo",
-    "classic-medium",
+    "zero-shot-llm",
     "zero-shot-encoders",
-    "classic-light",
 ]
-"""Bundled search-space presets, listed in descending resource-cost order.
+"""Bundled search-space presets that our library supports.
 
-Heavier presets explore more / larger models and take longer to run. The order
-is a cost ranking, **not** a quality ranking: a heavier preset is not strictly
-better — e.g. ``transformers-heavy`` will overfit on tiny datasets where a
-classic-* preset wins on accuracy. ``autointent.advisor.recommend`` uses this
-ordering to pick the heaviest preset that still fits the hardware budget,
-which is a reasonable default but not always the right choice for the data."""
+The order here carries no meaning. Resource-cost ranking lives in
+``autointent.advisor._workflows.PRESET_COST_ORDER``, which ``recommend`` uses to
+pick the heaviest preset that still fits the hardware budget. That is a cost
+ranking, **not** a quality ranking: a heavier preset is not strictly better —
+``transformers-heavy`` will overfit on tiny datasets where a ``classic-*``
+preset wins on accuracy.
+"""
 
 
 class Document(BaseModel):
