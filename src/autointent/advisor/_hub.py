@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # Conservative "large-model" shape used when Hub metadata is unavailable —
 # roughly deberta-v3-large / bert-large sized. Previously we defaulted to a
 # BERT-base shape (110M / 768 / 12), which *under*-predicted a real deberta-large
-# fit by ~2x. Because the advisor's contract is a pessimistic upper bound, the
+# fit by ~2x. Because the advisor aims to over- rather than under-predict, the
 # offline fallback needs to over-estimate small models rather than under-estimate
 # large ones. Callers can still see the fallback happened via ``confidence ==
 # "heuristic"`` and ``PreflightReport.low_confidence``.
@@ -173,7 +173,7 @@ def _heuristic_metadata(model_name: str) -> ModelMeta:
     logger.warning(
         "Falling back to name-pattern heuristic for %s; "
         "using CONSERVATIVE large-model defaults (params=%dM, hidden=%d, layers=%d) "
-        "so cost estimates upper-bound rather than under-predict.",
+        "so cost estimates aim to over- rather than under-predict.",
         model_name,
         _DEFAULT_HEURISTIC_PARAMS // 1_000_000,
         _DEFAULT_HEURISTIC_HIDDEN,

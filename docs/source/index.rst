@@ -68,6 +68,9 @@ Reference
 :doc:`🌐 Inference servers <server>`
    Deploy a trained pipeline behind HTTP (FastAPI) or MCP (FastMCP): installation extras, environment variables, and how to run each server.
 
+:doc:`🔍 Compute feasibility advisor <advisor>`
+   Estimate VRAM, RAM, disk, and wall-time for a search space before training. Run it from the CLI or gate ``Pipeline.fit`` on it.
+
 :doc:`🔧 API Reference <autoapi/autointent/index>`
    Complete technical documentation for all classes, methods, and functions. Essential reference for developers integrating AutoIntent into their applications.
    
@@ -84,4 +87,5 @@ Reference
    user_guides
    learn/index
    server
+   advisor
    autoapi/autointent/index

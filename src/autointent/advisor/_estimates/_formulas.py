@@ -10,7 +10,8 @@ Conventions:
   * All ``*_hours`` results assume the GPU baseline of ~1 second per step;
     CPU runs pay a flat slowdown factor (see ``_time_for_transformer``).
   * "fp32 worst case" — we deliberately ignore lower-precision / FlashAttention /
-    quantization optimizations, per the advisor's "pessimistic upper bound" contract.
+    quantization optimizations, since the advisor aims to over- rather than
+    under-predict cost.
 """
 
 from __future__ import annotations
@@ -58,9 +59,9 @@ def _classify_severity(estimate: float, budget: float) -> Severity:
 def _weights_vram_for_transformer(meta: ModelMeta, mode: str) -> float:
     """Weight-side VRAM: weights + grads + optimizer state.
 
-    Pessimistic upper bound by mode: 1.3x inference, 1.3x + 0.5 GB lora
-    adapters, 4.5x full finetune (textbook 4W + fragmentation/workspaces
-    slack).
+    Multiplier chosen to over- rather than under-estimate, by mode: 1.3x
+    inference, 1.3x + 0.5 GB lora adapters, 4.5x full finetune (textbook 4W +
+    fragmentation/workspaces slack).
     """
     weights_gb = meta.weights_gb
     if mode == "inference":
@@ -133,7 +134,8 @@ def _max_fitting_batch_size(
 
 
 # Sustained TFLOPS per device class — real HF-Trainer MFU (~20% on A100),
-# not peak spec sheet. Advisor upper-bounds, so pessimistic values here.
+# not peak spec sheet. Advisor aims to over- rather than under-predict time,
+# so pessimistic (low) values here.
 _DEVICE_TFLOPS = {
     "high-gpu": 60.0,   # A100 / H100
     "mid-gpu": 20.0,    # V100 / RTX 3090 / A6000
@@ -194,10 +196,10 @@ def _largest_embedder(seen_models: dict[str, ModelMeta]) -> ModelMeta | None:
 
 
 def _ram_for_module(meta: ModelMeta, stats: DatasetStats, *, mode: str = "inference") -> float:
-    """RAM upper bound: weights x mode_mult + tokenized text (n_samples x avg_tokens x 4 B).
+    """RAM estimate: weights x mode_mult + tokenized text (n_samples x avg_tokens x 4 B).
 
-    Mode multiplier: 1.3 inference, 1.5 lora, 4.5 full-finetune (Adam
-    mirrors weights on host too).
+    Mode multiplier chosen to over- rather than under-estimate: 1.3 inference,
+    1.5 lora, 4.5 full-finetune (Adam mirrors weights on host too).
     """
     if mode == "inference":
         weights_mult = 1.3
@@ -348,8 +350,8 @@ def _rnn_param_count(*, embed_dim: int, hidden_dim: int, n_classes: int) -> int:
 def _vram_for_nn(*, params: int, batch_size: int, hidden_dim: int) -> float:
     """Weights + 3x optimizer/grads + activations.
 
-    Same fp32 upper bound as transformers, smaller hidden dim (embed_dim /
-    num_filters).
+    Same fp32, over- rather than under-estimate approach as transformers,
+    smaller hidden dim (embed_dim / num_filters).
     """
     weights_gb = (params * _NN_BYTES_PER_PARAM) / _BYTES_PER_GB
     activations_gb = (

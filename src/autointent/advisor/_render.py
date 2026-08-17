@@ -122,7 +122,7 @@ def render_text(report: PreflightReport) -> str:
     if report.low_confidence:
         summary += " — low-confidence (heuristic fallback in use)"
     lines.append(summary)
-    lines.append("Note: estimates are heuristic upper bounds, not measurements.")
+    lines.append("Note: estimates are heuristic guidance, not measurements or guarantees.")
     return "\n".join(lines)
 
 

@@ -71,7 +71,7 @@ class TestRenderText:
 
     def test_disclaimer_always_present(self) -> None:
         out = render_text(_populated_report())
-        assert "heuristic upper bounds" in out
+        assert "heuristic guidance" in out
 
     def test_low_confidence_tag_when_offline(self) -> None:
         r = _populated_report()
