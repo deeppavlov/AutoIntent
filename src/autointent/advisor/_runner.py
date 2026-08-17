@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import ValidationError
 
 from autointent._optimization_config import OptimizationConfig
-from autointent.advisor._estimates._resource import _resource_phase
+from autointent.advisor._estimates._resource import _resource_phase, _ResourceInputs
 from autointent.advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
 from autointent.advisor._report import PreflightReport, Severity
 
@@ -79,18 +79,20 @@ def run_preflight(
     report.notes.extend(hardware.notes)
 
     _resource_phase(
-        embedder_config=cfg.embedder_config,
-        search_space=cfg.search_space,
-        n_trials=cfg.hpo_config.n_trials,
-        n_jobs=cfg.hpo_config.n_jobs,
-        dump_modules=cfg.logging_config.dump_modules,
-        stats=stats,
-        hardware=hardware,
-        report=report,
-        refit_after=refit_after,
-        cross_encoder_model_name=cfg.cross_encoder_config.model_name,
-        transformer_model_name=cfg.transformer_config.model_name,
-        cache_probe=embedding_cache_probe,
+        _ResourceInputs(
+            embedder_config=cfg.embedder_config,
+            search_space=cfg.search_space,
+            n_trials=cfg.hpo_config.n_trials,
+            n_jobs=cfg.hpo_config.n_jobs,
+            dump_modules=cfg.logging_config.dump_modules,
+            refit_after=refit_after,
+            cross_encoder_model_name=cfg.cross_encoder_config.model_name,
+            transformer_model_name=cfg.transformer_config.model_name,
+            cache_probe=embedding_cache_probe,
+        ),
+        stats,
+        hardware,
+        report,
     )
     _data_phase(cfg.search_space, stats, report)
     _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, cfg.hpo_config.n_trials, hardware, report)

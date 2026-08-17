@@ -380,6 +380,68 @@ def _estimate_nn_entry(
     )
 
 
+def _probe_warm_models(
+    seen_models: dict[str, ModelMeta],
+    cache_probe: Callable[[str], bool] | None,
+) -> set[str]:
+    """Model names the probe reports as already having embeddings on disk.
+
+    Pre-populating these lets the first-seen module hit the cache-hit branch
+    instead of paying the forward, and skips them in the disk-cache aggregation
+    (already on disk). Without a probe nothing is warm — the pessimistic cold
+    assumption the advisor shipped with.
+    """
+    warm_models: set[str] = set()
+    if cache_probe is not None:
+        for name in seen_models:
+            if cache_probe(name):
+                warm_models.add(name)
+    return warm_models
+
+
+def _mark_cache_hit(me: _ModuleEstimate, module: str, *, suffix: str) -> None:
+    """Zero a transformer entry's forward time because the embedding is cached.
+
+    Only modules whose per-entry estimate bundles the embedder forward into
+    ``time_hours`` have anything to give back; the rest are left alone.
+    """
+    if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
+        me.time_hours = 0.0
+        me.driver["time_hours"] = 0.0
+        me.driver["mode"] = f"{me.driver['mode']}+{suffix}"
+
+
+def _charge_first_forward(
+    me: _ModuleEstimate,
+    module: str,
+    model: str,
+    *,
+    seen_models: dict[str, ModelMeta],
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+) -> None:
+    """Add a synthetic embedder forward to the entry that first pays for ``model``.
+
+    Per unique embedder the first cache-honoring entry pays the forward; later
+    transformer entries hit the cache, and classic entries need a forward added
+    because their own cost model assumes embeddings already exist.
+    """
+    if module in {"linear", "catboost"}:
+        embedder_meta = seen_models.get(model)
+        forward_h = _time_for_transformer(
+            n_trials=1,
+            epochs=1,
+            batch_size=32,
+            seq_len=128,
+            n_samples=stats.n_samples,
+            params_millions=(embedder_meta.total_params / 1_000_000) if embedder_meta else 100.0,
+            device_class=hardware.device_class,
+        )
+        me.time_hours += forward_h
+        me.driver["time_hours"] = round(me.time_hours, 2)
+        me.driver["mode"] = f"{me.driver['mode']}+embed"
+
+
 def _apply_embedding_cache(
     module_estimates: list[_ModuleEstimate],
     seen_models: dict[str, ModelMeta],
@@ -405,14 +467,7 @@ def _apply_embedding_cache(
     (i.e. contributed to ``disk_embedding_cache_gb`` in the disk aggregation).
     """
     paid: set[str] = set()
-    # Models the probe reports as already-warm — pre-populate ``paid`` so the
-    # first-seen module also hits the cache-hit branch instead of paying the
-    # forward, and skip them in the disk-cache aggregation (already on disk).
-    warm_models: set[str] = set()
-    if cache_probe is not None:
-        for name in seen_models:
-            if cache_probe(name):
-                warm_models.add(name)
+    warm_models = _probe_warm_models(seen_models, cache_probe)
     for me in module_estimates:
         module = me.driver["module"]
         if module not in _CACHE_HONORING_MODULES:
@@ -421,32 +476,13 @@ def _apply_embedding_cache(
         if model not in seen_models:  # synthetic / "(no embedder)" rows
             continue
         if model in warm_models:
-            if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
-                me.time_hours = 0.0
-                me.driver["time_hours"] = 0.0
-                me.driver["mode"] = f"{me.driver['mode']}+warm"
+            _mark_cache_hit(me, module, suffix="warm")
             continue
         if model in paid:
-            if module in _EMBEDDER_FORWARD_TRANSFORMER_MODULES:
-                me.time_hours = 0.0
-                me.driver["time_hours"] = 0.0
-                me.driver["mode"] = f"{me.driver['mode']}+cached"
+            _mark_cache_hit(me, module, suffix="cached")
         else:
             paid.add(model)
-            if module in {"linear", "catboost"}:
-                embedder_meta = seen_models.get(model)
-                forward_h = _time_for_transformer(
-                    n_trials=1,
-                    epochs=1,
-                    batch_size=32,
-                    seq_len=128,
-                    n_samples=stats.n_samples,
-                    params_millions=(embedder_meta.total_params / 1_000_000) if embedder_meta else 100.0,
-                    device_class=hardware.device_class,
-                )
-                me.time_hours += forward_h
-                me.driver["time_hours"] = round(me.time_hours, 2)
-                me.driver["mode"] = f"{me.driver['mode']}+embed"
+            _charge_first_forward(me, module, model, seen_models=seen_models, stats=stats, hardware=hardware)
     return paid
 
 
@@ -602,20 +638,143 @@ def _not_estimated_row(*, node_type: str, module: str) -> _ModuleEstimate:
     )
 
 
+@dataclass(frozen=True)
+class _ResourceInputs:
+    """Configuration-shaped inputs to the resource phase.
+
+    Bundled because these travel together through both estimation passes and
+    passing nine keyword arguments down each one is unreadable.
+
+    ``cross_encoder_model_name`` and ``transformer_model_name`` come from the
+    pipeline's top-level configs and act as the fallback model for modules that
+    don't declare a per-entry ``classification_model_config`` but still consume
+    one at runtime (``description_cross`` / ``dnnc`` / ``retrieval`` pull from
+    ``cross_encoder_config``; ``bert`` falls back to ``transformer_config``).
+    Seeding them here fixes the disk-download under-count called out in the
+    follow-up review (missing 6.4 GB reranker in ``zero-shot-encoders``).
+    """
+
+    embedder_config: EmbedderConfig
+    search_space: list[dict[str, Any]]
+    n_trials: int
+    n_jobs: int
+    dump_modules: bool
+    refit_after: bool = False
+    cross_encoder_model_name: str | None = None
+    transformer_model_name: str | None = None
+    cache_probe: Callable[[str], bool] | None = None
+
+
+def _estimate_transformer_entries(
+    transformer_entries: list[tuple[int, str, dict[str, Any]]],
+    inputs: _ResourceInputs,
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+    seen_models: dict[str, ModelMeta],
+    effective_trials: Callable[[int, dict[str, Any] | None], int],
+) -> tuple[list[_ModuleEstimate], dict[int, float]]:
+    """First pass: transformer-bearing modules.
+
+    Also populates ``seen_models`` in place, which the classic pass reads to
+    derive ``embedder_dim`` from the largest model seen — so this must run first.
+
+    Returns ``(module_estimates, node_max_weights)``.
+    """
+    global_embedder = _embedder_model_name(inputs.embedder_config)
+    cross_encoder_model_name = inputs.cross_encoder_model_name
+    transformer_model_name = inputs.transformer_model_name
+    refit_after = inputs.refit_after
+
+    module_estimates: list[_ModuleEstimate] = []
+    node_max_weights: dict[int, float] = {}
+    for node_idx, node_type, entry in transformer_entries:
+        module = entry.get("module_name", "?")
+        model_names = _extract_model_names(entry)
+        if not model_names:
+            if module in {"knn", "mlknn"} and global_embedder:
+                model_names = [global_embedder]
+            elif module in _CROSS_ENCODER_CONSUMERS and cross_encoder_model_name:
+                model_names = [cross_encoder_model_name]
+            elif module in _TRANSFORMER_CONFIG_CONSUMERS and transformer_model_name:
+                model_names = [transformer_model_name]
+            elif module in _NN_SCORER_MODULES:
+                # cnn / rnn — small torch models trained from scratch, no hub
+                # model to resolve. Route to the small-model heuristic.
+                nn_estimate = _estimate_nn_entry(
+                    entry=entry,
+                    node_type=node_type,
+                    stats=stats,
+                    hardware=hardware,
+                    n_trials=effective_trials(node_idx, entry),
+                    refit_after=refit_after,
+                )
+                if nn_estimate is not None:
+                    module_estimates.append(nn_estimate)
+                continue
+            elif module in _UNKNOWN_SCORER_MODULES:
+                # Placeholder so the row is visible instead of silently zeroed.
+                module_estimates.append(_not_estimated_row(node_type=node_type, module=module))
+                continue
+        for name in model_names:
+            meta = seen_models.setdefault(name, _hub.resolve_model(name))
+            me = _estimate_transformer_model(
+                meta=meta,
+                entry=entry,
+                node_type=node_type,
+                module=module,
+                name=name,
+                stats=stats,
+                hardware=hardware,
+                n_trials=effective_trials(node_idx, entry),
+                refit_after=refit_after,
+            )
+            module_estimates.append(me)
+            # Track heaviest weight per node so dump_modules is bounded by one
+            # selected variant per node x n_trials, not the sum of all candidates.
+            node_max_weights[node_idx] = max(node_max_weights.get(node_idx, 0.0), me.model_weights_gb)
+    return module_estimates, node_max_weights
+
+
+def _estimate_classic_entries(
+    classic_entries: list[tuple[int, str, dict[str, Any]]],
+    inputs: _ResourceInputs,
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+    seen_models: dict[str, ModelMeta],
+    effective_trials: Callable[[int, dict[str, Any] | None], int],
+) -> list[_ModuleEstimate]:
+    """Second pass: linear / catboost / sklearn modules.
+
+    Their cost depends on ``embedder_dim`` rather than on a checkpoint, so this
+    reads ``seen_models`` as populated by :func:`_estimate_transformer_entries`
+    and derives the dimension from the largest embedder seen there.
+    """
+    refit_after = inputs.refit_after
+
+    module_estimates: list[_ModuleEstimate] = []
+    embedder_meta = _largest_embedder(seen_models)
+    embedder_dim_val = _embedder_dim(embedder_meta)
+    for node_idx, node_type, entry in classic_entries:
+        classic_estimate = _estimate_classic_entry(
+            entry=entry,
+            node_type=node_type,
+            embedder_meta=embedder_meta,
+            embedder_dim=embedder_dim_val,
+            stats=stats,
+            hardware=hardware,
+            n_trials=effective_trials(node_idx, entry),
+            refit_after=refit_after,
+        )
+        if classic_estimate is not None:
+            module_estimates.append(classic_estimate)
+    return module_estimates
+
+
 def _resource_phase(
-    *,
-    embedder_config: EmbedderConfig,
-    search_space: list[dict[str, Any]],
-    n_trials: int,
-    n_jobs: int,
-    dump_modules: bool,
+    inputs: _ResourceInputs,
     stats: DatasetStats,
     hardware: HardwareProfile,
     report: PreflightReport,
-    refit_after: bool = False,
-    cross_encoder_model_name: str | None = None,
-    transformer_model_name: str | None = None,
-    cache_probe: Callable[[str], bool] | None = None,
 ) -> None:
     """Walk the validated search space, fold per-module costs into the report.
 
@@ -623,16 +782,14 @@ def _resource_phase(
     the largest model can drive ``embedder_dim`` for the classic pass), then
     linear / catboost. Disk, VRAM/RAM peak, time sum, and final findings are
     folded onto the report.
-
-    ``cross_encoder_model_name`` and ``transformer_model_name`` come from the
-    pipeline's top-level configs. They're used as the fallback model for
-    modules that don't declare a per-entry ``classification_model_config`` but
-    still consume one at runtime (``description_cross`` / ``dnnc`` /
-    ``retrieval`` pull from ``cross_encoder_config``; ``bert`` falls back to
-    ``transformer_config``). Seeding them here fixes the disk-download
-    under-count called out in the follow-up review (missing 6.4 GB reranker in
-    ``zero-shot-encoders``).
     """
+    embedder_config = inputs.embedder_config
+    search_space = inputs.search_space
+    n_trials = inputs.n_trials
+    n_jobs = inputs.n_jobs
+    dump_modules = inputs.dump_modules
+    cache_probe = inputs.cache_probe
+
     seen_models: dict[str, ModelMeta] = {}
     global_embedder = _embedder_model_name(embedder_config)
     if global_embedder:
@@ -656,70 +813,15 @@ def _resource_phase(
         return max(1, n_trials // divisor)
 
     # First pass: transformer modules (also populates seen_models for the classic pass).
-    module_estimates: list[_ModuleEstimate] = []
-    node_max_weights: dict[int, float] = {}
-    for node_idx, node_type, entry in transformer_entries:
-        module = entry.get("module_name", "?")
-        model_names = _extract_model_names(entry)
-        if not model_names:
-            if module in {"knn", "mlknn"} and global_embedder:
-                model_names = [global_embedder]
-            elif module in _CROSS_ENCODER_CONSUMERS and cross_encoder_model_name:
-                model_names = [cross_encoder_model_name]
-            elif module in _TRANSFORMER_CONFIG_CONSUMERS and transformer_model_name:
-                model_names = [transformer_model_name]
-            elif module in _NN_SCORER_MODULES:
-                # cnn / rnn — small torch models trained from scratch, no hub
-                # model to resolve. Route to the small-model heuristic.
-                nn_estimate = _estimate_nn_entry(
-                    entry=entry,
-                    node_type=node_type,
-                    stats=stats,
-                    hardware=hardware,
-                    n_trials=_effective_trials(node_idx, entry),
-                    refit_after=refit_after,
-                )
-                if nn_estimate is not None:
-                    module_estimates.append(nn_estimate)
-                continue
-            elif module in _UNKNOWN_SCORER_MODULES:
-                # Placeholder so the row is visible instead of silently zeroed.
-                module_estimates.append(_not_estimated_row(node_type=node_type, module=module))
-                continue
-        for name in model_names:
-            meta = seen_models.setdefault(name, _hub.resolve_model(name))
-            me = _estimate_transformer_model(
-                meta=meta,
-                entry=entry,
-                node_type=node_type,
-                module=module,
-                name=name,
-                stats=stats,
-                hardware=hardware,
-                n_trials=_effective_trials(node_idx, entry),
-                refit_after=refit_after,
-            )
-            module_estimates.append(me)
-            # Track heaviest weight per node so dump_modules is bounded by one
-            # selected variant per node x n_trials, not the sum of all candidates.
-            node_max_weights[node_idx] = max(node_max_weights.get(node_idx, 0.0), me.model_weights_gb)
+    module_estimates, node_max_weights = _estimate_transformer_entries(
+        transformer_entries, inputs, stats, hardware, seen_models, _effective_trials,
+    )
 
     # Second pass: linear / catboost — cost depends on embedder_dim, not a checkpoint.
     embedder_meta = _largest_embedder(seen_models)
-    embedder_dim_val = _embedder_dim(embedder_meta)
-    for node_idx, node_type, entry in classic_entries:
-        classic_estimate = _estimate_classic_entry(
-            entry=entry,
-            node_type=node_type,
-            embedder_meta=embedder_meta,
-            embedder_dim=embedder_dim_val,
-            stats=stats,
-            hardware=hardware,
-            n_trials=_effective_trials(node_idx, entry),
-            refit_after=refit_after,
-        )
-        if classic_estimate is not None:
-            module_estimates.append(classic_estimate)
+    module_estimates += _estimate_classic_entries(
+        classic_entries, inputs, stats, hardware, seen_models, _effective_trials,
+    )
 
     # Cache-aware time/disk: must run before the fold below.
     cached_embedders = _apply_embedding_cache(
