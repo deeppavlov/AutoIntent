@@ -7,16 +7,18 @@ Everything below it is supporting machinery for the three phases.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
+from autointent._optimization_config import OptimizationConfig
 from autointent.advisor._estimates._resource import _resource_phase
 from autointent.advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
 from autointent.advisor._report import PreflightReport, Severity
-from autointent._optimization_config import OptimizationConfig
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from autointent.advisor._hardware import HardwareProfile
     from autointent.advisor._report import DatasetStats
 
@@ -111,6 +113,11 @@ def _validated_config(config: dict[str, Any]) -> OptimizationConfig:
         return OptimizationConfig.model_validate({"search_space": []})
 
 
+# Warn about wasted HPO budget only when trials outnumber unique configs by 4x
+# or more; below that the duplicate count is small enough to ignore.
+_MIN_DUPLICATE_TRIAL_RATIO = 4
+
+
 def _config_phase(
     search_space: list[dict[str, Any]],
     n_jobs: int,
@@ -144,7 +151,11 @@ def _config_phase(
         if module in {"argmax", "threshold", "jinoos", "tunable", "adaptive"}:
             continue  # decision modules are cheap and often singleton by design
         cardinality = _module_cardinality(entry)
-        if cardinality is not None and cardinality < n_trials and n_trials // max(1, cardinality) >= 4:
+        if (
+            cardinality is not None
+            and cardinality < n_trials
+            and n_trials // max(1, cardinality) >= _MIN_DUPLICATE_TRIAL_RATIO
+        ):
             report.add(
                 "config",
                 Severity.TIGHT,

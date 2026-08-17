@@ -7,7 +7,7 @@ public name is a deliberate act that updates this list.
 
 from __future__ import annotations
 
-import autointent.advisor as advisor
+from autointent import advisor
 
 EXPECTED_SURFACE = {
     # functions

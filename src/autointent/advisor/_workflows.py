@@ -295,13 +295,41 @@ class ReduceToFitError(RuntimeError):
         self.pruned_config = pruned_config
         self.last_report = last_report
 
+    @classmethod
+    def nothing_droppable(cls, *, pruned_config: dict[str, Any], last_report: PreflightReport) -> ReduceToFitError:
+        return cls(
+            "No droppable scoring-node module found; remaining search space cannot be reduced further.",
+            pruned_config=pruned_config,
+            last_report=last_report,
+        )
+
+    @classmethod
+    def scoring_exhausted(cls, *, pruned_config: dict[str, Any], last_report: PreflightReport) -> ReduceToFitError:
+        return cls(
+            "All scoring modules were pruned to fit the budget; the resulting pipeline would have "
+            "nothing to run. Raise the budget or add cheaper scoring modules.",
+            pruned_config=pruned_config,
+            last_report=last_report,
+        )
+
+    @classmethod
+    def not_converged(
+        cls, max_iters: int, *, pruned_config: dict[str, Any], last_report: PreflightReport
+    ) -> ReduceToFitError:
+        return cls(
+            f"Search space still infeasible after {max_iters} prune iterations.",
+            pruned_config=pruned_config,
+            last_report=last_report,
+        )
+
 
 def _drop_module_from_search_space(
     search_space: list[dict[str, Any]], node_type: str, module_name: str,
 ) -> list[dict[str, Any]]:
-    """Return a deep-copied search_space with ``module_name`` removed from the
-    matching ``node_type`` node. Nodes whose ``search_space`` becomes empty are
-    dropped entirely so the pipeline stays valid.
+    """Return a deep-copied search_space with ``module_name`` removed.
+
+    Only the matching ``node_type`` node is touched. Nodes whose ``search_space``
+    becomes empty are dropped entirely so the pipeline stays valid.
     """
     import copy
 
@@ -408,11 +436,7 @@ def reduce_to_fit(
     for _ in range(max_iters):
         pick = _pick_module_to_drop(report)
         if pick is None:
-            raise ReduceToFitError(
-                "No droppable scoring-node module found; remaining search space cannot be reduced further.",
-                pruned_config=current,
-                last_report=report,
-            )
+            raise ReduceToFitError.nothing_droppable(pruned_config=current, last_report=report)
         node_type, module_name = pick
         current["search_space"] = _drop_module_from_search_space(
             current["search_space"], node_type, module_name,
@@ -422,27 +446,20 @@ def reduce_to_fit(
         # would look "feasible" to run_preflight (no drivers, no findings), so
         # explicitly rule it out: an empty pipeline can't score anything.
         if not _has_scoring_module(current):
-            raise ReduceToFitError(
-                "All scoring modules were pruned to fit the budget; the resulting pipeline "
-                "would have nothing to run. Raise the budget or add cheaper scoring modules.",
-                pruned_config=current,
-                last_report=report,
-            )
+            raise ReduceToFitError.scoring_exhausted(pruned_config=current, last_report=report)
         report = run_preflight(current, stats, hardware, refit_after=refit_after)
         if report.is_feasible:
             return current, report
 
-    raise ReduceToFitError(
-        f"Search space still infeasible after {max_iters} prune iterations.",
-        pruned_config=current,
-        last_report=report,
-    )
+    raise ReduceToFitError.not_converged(max_iters, pruned_config=current, last_report=report)
 
 
 def _has_scoring_module(config: dict[str, Any]) -> bool:
-    """True when ``config`` has at least one scoring-node entry left. Empty
-    scoring is a common outcome of pruning to the bone — reduce_to_fit treats
-    it as unfittable rather than "feasible with nothing to do."""
+    """Return True when ``config`` has at least one scoring-node entry left.
+
+    Empty scoring is a common outcome of pruning to the bone — ``reduce_to_fit``
+    treats it as unfittable rather than "feasible with nothing to do".
+    """
     for node in config.get("search_space", []):
         if node.get("node_type") == "scoring" and node.get("search_space"):
             return True

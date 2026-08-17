@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # Conservative "large-model" shape used when Hub metadata is unavailable —
 # roughly deberta-v3-large / bert-large sized. Previously we defaulted to a
 # BERT-base shape (110M / 768 / 12), which *under*-predicted a real deberta-large
-# fit by ~2×. Because the advisor's contract is a pessimistic upper bound, the
+# fit by ~2x. Because the advisor's contract is a pessimistic upper bound, the
 # offline fallback needs to over-estimate small models rather than under-estimate
 # large ones. Callers can still see the fallback happened via ``confidence ==
 # "heuristic"`` and ``PreflightReport.low_confidence``.

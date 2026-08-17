@@ -56,9 +56,12 @@ def _classify_severity(estimate: float, budget: float) -> Severity:
 
 
 def _weights_vram_for_transformer(meta: ModelMeta, mode: str) -> float:
-    """Weight-side VRAM: weights + grads + optimizer state. Pessimistic upper
-    bound by mode: 1.3× inference, 1.3× + 0.5 GB lora adapters, 4.5× full
-    finetune (textbook 4W + fragmentation/workspaces slack)."""
+    """Weight-side VRAM: weights + grads + optimizer state.
+
+    Pessimistic upper bound by mode: 1.3x inference, 1.3x + 0.5 GB lora
+    adapters, 4.5x full finetune (textbook 4W + fragmentation/workspaces
+    slack).
+    """
     weights_gb = meta.weights_gb
     if mode == "inference":
         return weights_gb * 1.3
@@ -73,9 +76,11 @@ def _activations_gb_per_sample(
     *,
     is_training: bool,
 ) -> float:
-    """Activation memory per sample. Training: 34 B/token/layer (Korthikanti
-    2022 upper bound, standard attention). Inference: 8 B/token (only 1-2
-    layers' outputs in flight)."""
+    """Activation memory per sample.
+
+    Training: 34 B/token/layer (Korthikanti 2022 upper bound, standard
+    attention). Inference: 8 B/token (only 1-2 layers' outputs in flight).
+    """
     hidden = _embedder_dim(meta)
     training_bytes_per_token_per_layer = 34
     inference_bytes_per_token = 8
@@ -93,10 +98,11 @@ def _vram_for_transformer(
     batch_size: int = 0,
     seq_len: int = _DEFAULT_SEQ_LEN,
 ) -> float:
-    """Total VRAM: weights + grads + optimizer state + activations × batch.
+    """Total VRAM: weights + grads + optimizer state + activations x batch.
 
     Safety margin: 1.20 for training (backward transients, eval sweep,
-    allocator fragmentation), 1.10 for inference (no backward)."""
+    allocator fragmentation), 1.10 for inference (no backward).
+    """
     base = _weights_vram_for_transformer(meta, mode)
     if batch_size <= 0:
         return base
@@ -152,9 +158,11 @@ def _time_for_transformer(
     params_millions: float,
     device_class: str,
 ) -> float:
-    """Transformer training wall-time in hours. Per-step FLOPs = 6 × params ×
-    batch × seq_len (fwd+bwd), ÷ sustained device TFLOPS, × total steps ×
-    trainer overhead."""
+    """Transformer training wall-time in hours.
+
+    Per-step FLOPs = 6 x params x batch x seq_len (fwd+bwd), ÷ sustained
+    device TFLOPS, x total steps x trainer overhead.
+    """
     steps_per_epoch = max(1, n_samples // max(1, batch_size))
     total_steps = n_trials * epochs * steps_per_epoch
     # 6x factor: ~2x for fwd matmul + ~4x for bwd (grad wrt input + grad wrt weight).
@@ -186,9 +194,11 @@ def _largest_embedder(seen_models: dict[str, ModelMeta]) -> ModelMeta | None:
 
 
 def _ram_for_module(meta: ModelMeta, stats: DatasetStats, *, mode: str = "inference") -> float:
-    """RAM upper bound: weights × mode_mult + tokenized text (n_samples ×
-    avg_tokens × 4 B). Mode multiplier: 1.3 inference, 1.5 lora, 4.5
-    full-finetune (Adam mirrors weights on host too)."""
+    """RAM upper bound: weights x mode_mult + tokenized text (n_samples x avg_tokens x 4 B).
+
+    Mode multiplier: 1.3 inference, 1.5 lora, 4.5 full-finetune (Adam
+    mirrors weights on host too).
+    """
     if mode == "inference":
         weights_mult = 1.3
     elif mode == "lora":
@@ -209,7 +219,7 @@ def _embedding_cache_disk_gb(n_samples: int, hidden_size: int) -> float:
 _LINEAR_CPU_S_PER_SAMPLE_FEATURE = 1.2e-9
 _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
 _CATBOOST_GPU_SPEEDUP = 10.0
-_LOGREG_CV_MULTIPLIER = 31  # sklearn default: Cs=10 × cv=3 + 1 final refit
+_LOGREG_CV_MULTIPLIER = 31  # sklearn default: Cs=10 x cv=3 + 1 final refit
 _CATBOOST_DEFAULT_BINS = 254  # CatBoost `border_count` default
 _CATBOOST_BYTES_PER_TREE_NODE = 32
 
@@ -231,8 +241,11 @@ def _time_for_linear(
     cv_multiplier: int,
     class_multiplier: int,
 ) -> float:
-    """LogisticRegression wall time. O(n_samples × features × classes × cv)
-    per fit; typical L-BFGS convergence absorbed into the calibration constant."""
+    """LogisticRegression wall time.
+
+    O(n_samples x features x classes x cv) per fit; typical L-BFGS
+    convergence absorbed into the calibration constant.
+    """
     seconds = (
         n_trials
         * _LINEAR_CPU_S_PER_SAMPLE_FEATURE
@@ -260,8 +273,10 @@ def _ram_for_sklearn(
     max_depth: int,
     n_jobs: int,
 ) -> float:
-    """RandomForest RAM: (feature matrix + trees) × n_jobs. joblib workers
-    each hold a full copy."""
+    """RandomForest RAM: (feature matrix + trees) x n_jobs.
+
+    joblib workers each hold a full copy.
+    """
     per_worker_data = stats.n_samples * embedder_dim * 8  # fp64 default
     n_leaves = min(2**max_depth, stats.n_samples) if max_depth > 0 else stats.n_samples
     per_worker_trees = n_estimators * n_leaves * _CATBOOST_BYTES_PER_TREE_NODE
@@ -270,9 +285,11 @@ def _ram_for_sklearn(
 
 def _embedder_load_ram_gb(meta: ModelMeta | None) -> float:
     """Aggregate-level RAM penalty when a classic preset uses an embedder.
+
     Added on top of the max-driver RAM because embedder + multiple classic
     scorers coexist in memory. Uses fp32 weights (transformers up-casts at
-    load) × 3.5 for weights + activation buffers + framework slack."""
+    load) x 3.5 for weights + activation buffers + framework slack.
+    """
     if meta is None:
         return 0.0
     return ((meta.total_params * 4) / _BYTES_PER_GB) * 3.5
@@ -329,8 +346,11 @@ def _rnn_param_count(*, embed_dim: int, hidden_dim: int, n_classes: int) -> int:
 
 
 def _vram_for_nn(*, params: int, batch_size: int, hidden_dim: int) -> float:
-    """Weights + 3× optimizer/grads + activations. Same fp32 upper bound as
-    transformers, smaller hidden dim (embed_dim / num_filters)."""
+    """Weights + 3x optimizer/grads + activations.
+
+    Same fp32 upper bound as transformers, smaller hidden dim (embed_dim /
+    num_filters).
+    """
     weights_gb = (params * _NN_BYTES_PER_PARAM) / _BYTES_PER_GB
     activations_gb = (
         batch_size * _NN_DEFAULT_SEQ_LEN * hidden_dim * _NN_TRAIN_ACT_BYTES_PER_UNIT
@@ -352,8 +372,11 @@ def _time_for_nn(
     params_millions: float,
     device_class: str,
 ) -> float:
-    """Reuse transformer FLOPs formula; small models slightly under-predict
-    since they're memory-bandwidth-bound, but within 2x for cost ranking."""
+    """Reuse transformer FLOPs formula.
+
+    Small models slightly under-predict since they're memory-bandwidth-bound,
+    but within 2x for cost ranking.
+    """
     return _time_for_transformer(
         n_trials=n_trials,
         epochs=epochs,

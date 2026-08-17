@@ -11,7 +11,7 @@ private machinery.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from autointent.advisor import _hub
 from autointent.advisor._report import ResourceEstimate, Severity
@@ -52,12 +52,13 @@ from ._formulas import (
 from ._search_space import (
     _extract_model_names,
     _max_int,
-    _module_cardinality,
     _walk_modules,
     _walk_modules_indexed,
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from autointent.advisor._hardware import HardwareProfile
     from autointent.advisor._hub import ModelMeta
     from autointent.advisor._report import DatasetStats, PreflightReport
@@ -269,7 +270,7 @@ def _estimate_classic_entry(
             max_depth=max_depth,
             n_jobs=sk_n_jobs,
         )
-        # Rough O(n_estimators × n × features / n_jobs); real numbers vary
+        # Rough O(n_estimators x n x features / n_jobs); real numbers vary
         # wildly by criterion so use the linear coefficient as a proxy.
         time_h = (
             n_trials
@@ -314,7 +315,9 @@ def _estimate_nn_entry(
     refit_after: bool,
 ) -> _ModuleEstimate | None:
     """Cost row for cnn / rnn scorers (returns None for anything else).
-    Small torch models trained from scratch on token ids."""
+
+    Small torch models trained from scratch on token ids.
+    """
     module = entry.get("module_name", "?")
     n_classes = max(1, stats.n_classes)
 
@@ -470,12 +473,12 @@ def _aggregate_disk(
 
     if cached_embedders and stats is not None:
         for name in cached_embedders:
-            meta = seen_models.get(name)
-            if meta is None:
+            cached_meta = seen_models.get(name)
+            if cached_meta is None:
                 continue
             estimate.disk_embedding_cache_gb += _embedding_cache_disk_gb(
                 n_samples=stats.n_samples,
-                hidden_size=_embedder_dim(meta),
+                hidden_size=_embedder_dim(cached_meta),
             )
 
 
@@ -644,9 +647,11 @@ def _resource_phase(
         variants_per_node[node_idx] = variants_per_node.get(node_idx, 0) + 1
 
     def _effective_trials(node_idx: int, entry: dict[str, Any] | None = None) -> int:  # noqa: ARG001
-        """Trials charged to this module. ``entry`` reserved for future
-        per-module caps (see git history for the cardinality-cap experiment
-        that broke description-scorer presets)."""
+        """Trials charged to this module.
+
+        ``entry`` is reserved for future per-module caps (see git history for the
+        cardinality-cap experiment that broke description-scorer presets).
+        """
         divisor = max(1, variants_per_node.get(node_idx, 1))
         return max(1, n_trials // divisor)
 
@@ -758,7 +763,7 @@ def _resource_phase(
     # Flip low_confidence if any model fell back to the heuristic path (Hub
     # unreachable, repo missing safetensors metadata, local-path checkpoint).
     # Emit as a TIGHT finding (not just a note) so it shows up in the main
-    # rendered findings block — buried notes previously let ~2× under-prediction
+    # rendered findings block — buried notes previously let ~2x under-prediction
     # of large-model shapes slip past the reviewer.
     heuristic_models = [m.name for m in seen_models.values() if m.confidence == "heuristic"]
     if heuristic_models:

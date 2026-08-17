@@ -12,6 +12,8 @@ smoke tests, so HF Hub probes fall back to the heuristic large-model shape.
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 from autointent.advisor import (
@@ -42,7 +44,7 @@ def _profile(vram_gb: float = 16.0, ram_gb: float = 32.0, free_disk_gb: float = 
     )
 
 
-def _cheap_config() -> dict:
+def _cheap_config() -> dict[str, Any]:
     return {
         "search_space": [
             {
@@ -59,7 +61,7 @@ def _cheap_config() -> dict:
     }
 
 
-def _big_and_cheap_config() -> dict:
+def _big_and_cheap_config() -> dict[str, Any]:
     """One expensive transformer + one cheap classic scorer.
 
     On a tiny (1 GB) VRAM budget, the transformer trips OVER; ``reduce_to_fit``
@@ -89,7 +91,7 @@ def _big_and_cheap_config() -> dict:
     }
 
 
-def _unfittable_config() -> dict:
+def _unfittable_config() -> dict[str, Any]:
     return {
         "search_space": [
             {

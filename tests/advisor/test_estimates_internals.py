@@ -717,7 +717,7 @@ class TestEmbeddingCache:
         assert linear_with["time_hours"] >= linear_no["time_hours"]
 
     def test_disk_embedding_cache_scales_with_n_samples(self) -> None:
-        """``disk_embedding_cache_gb`` ~ n_samples × hidden_size × 4 bytes per embedder."""
+        """``disk_embedding_cache_gb`` ~ n_samples x hidden_size x 4 bytes per embedder."""
         cfg = {
             "search_space": [
                 self._embedder_node(),
@@ -806,7 +806,7 @@ class TestCnnRnnHeuristic:
                 "hpo_config": {"n_trials": 5},
             }
             report = run_preflight(cfg, DatasetStats.placeholder(), _profile())
-            return next(d["vram_gb"] for d in report.resource.drivers if d["module"] == "rnn")
+            return float(next(d["vram_gb"] for d in report.resource.drivers if d["module"] == "rnn"))
 
         assert _run(1024) > _run(128), "larger hidden_dim must produce a larger VRAM row"
 
@@ -897,7 +897,7 @@ class TestModuleCardinality:
     def test_multi_list_multiplies(self) -> None:
         from autointent.advisor._estimates._search_space import _module_cardinality
 
-        # 2 batch × 3 lr candidates = 6 unique configs
+        # 2 batch x 3 lr candidates = 6 unique configs
         cardinality = _module_cardinality(
             {"module_name": "bert", "batch_size": [32, 64], "learning_rate": [1e-5, 5e-5, 1e-4]}
         )
@@ -960,7 +960,7 @@ class TestNoOpHpoFinding:
         assert no_op == [], f"unexpected warning for ranged search space: {[f.message for f in no_op]}"
 
     def test_no_finding_when_n_trials_matches_cardinality(self) -> None:
-        # n_trials=4, cardinality=2×2=4 → not a "no-op" waste
+        # n_trials=4, cardinality=2x2=4 → not a "no-op" waste
         cfg = {
             "search_space": [
                 {"node_type": "scoring", "search_space": [

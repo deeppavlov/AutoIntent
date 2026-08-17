@@ -55,6 +55,12 @@ def _max_int(value: Any, default: int) -> int:  # noqa: ANN401
         return default
 
 
+# Keys that describe the entry rather than a tunable hyperparameter.
+_RESERVED_ENTRY_KEYS = frozenset({"module_name", "target_metric"})
+# Above this many combinations the exact count stops mattering for cost.
+_CARDINALITY_CAP = 10_000
+
+
 def _module_cardinality(entry: dict[str, Any]) -> int | None:
     """Unique configurations the module entry can produce.
 
@@ -62,11 +68,9 @@ def _module_cardinality(entry: dict[str, Any]) -> int | None:
     products (capped at 10_000), None when any field is a continuous
     ``{low, high}`` range.
     """
-    _RESERVED = {"module_name", "target_metric"}
-    _CARDINALITY_CAP = 10_000
     product = 1
     for key, value in entry.items():
-        if key in _RESERVED:
+        if key in _RESERVED_ENTRY_KEYS:
             continue
         if isinstance(value, dict):
             if "low" in value and "high" in value:
