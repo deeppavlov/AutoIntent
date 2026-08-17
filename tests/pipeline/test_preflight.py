@@ -1,19 +1,34 @@
-"""Pipeline.fit preflight integration: off / warn / strict modes."""
+"""Pipeline.fit preflight integration: default-off, warn, strict.
+
+``fit()`` is driven with ``Pipeline._fit`` stubbed out, so these tests exercise
+the preflight gate (which runs before any heavy work) without training anything.
+With ``clear_ram=True, dump_modules=False`` the post-``_fit`` branch returns the
+context immediately, so a stubbed ``_fit`` leaves ``fit()`` fully functional.
+"""
 
 from __future__ import annotations
 
 import logging
+import subprocess
+import sys
 from typing import TYPE_CHECKING
 
 import pytest
 
 from autointent import Pipeline
-from autointent.advisor import HardwareProfile, dataset_stats, detect_hardware, run_preflight
-from autointent._pipeline import PreflightError
+from autointent.advisor import HardwareProfile, PreflightError, dataset_stats, detect_hardware, run_preflight
 from autointent.configs import LoggingConfig
 
 if TYPE_CHECKING:
     from autointent import Dataset
+
+_PIPELINE_LOGGER = "autointent._pipeline._pipeline"
+
+
+@pytest.fixture(autouse=True)
+def _stub_fit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Skip optimization; every test here is about the gate that runs before it."""
+    monkeypatch.setattr(Pipeline, "_fit", lambda _self, _context: None)
 
 
 def _tiny_hw() -> HardwareProfile:
@@ -34,35 +49,32 @@ def _classic_light_pipeline() -> Pipeline:
     return p
 
 
-def test_preflight_off_skips_advisor(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
-    """preflight='off' must not run the advisor (no Preflight log line)."""
+def test_fit_does_not_run_preflight_by_default(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
+    """The default is opt-out: no preflight, no Hub round-trips, no log line."""
     p = _classic_light_pipeline()
-    with caplog.at_level(logging.INFO, logger="autointent._pipeline._pipeline"):
-        try:
-            p.fit(dataset, preflight="off")
-        except Exception:  # noqa: BLE001 — fit may fail in test env; we only care about preflight side effect
-            pass
+    with caplog.at_level(logging.INFO, logger=_PIPELINE_LOGGER):
+        p.fit(dataset)
     assert not any("Preflight" in r.getMessage() for r in caplog.records)
 
 
-def test_preflight_warn_logs_findings(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
-    """preflight='warn' logs a Preflight verdict line."""
+def test_preflight_off_skips_advisor(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
     p = _classic_light_pipeline()
-    with caplog.at_level(logging.INFO, logger="autointent._pipeline._pipeline"):
-        try:
-            p.fit(dataset, preflight="warn")
-        except Exception:  # noqa: BLE001
-            pass
+    with caplog.at_level(logging.INFO, logger=_PIPELINE_LOGGER):
+        p.fit(dataset, preflight="off")
+    assert not any("Preflight" in r.getMessage() for r in caplog.records)
+
+
+def test_preflight_warn_logs_verdict(dataset: Dataset, caplog: pytest.LogCaptureFixture) -> None:
+    p = _classic_light_pipeline()
+    with caplog.at_level(logging.INFO, logger=_PIPELINE_LOGGER):
+        p.fit(dataset, preflight="warn")
     msgs = [r.getMessage() for r in caplog.records]
     assert any("Preflight" in m and "verdict=" in m for m in msgs)
 
 
 def test_preflight_strict_raises_on_infeasible(dataset: Dataset, monkeypatch: pytest.MonkeyPatch) -> None:
-    """preflight='strict' raises PreflightError when findings include OVER.
-
-    Forces a tiny hardware budget so even cheap presets blow it.
-    """
-    monkeypatch.setattr("autointent._pipeline._pipeline.detect_hardware", _tiny_hw)
+    """Patched at the advisor, not the pipeline: the import is lazy now."""
+    monkeypatch.setattr("autointent.advisor.detect_hardware", _tiny_hw)
     p = _classic_light_pipeline()
     with pytest.raises(PreflightError) as exc_info:
         p.fit(dataset, preflight="strict")
@@ -73,27 +85,28 @@ def test_preflight_strict_raises_on_infeasible(dataset: Dataset, monkeypatch: py
 def test_preflight_warn_does_not_raise_on_infeasible(
     dataset: Dataset, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Tiny hardware + warn mode logs an ERROR but doesn't raise."""
-    monkeypatch.setattr("autointent._pipeline._pipeline.detect_hardware", _tiny_hw)
+    monkeypatch.setattr("autointent.advisor.detect_hardware", _tiny_hw)
     p = _classic_light_pipeline()
-    with caplog.at_level(logging.ERROR, logger="autointent._pipeline._pipeline"):
-        try:
-            p.fit(dataset, preflight="warn")
-        except PreflightError:
-            pytest.fail("warn mode must not raise PreflightError")
-        except Exception:  # noqa: BLE001 — downstream fit errors are out of scope
-            pass
+    with caplog.at_level(logging.ERROR, logger=_PIPELINE_LOGGER):
+        p.fit(dataset, preflight="warn")
     assert any(r.levelno == logging.ERROR for r in caplog.records)
 
 
-def test_pipeline_advisor_config_round_trip(dataset: Dataset) -> None:
-    """End-to-end integration: Pipeline -> _build_advisor_config -> run_preflight.
+def test_importing_autointent_does_not_import_the_advisor() -> None:
+    """The advisor pulls in huggingface_hub probes; it must stay off the import path.
 
-    Asserts the round-trip is wired correctly: the dict ``Pipeline`` exposes to
-    the advisor validates against ``OptimizationConfig``, the advisor produces a
-    well-formed report, and the driver list reflects the actual modules from the
-    preset's search space (not silently empty).
+    Checked in a subprocess because pytest has already imported the advisor into
+    this process. Asserting on ``huggingface_hub`` itself would not work --
+    ``datasets`` imports it regardless -- so the subpackage's own absence is the
+    real invariant.
     """
+    code = "import autointent, sys; print('autointent.advisor' in sys.modules)"
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
+    assert result.stdout.strip() == "False", "importing autointent must not import autointent.advisor"
+
+
+def test_pipeline_advisor_config_round_trip(dataset: Dataset) -> None:
+    """End-to-end: Pipeline -> _build_advisor_config -> run_preflight."""
     p = _classic_light_pipeline()
     config = p._build_advisor_config()
     stats = dataset_stats(dataset)
@@ -101,20 +114,14 @@ def test_pipeline_advisor_config_round_trip(dataset: Dataset) -> None:
 
     report = run_preflight(config, stats, hardware, preset_name="classic-light")
 
-    # The advisor accepted the pipeline-built config and produced findings.
     assert report.preset_name == "classic-light"
     assert report.resource.drivers, "expected at least one driver row for classic-light"
 
-    # classic-light's scoring node has knn / linear / mlknn — at least linear
-    # should always end up in drivers (knn variants don't always carry an
-    # explicit model_name, so they're allowed to be absent).
     driver_modules = {d["module"] for d in report.resource.drivers}
     assert "linear" in driver_modules, f"missing linear scorer in drivers: {driver_modules}"
 
-    # The advisor must always emit the three resource findings.
     metrics = {f.metric for f in report.findings if f.metric}
     assert {"vram", "ram", "disk"} <= metrics, f"missing required metrics: {metrics}"
 
-    # Dataset stats round-trip into the report.
     assert report.dataset["n_samples"] == stats.n_samples
     assert report.dataset["n_classes"] == stats.n_classes

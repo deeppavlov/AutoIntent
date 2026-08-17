@@ -12,13 +12,6 @@ import yaml
 from typing_extensions import assert_never
 
 from autointent import Context, OptimizationConfig
-from autointent.advisor import (
-    PreflightError,
-    Severity,
-    dataset_stats,
-    detect_hardware,
-    run_preflight,
-)
 from autointent.configs import (
     CrossEncoderConfig,
     DataConfig,
@@ -41,7 +34,7 @@ from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent.advisor import PreflightReport
+    from autointent.advisor import Finding, PreflightReport
     from autointent.custom_types import ListOfGenericLabels, SearchSpacePreset, SearchSpaceValidationMode
     from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
 
@@ -185,14 +178,19 @@ class Pipeline:
 
         Logs each finding at INFO/WARNING/ERROR (by severity). When ``mode`` is
         ``"strict"`` and any OVER finding is produced, raises ``PreflightError``.
+
+        Imported lazily: the advisor probes the HF Hub, so it must stay off the
+        ``import autointent`` path.
         """
+        from autointent.advisor import PreflightError, Severity, dataset_stats, detect_hardware, run_preflight
+
         config = self._build_advisor_config()
         stats = dataset_stats(dataset)
         hardware = detect_hardware()
         report = run_preflight(config, stats, hardware, refit_after=refit_after)
         _log_preflight_report(report, self._logger)
         if mode == "strict":
-            over = [f for f in report.findings if f.severity == Severity.OVER]
+            over: list[Finding] = [f for f in report.findings if f.severity == Severity.OVER]
             if over:
                 raise PreflightError(over)
         return report
@@ -238,21 +236,23 @@ class Pipeline:
         dataset: Dataset,
         refit_after: bool = False,
         incompatible_search_space: SearchSpaceValidationMode = "filter",
-        preflight: PreflightMode = "warn",
+        preflight: PreflightMode = "off",
     ) -> Context:
         """Optimize the pipeline from dataset.
 
         Args:
             dataset: dataset for optimization.
             refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
-            sampler: sampler type to use.
-            incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
-            preflight: gate that runs :func:`autointent.advisor.run_preflight` over the
-                pipeline's effective config + dataset before any heavy work.
-                ``"off"`` skips it. ``"warn"`` (default) logs findings — INFO for
-                AMPLE, WARNING for TIGHT, ERROR for OVER — but never raises.
-                ``"strict"`` additionally raises :class:`PreflightError` when any
-                finding has severity OVER, so unfeasible runs abort before fit.
+            incompatible_search_space: how to handle data-incompatible modules occurring in search space.
+            preflight: **experimental** gate that runs
+                :func:`autointent.advisor.run_preflight` over the pipeline's
+                effective config + dataset before any heavy work.
+                ``"off"`` (default) skips it entirely. ``"warn"`` logs findings —
+                INFO for AMPLE, WARNING for TIGHT, ERROR for OVER — but never
+                raises; note it probes the HF Hub for model metadata, so it adds
+                network round-trips. ``"strict"`` additionally raises
+                :class:`autointent.advisor.PreflightError` when any finding has
+                severity OVER, so unfeasible runs abort before fit.
 
         Raises:
             RuntimeError: If pipeline is in inference mode.
@@ -532,6 +532,8 @@ def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
 
 def _log_preflight_report(report: PreflightReport, logger: logging.Logger) -> None:
     """Log each preflight finding at the appropriate level."""
+    from autointent.advisor import Severity
+
     level_for = {
         Severity.AMPLE: logging.INFO,
         Severity.TIGHT: logging.WARNING,

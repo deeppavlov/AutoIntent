@@ -1,3 +1,3 @@
-from ._pipeline import Pipeline, PreflightError, PreflightMode
+from ._pipeline import Pipeline, PreflightMode
 
-__all__ = ["Pipeline", "PreflightError", "PreflightMode"]
+__all__ = ["Pipeline", "PreflightMode"]
