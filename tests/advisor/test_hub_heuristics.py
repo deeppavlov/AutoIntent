@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from autointent._advisor import _hub
+from autointent.advisor import _hub
 
 
 @pytest.fixture(autouse=True)

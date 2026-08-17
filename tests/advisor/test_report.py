@@ -6,7 +6,7 @@ import dataclasses
 
 import pytest
 
-from autointent._advisor._report import (
+from autointent.advisor._report import (
     DatasetStats,
     Finding,
     PreflightReport,

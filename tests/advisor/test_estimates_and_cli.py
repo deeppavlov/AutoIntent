@@ -16,16 +16,16 @@ import sys
 
 import pytest
 
-from autointent._advisor import DatasetStats, HardwareProfile, run_preflight
-from autointent._advisor._cli import main
-from autointent._advisor.workflows import BUNDLED_PRESETS
+from autointent.advisor import DatasetStats, HardwareProfile, run_preflight
+from autointent.advisor._cli import main
+from autointent.advisor._workflows import BUNDLED_PRESETS
 from autointent.utils import load_preset
 
 
 @pytest.fixture(autouse=True)
 def _force_offline(monkeypatch: pytest.MonkeyPatch) -> None:
     """Force HF Hub lookups to fail so tests don't hit the network."""
-    from autointent._advisor import _hub
+    from autointent.advisor import _hub
 
     _hub.resolve_model.cache_clear()
     monkeypatch.setattr(_hub, "_hub_metadata", lambda _name: None)
@@ -65,7 +65,7 @@ def test_light_preset_is_feasible_on_8gb_budget(monkeypatch: pytest.MonkeyPatch)
     # deliberately pessimistic, so "light" would look infeasible on 8 GB.
     # Restore small-model resolution just for this test so we're verifying
     # the "light on 8 GB" contract, not the fallback pessimism.
-    from autointent._advisor import _hub
+    from autointent.advisor import _hub
 
     def _small_model(name: str) -> _hub.ModelMeta:
         return _hub.ModelMeta(

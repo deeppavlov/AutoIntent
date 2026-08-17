@@ -1,4 +1,4 @@
-"""Tests for ``autointent._advisor.reduce_to_fit``.
+"""Tests for ``autointent.advisor.reduce_to_fit``.
 
 Covers the three review-mandated contracts:
 
@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from autointent._advisor import (
+from autointent.advisor import (
     DatasetStats,
     HardwareProfile,
     ReduceToFitError,
@@ -25,7 +25,7 @@ from autointent._advisor import (
 
 @pytest.fixture(autouse=True)
 def _force_offline(monkeypatch: pytest.MonkeyPatch) -> None:
-    from autointent._advisor import _hub
+    from autointent.advisor import _hub
 
     _hub.resolve_model.cache_clear()
     monkeypatch.setattr(_hub, "_hub_metadata", lambda _name: None)

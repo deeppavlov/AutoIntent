@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from autointent import Pipeline
-from autointent._advisor import HardwareProfile, detect_hardware, run_preflight, stats_from_dataset_obj
+from autointent.advisor import HardwareProfile, detect_hardware, run_preflight, stats_from_dataset_obj
 from autointent._pipeline import PreflightError
 from autointent.configs import LoggingConfig
 

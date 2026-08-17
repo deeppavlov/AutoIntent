@@ -6,12 +6,12 @@ from typing import Any
 
 import pytest
 
-from autointent._advisor import _hub, run_preflight
-from autointent._advisor._estimates._formulas import _classify_severity, _ram_for_module, _vram_for_transformer
-from autointent._advisor._estimates._search_space import _extract_model_names, _max_int
-from autointent._advisor._hardware import HardwareProfile
-from autointent._advisor._hub import ModelMeta
-from autointent._advisor._report import DatasetStats, Severity
+from autointent.advisor import _hub, run_preflight
+from autointent.advisor._estimates._formulas import _classify_severity, _ram_for_module, _vram_for_transformer
+from autointent.advisor._estimates._search_space import _extract_model_names, _max_int
+from autointent.advisor._hardware import HardwareProfile
+from autointent.advisor._hub import ModelMeta
+from autointent.advisor._report import DatasetStats, Severity
 
 # Per-name ModelMeta fixtures used by the offline tests. Production resolution
 # (HF Hub config.json + safetensors metadata) is mocked away so the batch-fit
@@ -889,13 +889,13 @@ class TestModuleCardinality:
     """1 for all-singleton, N for finite lists, None for continuous ranges."""
 
     def test_all_singleton(self) -> None:
-        from autointent._advisor._estimates._search_space import _module_cardinality
+        from autointent.advisor._estimates._search_space import _module_cardinality
 
         assert _module_cardinality({"module_name": "bert"}) == 1
         assert _module_cardinality({"module_name": "bert", "batch_size": [64], "epochs": [30]}) == 1
 
     def test_multi_list_multiplies(self) -> None:
-        from autointent._advisor._estimates._search_space import _module_cardinality
+        from autointent.advisor._estimates._search_space import _module_cardinality
 
         # 2 batch × 3 lr candidates = 6 unique configs
         cardinality = _module_cardinality(
@@ -904,13 +904,13 @@ class TestModuleCardinality:
         assert cardinality == 6
 
     def test_range_dict_is_unbounded(self) -> None:
-        from autointent._advisor._estimates._search_space import _module_cardinality
+        from autointent.advisor._estimates._search_space import _module_cardinality
 
         # {low, high} → continuous → None (treated as unbounded)
         assert _module_cardinality({"module_name": "knn", "k": {"low": 1, "high": 20}}) is None
 
     def test_reserved_keys_skipped(self) -> None:
-        from autointent._advisor._estimates._search_space import _module_cardinality
+        from autointent.advisor._estimates._search_space import _module_cardinality
 
         # module_name / target_metric are not search dimensions
         assert (

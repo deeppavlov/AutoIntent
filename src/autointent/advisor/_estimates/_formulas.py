@@ -17,11 +17,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from autointent._advisor._report import Severity
+from autointent.advisor._report import Severity
 
 if TYPE_CHECKING:
-    from autointent._advisor._hub import ModelMeta
-    from autointent._advisor._report import DatasetStats
+    from autointent.advisor._hub import ModelMeta
+    from autointent.advisor._report import DatasetStats
 
 
 _BYTES_PER_GB = 1024**3

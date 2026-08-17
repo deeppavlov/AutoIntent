@@ -11,14 +11,14 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from pydantic import ValidationError
 
-from autointent._advisor._estimates._resource import _resource_phase
-from autointent._advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
-from autointent._advisor._report import PreflightReport, Severity
+from autointent.advisor._estimates._resource import _resource_phase
+from autointent.advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
+from autointent.advisor._report import PreflightReport, Severity
 from autointent._optimization_config import OptimizationConfig
 
 if TYPE_CHECKING:
-    from autointent._advisor._hardware import HardwareProfile
-    from autointent._advisor._report import DatasetStats
+    from autointent.advisor._hardware import HardwareProfile
+    from autointent.advisor._report import DatasetStats
 
 
 logger = logging.getLogger(__name__)

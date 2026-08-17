@@ -8,13 +8,13 @@ from unittest.mock import patch
 
 import pytest
 
-from autointent._advisor._hardware import detect_hardware
+from autointent.advisor._hardware import detect_hardware
 
 
 def test_cpu_fallback_when_no_accelerator() -> None:
     with (
-        patch("autointent._advisor._hardware._detect_cuda", return_value=None),
-        patch("autointent._advisor._hardware._detect_mps", return_value=None),
+        patch("autointent.advisor._hardware._detect_cuda", return_value=None),
+        patch("autointent.advisor._hardware._detect_mps", return_value=None),
     ):
         hw = detect_hardware()
     assert hw.accelerator == "cpu"
@@ -25,7 +25,7 @@ def test_cpu_fallback_when_no_accelerator() -> None:
 def test_cuda_branch_classifies_low_gpu() -> None:
     with (
         patch(
-            "autointent._advisor._hardware._detect_cuda",
+            "autointent.advisor._hardware._detect_cuda",
             return_value=(8.0, "NVIDIA RTX 3060"),
         ),
     ):
@@ -37,10 +37,10 @@ def test_cuda_branch_classifies_low_gpu() -> None:
 
 def test_mps_budget_uses_ram_fraction() -> None:
     with (
-        patch("autointent._advisor._hardware._detect_cuda", return_value=None),
-        patch("autointent._advisor._hardware._detect_ram_gb", return_value=32.0),
+        patch("autointent.advisor._hardware._detect_cuda", return_value=None),
+        patch("autointent.advisor._hardware._detect_ram_gb", return_value=32.0),
         patch(
-            "autointent._advisor._hardware._detect_mps",
+            "autointent.advisor._hardware._detect_mps",
             side_effect=lambda ram, ratio: (ram * ratio, "Apple Silicon (arm64)"),
         ),
     ):
@@ -53,7 +53,7 @@ def test_mps_budget_uses_ram_fraction() -> None:
 def test_vram_budget_override_applies() -> None:
     with (
         patch(
-            "autointent._advisor._hardware._detect_cuda",
+            "autointent.advisor._hardware._detect_cuda",
             return_value=(24.0, "NVIDIA RTX 4090"),
         ),
     ):
@@ -65,8 +65,8 @@ def test_vram_budget_override_applies() -> None:
 def test_broken_cuda_returns_none_does_not_crash() -> None:
     # _detect_cuda swallows torch quirks already; verify the wrapper holds.
     with (
-        patch("autointent._advisor._hardware._detect_cuda", return_value=None),
-        patch("autointent._advisor._hardware._detect_mps", return_value=None),
+        patch("autointent.advisor._hardware._detect_cuda", return_value=None),
+        patch("autointent.advisor._hardware._detect_mps", return_value=None),
     ):
         hw = detect_hardware()
     assert hw.accelerator == "cpu"

@@ -13,8 +13,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable
 
-from autointent._advisor import _hub
-from autointent._advisor._report import ResourceEstimate, Severity
+from autointent.advisor import _hub
+from autointent.advisor._report import ResourceEstimate, Severity
 from autointent.configs._embedder import (
     EmbedderConfig,
     OpenaiEmbeddingConfig,
@@ -58,9 +58,9 @@ from ._search_space import (
 )
 
 if TYPE_CHECKING:
-    from autointent._advisor._hardware import HardwareProfile
-    from autointent._advisor._hub import ModelMeta
-    from autointent._advisor._report import DatasetStats, PreflightReport
+    from autointent.advisor._hardware import HardwareProfile
+    from autointent.advisor._hub import ModelMeta
+    from autointent.advisor._report import DatasetStats, PreflightReport
 
 
 # Union variants of EmbedderConfig that carry a model_name attribute.

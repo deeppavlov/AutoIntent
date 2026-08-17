@@ -12,7 +12,7 @@ import yaml
 from typing_extensions import assert_never
 
 from autointent import Context, OptimizationConfig
-from autointent._advisor import (
+from autointent.advisor import (
     Severity,
     detect_hardware,
     run_preflight,
@@ -40,7 +40,7 @@ from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
     from autointent import Dataset
-    from autointent._advisor import PreflightReport
+    from autointent.advisor import PreflightReport
     from autointent.custom_types import ListOfGenericLabels, SearchSpacePreset, SearchSpaceValidationMode
     from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
 
@@ -255,7 +255,7 @@ class Pipeline:
             refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
             sampler: sampler type to use.
             incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
-            preflight: gate that runs :func:`autointent._advisor.run_preflight` over the
+            preflight: gate that runs :func:`autointent.advisor.run_preflight` over the
                 pipeline's effective config + dataset before any heavy work.
                 ``"off"`` skips it. ``"warn"`` (default) logs findings — INFO for
                 AMPLE, WARNING for TIGHT, ERROR for OVER — but never raises.

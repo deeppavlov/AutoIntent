@@ -147,7 +147,7 @@ Documentation = "https://deeppavlov.github.io/AutoIntent/"
 [project.scripts]
 "basic-aug" = "autointent.generation.utterances._basic.cli:main"
 "evolution-aug" = "autointent.generation.utterances._evolution.cli:main"
-"advisor" = "autointent._advisor._cli:main"
+"autointent-advisor" = "autointent.advisor._cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.7,<0.9.0"]

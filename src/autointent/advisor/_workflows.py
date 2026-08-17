@@ -22,7 +22,7 @@ from autointent.utils import load_preset
 
 from ._hardware import detect_hardware
 from ._report import DatasetStats, RecommendationResult, Severity
-from .runner import run_preflight
+from ._runner import run_preflight
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

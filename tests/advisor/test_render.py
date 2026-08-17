@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from autointent._advisor._render import _batch_hint, render_json, render_recommendation, render_text
-from autointent._advisor._report import (
+from autointent.advisor._render import _batch_hint, render_json, render_recommendation, render_text
+from autointent.advisor._report import (
     DatasetStats,
     PreflightReport,
     ResourceEstimate,

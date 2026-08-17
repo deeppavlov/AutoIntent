@@ -10,8 +10,8 @@ csv/json/jsonl/parquet path loaded via ``datasets.load_dataset``) or
 ``--n-samples / --n-classes / --avg-tokens`` placeholders so the script is
 useful before the user has built a dataset.
 
-The CLI is a thin wrapper around :func:`autointent._advisor.inspect` and
-:func:`autointent._advisor.recommend`; callers that don't need argparse can
+The CLI is a thin wrapper around :func:`autointent.advisor.inspect` and
+:func:`autointent.advisor.recommend`; callers that don't need argparse can
 import those helpers directly.
 """
 
@@ -22,7 +22,7 @@ import json
 import logging
 import sys
 
-from autointent._advisor import inspect, recommend, stats_from_dataset
+from autointent.advisor import inspect, recommend, stats_from_dataset
 
 from ._render import render_json, render_recommendation, render_text
 from ._report import DatasetStats

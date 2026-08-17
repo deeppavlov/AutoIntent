@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from ._hardware import HardwareProfile, detect_hardware
 from ._report import DatasetStats, Finding, PreflightReport, RecommendationResult, ResourceEstimate, Severity
-from .runner import run_preflight
-from .workflows import (
+from ._runner import run_preflight
+from ._workflows import (
     BUNDLED_PRESETS,
     ReduceToFitError,
     inspect,
