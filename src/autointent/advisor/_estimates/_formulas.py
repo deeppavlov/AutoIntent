@@ -137,11 +137,11 @@ def _max_fitting_batch_size(
 # not peak spec sheet. Advisor aims to over- rather than under-predict time,
 # so pessimistic (low) values here.
 _DEVICE_TFLOPS = {
-    "high-gpu": 60.0,   # A100 / H100
-    "mid-gpu": 20.0,    # V100 / RTX 3090 / A6000
-    "low-gpu": 7.0,     # T4 / RTX 3060 / 8 GB consumer card
+    "high-gpu": 60.0,  # A100 / H100
+    "mid-gpu": 20.0,  # V100 / RTX 3090 / A6000
+    "low-gpu": 7.0,  # T4 / RTX 3060 / 8 GB consumer card
     "apple-silicon": 4.0,  # M1/M2/M3 GPU cores
-    "cpu": 0.05,        # single-thread modern x86 with MKL
+    "cpu": 0.05,  # single-thread modern x86 with MKL
 }
 _DEFAULT_TFLOPS = 7.0  # unknown device → treat as low-GPU
 
@@ -221,9 +221,38 @@ def _embedding_cache_disk_gb(n_samples: int, hidden_size: int) -> float:
 _LINEAR_CPU_S_PER_SAMPLE_FEATURE = 1.2e-9
 _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER = 1e-9
 _CATBOOST_GPU_SPEEDUP = 10.0
-_LOGREG_CV_MULTIPLIER = 31  # sklearn default: Cs=10 x cv=3 + 1 final refit
+_LOGREG_CS = 10  # LogisticRegressionCV(Cs=10) sklearn default; LinearScorer does not expose it
+_LOGREG_DEFAULT_CV = 3  # LinearScorer(cv=3) default
 _CATBOOST_DEFAULT_BINS = 254  # CatBoost `border_count` default
 _CATBOOST_BYTES_PER_TREE_NODE = 32
+
+# CPU parallelism. The coefficients above are calibrated at one thread, which
+# left every CPU-bound estimate independent of core count — a 4-core and a
+# 64-core box priced identically. Speedup is modelled with Amdahl's law and
+# capped: these estimates exist to bound cost from above, and an over-generous
+# speedup turns a conservative estimate into an optimistic one.
+_CATBOOST_PARALLEL_FRACTION = 0.90  # CatBoost `thread_count` defaults to every core
+_LINEAR_PARALLEL_FRACTION = 0.50  # only the BLAS calls inside L-BFGS thread
+_MAX_CPU_SPEEDUP = 8.0  # refuse to believe in more than 8x however many cores are reported
+
+
+def _logreg_cv_multiplier(cv: int) -> int:
+    """Fits per ``LogisticRegressionCV`` run: a ``Cs x cv`` grid plus one final refit."""
+    return _LOGREG_CS * max(1, cv) + 1
+
+
+def _cpu_speedup(cores: int, parallel_fraction: float) -> float:
+    """Amdahl speedup on ``cores``, capped at :data:`_MAX_CPU_SPEEDUP`."""
+    n = max(1, cores)
+    if n == 1:
+        return 1.0
+    speedup = 1.0 / ((1.0 - parallel_fraction) + parallel_fraction / n)
+    return min(speedup, _MAX_CPU_SPEEDUP)
+
+
+def _cores_per_trial(cpu_count: int, n_jobs: int) -> int:
+    """Cores one HPO trial gets when ``n_jobs`` trials run concurrently."""
+    return max(1, max(1, cpu_count) // max(1, n_jobs))
 
 
 def _ram_for_linear(*, stats: DatasetStats, embedder_dim: int) -> float:
@@ -242,21 +271,17 @@ def _time_for_linear(
     max_iter: int,  # noqa: ARG001 — API stability; typical L-BFGS convergence baked into coeff
     cv_multiplier: int,
     class_multiplier: int,
+    cores: int = 1,
 ) -> float:
     """LogisticRegression wall time.
 
     O(n_samples x features x classes x cv) per fit; typical L-BFGS
-    convergence absorbed into the calibration constant.
+    convergence absorbed into the calibration constant. ``cores`` divides that
+    by the modest BLAS-only speedup L-BFGS gets — sklearn's own CV loop runs
+    single-threaded here, since ``LinearScorer`` leaves ``n_jobs`` unset.
     """
-    seconds = (
-        n_trials
-        * _LINEAR_CPU_S_PER_SAMPLE_FEATURE
-        * n_samples
-        * embedder_dim
-        * cv_multiplier
-        * class_multiplier
-    )
-    return seconds / 3600.0
+    seconds = n_trials * _LINEAR_CPU_S_PER_SAMPLE_FEATURE * n_samples * embedder_dim * cv_multiplier * class_multiplier
+    return seconds / _cpu_speedup(cores, _LINEAR_PARALLEL_FRACTION) / 3600.0
 
 
 def _ram_for_catboost(*, stats: DatasetStats, n_features: int, iterations: int, depth: int) -> float:
@@ -306,6 +331,7 @@ def _time_for_catboost(
     depth: int,
     class_multiplier: int,
     on_gpu: bool,
+    cores: int = 1,
 ) -> float:
     """CatBoost wall time, in hours.
 
@@ -313,11 +339,17 @@ def _time_for_catboost(
     fit. GPU training is ~10x faster than CPU for typical workloads per
     CatBoost's published benchmarks.
     https://catboost.ai/en/docs/concepts/speed-up-training
+
+    On CPU, ``cores`` divides that: CatBoost's ``thread_count`` defaults to
+    every core, so core count is the single largest term the one-thread
+    calibration was missing. Ignored on GPU, where the device is the bottleneck.
     """
     coeff = _CATBOOST_CPU_S_PER_SAMPLE_FEATURE_ITER
     if on_gpu:
         coeff /= _CATBOOST_GPU_SPEEDUP
     seconds = n_trials * iterations * coeff * n_samples * n_features * depth * class_multiplier
+    if not on_gpu:
+        seconds /= _cpu_speedup(cores, _CATBOOST_PARALLEL_FRACTION)
     return seconds / 3600.0
 
 
@@ -340,11 +372,7 @@ def _cnn_param_count(*, embed_dim: int, num_filters: int, n_kernels: int, n_clas
 
 def _rnn_param_count(*, embed_dim: int, hidden_dim: int, n_classes: int) -> int:
     """LSTM classifier params: embedding + 4-gate LSTM cell + fc."""
-    return (
-        _NN_MAX_VOCAB * embed_dim
-        + 4 * hidden_dim * (embed_dim + hidden_dim + 1)
-        + hidden_dim * max(1, n_classes)
-    )
+    return _NN_MAX_VOCAB * embed_dim + 4 * hidden_dim * (embed_dim + hidden_dim + 1) + hidden_dim * max(1, n_classes)
 
 
 def _vram_for_nn(*, params: int, batch_size: int, hidden_dim: int) -> float:
@@ -354,9 +382,7 @@ def _vram_for_nn(*, params: int, batch_size: int, hidden_dim: int) -> float:
     smaller hidden dim (embed_dim / num_filters).
     """
     weights_gb = (params * _NN_BYTES_PER_PARAM) / _BYTES_PER_GB
-    activations_gb = (
-        batch_size * _NN_DEFAULT_SEQ_LEN * hidden_dim * _NN_TRAIN_ACT_BYTES_PER_UNIT
-    ) / _BYTES_PER_GB
+    activations_gb = (batch_size * _NN_DEFAULT_SEQ_LEN * hidden_dim * _NN_TRAIN_ACT_BYTES_PER_UNIT) / _BYTES_PER_GB
     return 4 * weights_gb + activations_gb
 
 

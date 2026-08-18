@@ -44,6 +44,8 @@ Each finding carries a severity:
 
 The drivers table lists the modules that dominate the cost, so it shows *what* to change. ``low confidence`` on a report means Hub metadata was unavailable or incomplete for at least one model, and conservative large-model defaults were substituted — the numbers are much rougher when you see it.
 
+Findings are not only about hardware. The advisor also prices your ``DataConfig``: it reports ``over`` when a class has too few samples for the stratified split to succeed, using the same minimum as :py:func:`~autointent.context.data_handler.check_split_readiness`, and when ``LogisticRegressionCV`` would not have ``cv`` samples per class *after* the train/validation split. Per-class counts are measured on the train split you supply, so the advisor discounts them by whatever ``validation_size``, ``n_folds``, and ``separation_ratio`` will take away.
+
 From Python
 -----------
 
@@ -82,5 +84,6 @@ Validated end to end on one machine class (RTX 3060 Laptop, 6 GB VRAM / 16 GB RA
 - **Feasibility verdicts are the reliable part.** That is what the advisor was built and validated for.
 - **VRAM is close but not a guaranteed ceiling.** One preset used 1.22× its prediction. Leave headroom rather than trusting the figure exactly.
 - **Wall-time estimates are indicative only.** Measured error has run in both directions across formula revisions, once by more than an order of magnitude for cross-encoders. ``--budget-time-h`` inherits that uncertainty.
+- **CPU parallelism is modelled, not measured.** The CPU coefficients are calibrated single-threaded; core count is then applied as a capped Amdahl speedup (higher for CatBoost, which uses every core by default, than for scikit-learn's L-BFGS, which only threads inside BLAS), divided across concurrent ``hpo_config.n_jobs`` trials. It is a correction for the fact that core count used to change nothing at all, not a validated speedup curve.
 - **Preset ranking does not depend on time estimates.** ``recommend`` orders presets by a declared cost ranking, so unstable time figures cannot reorder its choice.
 - **Only one hardware class has been validated end to end.** Treat other machines as unverified.

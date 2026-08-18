@@ -25,15 +25,17 @@ from autointent.configs._embedder import (
 from ._formulas import (
     _DEFAULT_SEQ_LEN,
     _LINEAR_CPU_S_PER_SAMPLE_FEATURE,
-    _LOGREG_CV_MULTIPLIER,
+    _LOGREG_DEFAULT_CV,
     _MULTICLASS_THRESHOLD,
     _activations_gb_per_sample,
     _classify_severity,
     _cnn_param_count,
+    _cores_per_trial,
     _embedder_dim,
     _embedder_load_ram_gb,
     _embedding_cache_disk_gb,
     _largest_embedder,
+    _logreg_cv_multiplier,
     _max_fitting_batch_size,
     _ram_for_catboost,
     _ram_for_linear,
@@ -213,15 +215,21 @@ def _estimate_classic_entry(
     hardware: HardwareProfile,
     n_trials: int,
     refit_after: bool,
+    hpo_n_jobs: int = 1,
 ) -> _ModuleEstimate | None:
     """Cost row for a linear or catboost scorer (returns ``None`` for any other module)."""
     module = entry.get("module_name", "?")
     refit = _refit_factor(refit_after=refit_after, n_trials=n_trials)
     # Both multinomial (multiclass) and one-vs-rest (multilabel) LR scale linearly in n_classes.
     class_multiplier = max(1, stats.n_classes)
+    # Concurrent HPO trials share the box, so a trial does not get every core.
+    cores = _cores_per_trial(hardware.cpu_count, hpo_n_jobs)
 
     if module == "linear":
-        cv_multiplier = 1 if stats.multilabel else _LOGREG_CV_MULTIPLIER
+        # cv is per-entry and the grid scales with it; assuming the default 3
+        # under-priced every search space that tuned it.
+        cv = _max_int(entry.get("cv"), _LOGREG_DEFAULT_CV)
+        cv_multiplier = 1 if stats.multilabel else _logreg_cv_multiplier(cv)
         ram = _ram_for_linear(stats=stats, embedder_dim=embedder_dim)
         time_h = (
             _time_for_linear(
@@ -231,11 +239,12 @@ def _estimate_classic_entry(
                 max_iter=_max_int(entry.get("max_iter"), 100),
                 cv_multiplier=cv_multiplier,
                 class_multiplier=class_multiplier,
+                cores=cores,
             )
             * refit
         )
         vram = 0.0
-        mode = "linear-cv" if cv_multiplier > 1 else "linear"
+        mode = f"linear-cv{cv}" if cv_multiplier > 1 else "linear"
     elif module == "catboost":
         on_gpu = entry.get("task_type") == "GPU" and hardware.accelerator == "cuda"
         # CatBoost MultiClass loss grows per-class trees only above binary; binary uses
@@ -253,6 +262,7 @@ def _estimate_classic_entry(
                 depth=depth,
                 class_multiplier=cb_class_mult,
                 on_gpu=on_gpu,
+                cores=cores,
             )
             * refit
         )
@@ -349,17 +359,14 @@ def _estimate_nn_entry(
 
     vram = _vram_for_nn(params=params, batch_size=batch_size, hidden_dim=hidden_dim)
     ram = _ram_for_nn(params=params, stats=stats)
-    time_h = (
-        _time_for_nn(
-            n_trials=n_trials,
-            epochs=epochs,
-            batch_size=batch_size,
-            n_samples=stats.n_samples,
-            params_millions=params / 1_000_000,
-            device_class=hardware.device_class,
-        )
-        * _refit_factor(refit_after=refit_after, n_trials=n_trials)
-    )
+    time_h = _time_for_nn(
+        n_trials=n_trials,
+        epochs=epochs,
+        batch_size=batch_size,
+        n_samples=stats.n_samples,
+        params_millions=params / 1_000_000,
+        device_class=hardware.device_class,
+    ) * _refit_factor(refit_after=refit_after, n_trials=n_trials)
 
     return _ModuleEstimate(
         driver={
@@ -484,9 +491,7 @@ def _apply_embedding_cache(
             _mark_cache_hit(me, module, suffix="cached")
         else:
             paid.add(model)
-            _charge_first_forward_if_classic(
-                me, module, model, seen_models=seen_models, stats=stats, hardware=hardware
-            )
+            _charge_first_forward_if_classic(me, module, model, seen_models=seen_models, stats=stats, hardware=hardware)
     return paid
 
 
@@ -593,17 +598,24 @@ not-estimated placeholder row instead of a silent zero."""
 _NN_SCORER_MODULES = frozenset({"cnn", "rnn"})
 
 _EMBEDDER_CONSUMING_MODULES = frozenset(
-    {"linear", "catboost", "sklearn", "knn", "mlknn", "retrieval",
-     "description_bi", "description_cross", "description_llm"},
+    {
+        "linear",
+        "catboost",
+        "sklearn",
+        "knn",
+        "mlknn",
+        "retrieval",
+        "description_bi",
+        "description_cross",
+        "description_llm",
+    },
 )
 
 
 def _uses_embedder(search_space: list[dict[str, Any]]) -> bool:
     """True when any search-space module consumes the embedder."""
-    return any(
-        entry.get("module_name") in _EMBEDDER_CONSUMING_MODULES
-        for _, entry in _walk_modules(search_space)
-    )
+    return any(entry.get("module_name") in _EMBEDDER_CONSUMING_MODULES for _, entry in _walk_modules(search_space))
+
 
 # Modules that consume the top-level ``cross_encoder_config.model_name`` as
 # their scoring model (see zero-shot-encoders preset: description_cross pulls
@@ -649,9 +661,10 @@ class _ResourceInputs:
     Bundled by provenance rather than by use: every field is derived from one
     validated ``OptimizationConfig``, plus the caller-injected ``cache_probe``.
     Individual passes read only what they need — the classic pass reads
-    ``refit_after`` alone, and ``search_space`` / ``n_trials`` / ``n_jobs`` /
-    ``dump_modules`` never leave ``_resource_phase`` — but threading them
-    separately would mean a dozen keyword arguments down each call.
+    ``refit_after`` and ``n_jobs`` (concurrent trials divide the CPU cores each
+    one gets), and ``search_space`` / ``n_trials`` / ``dump_modules`` never
+    leave ``_resource_phase`` — but threading them separately would mean a
+    dozen keyword arguments down each call.
 
     ``cross_encoder_model_name`` and ``transformer_model_name`` come from the
     pipeline's top-level configs and act as the fallback model for modules that
@@ -774,6 +787,7 @@ def _estimate_classic_entries(
             hardware=hardware,
             n_trials=effective_trials(node_idx, entry),
             refit_after=refit_after,
+            hpo_n_jobs=inputs.n_jobs,
         )
         if classic_estimate is not None:
             module_estimates.append(classic_estimate)
@@ -824,18 +838,32 @@ def _resource_phase(
 
     # First pass: transformer modules (also populates seen_models for the classic pass).
     module_estimates, node_max_weights = _estimate_transformer_entries(
-        transformer_entries, inputs, stats, hardware, seen_models, _effective_trials,
+        transformer_entries,
+        inputs,
+        stats,
+        hardware,
+        seen_models,
+        _effective_trials,
     )
 
     # Second pass: linear / catboost — cost depends on embedder_dim, not a checkpoint.
     embedder_meta = _largest_embedder(seen_models)
     module_estimates += _estimate_classic_entries(
-        classic_entries, inputs, stats, hardware, seen_models, _effective_trials,
+        classic_entries,
+        inputs,
+        stats,
+        hardware,
+        seen_models,
+        _effective_trials,
     )
 
     # Cache-aware time/disk: must run before the fold below.
     cached_embedders = _apply_embedding_cache(
-        module_estimates, seen_models, stats=stats, hardware=hardware, cache_probe=cache_probe,
+        module_estimates,
+        seen_models,
+        stats=stats,
+        hardware=hardware,
+        cache_probe=cache_probe,
     )
 
     estimate = ResourceEstimate(parallel_factor=n_jobs)
@@ -854,13 +882,8 @@ def _resource_phase(
     # CUDA baseline only when we predict some VRAM AND run on CUDA. Mode read
     # off drivers: any training row flips to the larger baseline.
     if estimate.vram_gb > 0 and hardware.accelerator == "cuda":
-        is_training = any(
-            d.get("mode") in {"full-finetune", "lora", "small-torch-train"}
-            for d in estimate.drivers
-        )
-        estimate.vram_gb += (
-            _CUDA_BASELINE_VRAM_TRAINING_GB if is_training else _CUDA_BASELINE_VRAM_INFERENCE_GB
-        )
+        is_training = any(d.get("mode") in {"full-finetune", "lora", "small-torch-train"} for d in estimate.drivers)
+        estimate.vram_gb += _CUDA_BASELINE_VRAM_TRAINING_GB if is_training else _CUDA_BASELINE_VRAM_INFERENCE_GB
 
     _aggregate_disk(
         estimate,

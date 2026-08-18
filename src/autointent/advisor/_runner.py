@@ -16,11 +16,18 @@ from autointent.advisor._estimates._resource import _resource_phase, _ResourceIn
 from autointent.advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
 from autointent.advisor._report import PreflightReport, Severity
 
+# Imported rather than reimplemented: the advisor must not disagree with the
+# splitter about what counts as too few samples per class. `check_split_readiness`
+# itself needs a Dataset, which the advisor never has (it works from DatasetStats),
+# so the shared piece is the minimum. `test_split_readiness_agreement` pins them together.
+from autointent.context.data_handler._readiness_util import _min_samples_per_class_for_config
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from autointent.advisor._hardware import HardwareProfile
     from autointent.advisor._report import DatasetStats
+    from autointent.configs import DataConfig
 
 
 logger = logging.getLogger(__name__)
@@ -94,7 +101,7 @@ def run_preflight(
         hardware,
         report,
     )
-    _data_phase(cfg.search_space, stats, report)
+    _data_phase(cfg.search_space, stats, cfg.data_config, report)
     _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, cfg.hpo_config.n_trials, hardware, report)
 
     return report
@@ -169,9 +176,60 @@ def _config_phase(
             break
 
 
+def _effective_train_fraction(data_config: DataConfig) -> float:
+    """Fraction of the train split a scoring module is actually fitted on.
+
+    ``DatasetStats.class_counts`` is measured on the train split as the user
+    supplies it, but the pipeline carves that up before any module sees it:
+    hold-out takes ``validation_size`` away for validation, cross-validation
+    leaves one fold out, and ``separation_ratio`` splits the remaining pool
+    again into scoring and decision halves. Counting against the raw split is
+    therefore optimistic, which is the wrong direction for a feasibility gate.
+
+    An approximation of :class:`~autointent.context.data_handler.DataHandler`'s
+    splitting, not a reimplementation of it — deliberately coarse, and only
+    used to decide whether a class is at risk.
+    """
+    if data_config.scheme == "cv":
+        n_folds = max(2, data_config.n_folds)
+        fraction = (n_folds - 1) / n_folds
+    else:
+        fraction = 1.0 - float(data_config.validation_size)
+    if data_config.separation_ratio is not None:
+        fraction *= 1.0 - float(data_config.separation_ratio)
+    return max(0.0, min(1.0, fraction))
+
+
+def _split_readiness_finding(
+    stats: DatasetStats,
+    data_config: DataConfig,
+    report: PreflightReport,
+) -> None:
+    """Flag classes the stratified splitter will reject, by the splitter's own rule."""
+    if not stats.class_counts:
+        return
+    min_required = _min_samples_per_class_for_config(config=data_config)
+    starved = sorted(name for name, count in stats.class_counts.items() if count < min_required)
+    if not starved:
+        return
+    detail = f"scheme={data_config.scheme}"
+    if data_config.scheme != "ho":
+        detail += f", n_folds={data_config.n_folds}"
+    if data_config.separation_ratio is not None:
+        detail += f", separation_ratio={data_config.separation_ratio}"
+    report.add(
+        "data",
+        Severity.OVER,
+        f"Stratified splitting will fail before any module is fitted: classes {starved[:5]} "
+        f"have <{min_required} samples ({detail}). Same minimum as "
+        f"autointent.context.data_handler.check_split_readiness.",
+    )
+
+
 def _data_phase(
     search_space: list[dict[str, Any]],
     stats: DatasetStats,
+    data_config: DataConfig,
     report: PreflightReport,
 ) -> None:
     """Data-phase checks: token truncation, rare classes, missing intent descriptions."""
@@ -191,21 +249,28 @@ def _data_phase(
                 f"Train tokens p95~{p95} exceeds {module_name}.max_length={max_len}; expect silent truncation.",
             )
 
-    # sklearn LogisticRegressionCV inner-CV failure: each class needs >= cv samples.
-    # cv is configurable per linear entry (default 3); use the strictest one across
-    # the search space. Multilabel uses LogisticRegression (no CV), so skip there.
+    _split_readiness_finding(stats, data_config, report)
+
+    # sklearn LogisticRegressionCV inner-CV failure: each class needs >= cv samples
+    # in the split the scorer is fitted on, which is smaller than the train split
+    # the counts were measured on. cv is configurable per linear entry (default 3);
+    # use the strictest one across the search space. Multilabel uses
+    # LogisticRegression (no CV), so skip there.
     if not stats.multilabel and stats.class_counts:
         linear_cvs = [
             _max_int(e.get("cv"), 3) for _, e in _walk_modules(search_space) if e.get("module_name") == "linear"
         ]
         if linear_cvs:
             cv_max = max(linear_cvs)
-            failing = sorted(name for name, count in stats.class_counts.items() if count < cv_max)
+            fraction = _effective_train_fraction(data_config)
+            failing = sorted(name for name, count in stats.class_counts.items() if int(count * fraction) < cv_max)
             if failing:
+                note = "" if fraction >= 1.0 else f" after the {fraction:.0%} train/validation split"
                 report.add(
                     "data",
                     Severity.OVER,
-                    f"LogisticRegressionCV (cv={cv_max}) will fail: classes {failing[:5]} have <{cv_max} samples.",
+                    f"LogisticRegressionCV (cv={cv_max}) will fail: classes {failing[:5]} "
+                    f"have <{cv_max} samples{note}.",
                 )
 
     # partial descriptions x description scorer
