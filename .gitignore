@@ -185,3 +185,11 @@ vector_db*
 model_output/
 my.py
 .DS_store
+
+# Local advisor validation artifacts + Superpowers process docs (never shipped)
+res-adapt-ckeck/
+banking77_*_repredicted.json
+claude-issue-investigation.md
+review-of-review.md
+docs/superpowers/
+.python-version

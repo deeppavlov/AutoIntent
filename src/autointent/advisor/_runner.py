@@ -1,0 +1,284 @@
+"""Public entry point + config validation + data/config phases.
+
+This file contains the central public function ``run_preflight`` at the top.
+Everything below it is supporting machinery for the three phases.
+"""
+
+from __future__ import annotations
+
+import logging
+from typing import TYPE_CHECKING, Any
+
+from pydantic import ValidationError
+
+from autointent._optimization_config import OptimizationConfig
+from autointent.advisor._estimates._resource import _resource_phase, _ResourceInputs
+from autointent.advisor._estimates._search_space import _max_int, _module_cardinality, _walk_modules
+from autointent.advisor._report import PreflightReport, Severity
+
+# Imported rather than reimplemented: the advisor must not disagree with the
+# splitter about what counts as too few samples per class. `check_split_readiness`
+# itself needs a Dataset, which the advisor never has (it works from DatasetStats),
+# so the shared piece is the minimum. `test_split_readiness_agreement` pins them together.
+from autointent.context.data_handler._readiness_util import _min_samples_per_class_for_config
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from autointent.advisor._hardware import HardwareProfile
+    from autointent.advisor._report import DatasetStats
+    from autointent.configs import DataConfig
+
+
+logger = logging.getLogger(__name__)
+
+
+def run_preflight(
+    config: dict[str, Any],
+    stats: DatasetStats,
+    hardware: HardwareProfile,
+    *,
+    preset_name: str | None = None,
+    refit_after: bool = False,
+    embedding_cache_probe: Callable[[str], bool] | None = None,
+) -> PreflightReport:
+    """Run all three preflight phases and return one report.
+
+    Args:
+        config: parsed preset / ``OptimizationConfig`` dict (top-level keys:
+            ``search_space``, ``hpo_config``, optional ``embedder_config``,
+            optional ``logging_config.dump_modules``).
+        stats: dataset statistics (real or placeholder).
+        hardware: detected hardware profile.
+        preset_name: optional friendly name for the report header.
+        refit_after: matches the ``Pipeline.fit(refit_after=...)`` argument.
+            When True, time estimates include the extra refit-on-full-data pass.
+        embedding_cache_probe: optional callable ``(embedder_model_name) -> bool``.
+            Return True when the embedding cache already holds this model's
+            embeddings for the current dataset — the advisor then predicts 0
+            forward time and 0 ``disk_embedding_cache_gb`` for that embedder
+            (mirrors the ``cached_locally`` treatment for HF weights). Default
+            is the pessimistic cold assumption every embedder pays once.
+
+    Returns:
+        ``PreflightReport`` with findings across resource / data / config phases.
+    """
+    cfg = _validated_config(config)
+    report = PreflightReport(
+        preset_name=preset_name,
+        hardware={
+            "accelerator": hardware.accelerator,
+            "device_name": hardware.device_name,
+            "vram_gb": round(hardware.vram_gb, 2),
+            "ram_gb": round(hardware.ram_gb, 2),
+            "free_disk_gb": round(hardware.free_disk_gb, 2),
+            "device_class": hardware.device_class,
+        },
+        dataset={
+            "n_samples": stats.n_samples,
+            "n_classes": stats.n_classes,
+            "avg_tokens": stats.avg_tokens,
+            "p95_tokens": stats.p95_tokens,
+            "multilabel": stats.multilabel,
+            "source": stats.source,
+        },
+    )
+    report.notes.extend(hardware.notes)
+
+    _resource_phase(
+        _ResourceInputs(
+            embedder_config=cfg.embedder_config,
+            search_space=cfg.search_space,
+            n_trials=cfg.hpo_config.n_trials,
+            n_jobs=cfg.hpo_config.n_jobs,
+            dump_modules=cfg.logging_config.dump_modules,
+            refit_after=refit_after,
+            cross_encoder_model_name=cfg.cross_encoder_config.model_name,
+            transformer_model_name=cfg.transformer_config.model_name,
+            cache_probe=embedding_cache_probe,
+        ),
+        stats,
+        hardware,
+        report,
+    )
+    _data_phase(cfg.search_space, stats, cfg.data_config, report)
+    _config_phase(cfg.search_space, cfg.hpo_config.n_jobs, cfg.hpo_config.n_trials, hardware, report)
+
+    return report
+
+
+def _validated_config(config: dict[str, Any]) -> OptimizationConfig:
+    """Validate ``config`` against the project's canonical ``OptimizationConfig``.
+
+    The advisor is best-effort: a malformed user config should still produce a
+    report (with placeholder costs) rather than crashing, so any validation
+    error falls back to the model defaults.
+    """
+    try:
+        return OptimizationConfig.model_validate(config)
+    except ValidationError as e:
+        logger.warning("Advisor config failed validation; falling back to defaults: %s", e)
+        # OptimizationConfig requires `search_space`; build a minimal valid default.
+        return OptimizationConfig.model_validate({"search_space": []})
+
+
+# Warn about wasted HPO budget only when trials outnumber unique configs by 4x
+# or more; below that the duplicate count is small enough to ignore.
+_MIN_DUPLICATE_TRIAL_RATIO = 4
+
+
+def _config_phase(
+    search_space: list[dict[str, Any]],
+    n_jobs: int,
+    n_trials: int,
+    hardware: HardwareProfile,
+    report: PreflightReport,
+) -> None:
+    """Config-phase checks: parallelism vs. hardware mismatches + no-op HPO."""
+    if n_jobs > 1 and hardware.accelerator in {"cuda", "mps"}:
+        report.add(
+            "config",
+            Severity.TIGHT,
+            f"hpo_config.n_jobs={n_jobs} on a single GPU multiplies VRAM demand by {n_jobs}x.",
+        )
+
+    uses_catboost_gpu = any(
+        entry.get("module_name") == "catboost" and entry.get("task_type") == "GPU"
+        for _, entry in _walk_modules(search_space)
+    )
+    if uses_catboost_gpu and hardware.accelerator != "cuda":
+        report.add(
+            "config",
+            Severity.TIGHT,
+            "CatBoost task_type=GPU configured but no CUDA detected - will fall back to CPU.",
+        )
+
+    # No-op HPO warning: n_trials >> cardinality → mostly duplicate trials.
+    # At most one warning per preset to avoid flooding multi-module reports.
+    for _, entry in _walk_modules(search_space):
+        module = entry.get("module_name", "?")
+        if module in {"argmax", "threshold", "jinoos", "tunable", "adaptive"}:
+            continue  # decision modules are cheap and often singleton by design
+        cardinality = _module_cardinality(entry)
+        if (
+            cardinality is not None
+            and cardinality < n_trials
+            and n_trials // max(1, cardinality) >= _MIN_DUPLICATE_TRIAL_RATIO
+        ):
+            report.add(
+                "config",
+                Severity.TIGHT,
+                f"'{module}' entry has {cardinality} unique configurations but "
+                f"hpo_config.n_trials={n_trials} — expect ~{n_trials - cardinality} "
+                f"duplicate trials unless the sampler dedupes. Reduce n_trials or "
+                f"widen the search space.",
+            )
+            break
+
+
+def _effective_train_fraction(data_config: DataConfig) -> float:
+    """Fraction of the train split a scoring module is actually fitted on.
+
+    ``DatasetStats.class_counts`` is measured on the train split as the user
+    supplies it, but the pipeline carves that up before any module sees it:
+    hold-out takes ``validation_size`` away for validation, cross-validation
+    leaves one fold out, and ``separation_ratio`` splits the remaining pool
+    again into scoring and decision halves. Counting against the raw split is
+    therefore optimistic, which is the wrong direction for a feasibility gate.
+
+    An approximation of :class:`~autointent.context.data_handler.DataHandler`'s
+    splitting, not a reimplementation of it — deliberately coarse, and only
+    used to decide whether a class is at risk.
+    """
+    if data_config.scheme == "cv":
+        n_folds = max(2, data_config.n_folds)
+        fraction = (n_folds - 1) / n_folds
+    else:
+        fraction = 1.0 - float(data_config.validation_size)
+    if data_config.separation_ratio is not None:
+        fraction *= 1.0 - float(data_config.separation_ratio)
+    return max(0.0, min(1.0, fraction))
+
+
+def _split_readiness_finding(
+    stats: DatasetStats,
+    data_config: DataConfig,
+    report: PreflightReport,
+) -> None:
+    """Flag classes the stratified splitter will reject, by the splitter's own rule."""
+    if not stats.class_counts:
+        return
+    min_required = _min_samples_per_class_for_config(config=data_config)
+    starved = sorted(name for name, count in stats.class_counts.items() if count < min_required)
+    if not starved:
+        return
+    detail = f"scheme={data_config.scheme}"
+    if data_config.scheme != "ho":
+        detail += f", n_folds={data_config.n_folds}"
+    if data_config.separation_ratio is not None:
+        detail += f", separation_ratio={data_config.separation_ratio}"
+    report.add(
+        "data",
+        Severity.OVER,
+        f"Stratified splitting will fail before any module is fitted: classes {starved[:5]} "
+        f"have <{min_required} samples ({detail}). Same minimum as "
+        f"autointent.context.data_handler.check_split_readiness.",
+    )
+
+
+def _data_phase(
+    search_space: list[dict[str, Any]],
+    stats: DatasetStats,
+    data_config: DataConfig,
+    report: PreflightReport,
+) -> None:
+    """Data-phase checks: token truncation, rare classes, missing intent descriptions."""
+    # token-length truncation (heuristic — we use stats.p95_tokens vs configured max_length)
+    p95 = stats.p95_tokens or int(stats.avg_tokens * 2.5)
+    for _, entry in _walk_modules(search_space):
+        max_len_value = entry.get("max_length")
+        if max_len_value is None:
+            continue
+        max_len = _max_int(max_len_value, 512)
+        if p95 > max_len:
+            severity = Severity.OVER if p95 > max_len * 1.5 else Severity.TIGHT
+            module_name = entry.get("module_name", "?")
+            report.add(
+                "data",
+                severity,
+                f"Train tokens p95~{p95} exceeds {module_name}.max_length={max_len}; expect silent truncation.",
+            )
+
+    _split_readiness_finding(stats, data_config, report)
+
+    # sklearn LogisticRegressionCV inner-CV failure: each class needs >= cv samples
+    # in the split the scorer is fitted on, which is smaller than the train split
+    # the counts were measured on. cv is configurable per linear entry (default 3);
+    # use the strictest one across the search space. Multilabel uses
+    # LogisticRegression (no CV), so skip there.
+    if not stats.multilabel and stats.class_counts:
+        linear_cvs = [
+            _max_int(e.get("cv"), 3) for _, e in _walk_modules(search_space) if e.get("module_name") == "linear"
+        ]
+        if linear_cvs:
+            cv_max = max(linear_cvs)
+            fraction = _effective_train_fraction(data_config)
+            failing = sorted(name for name, count in stats.class_counts.items() if int(count * fraction) < cv_max)
+            if failing:
+                note = "" if fraction >= 1.0 else f" after the {fraction:.0%} train/validation split"
+                report.add(
+                    "data",
+                    Severity.OVER,
+                    f"LogisticRegressionCV (cv={cv_max}) will fail: classes {failing[:5]} "
+                    f"have <{cv_max} samples{note}.",
+                )
+
+    # partial descriptions x description scorer
+    description_modules = {"description_bi", "description_cross", "description_llm"}
+    has_description = any(e.get("module_name") in description_modules for _, e in _walk_modules(search_space))
+    if has_description and stats.has_descriptions is False:
+        report.add(
+            "data",
+            Severity.OVER,
+            "description scorer present but intent descriptions are missing - fill them in or drop the scorer.",
+        )

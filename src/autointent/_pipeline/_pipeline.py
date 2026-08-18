@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 import yaml
@@ -34,8 +34,12 @@ from ._schemas import InferencePipelineOutput, InferencePipelineUtteranceOutput
 
 if TYPE_CHECKING:
     from autointent import Dataset
+    from autointent.advisor import Finding, PreflightReport
     from autointent.custom_types import ListOfGenericLabels, SearchSpacePreset, SearchSpaceValidationMode
     from autointent.modules.base import BaseDecision, BaseRegex, BaseScorer
+
+
+PreflightMode = Literal["off", "warn", "strict"]
 
 
 class Pipeline:
@@ -152,6 +156,45 @@ class Pipeline:
         pipeline.set_config(optimization_config.hpo_config)
         return pipeline
 
+    def _build_advisor_config(self) -> dict[str, Any]:
+        """Reconstruct an ``OptimizationConfig``-shaped dict for the advisor."""
+        search_space = [
+            {"node_type": opt.node_type, "search_space": opt.modules_search_spaces}
+            for opt in self.nodes.values()
+            if isinstance(opt, NodeOptimizer)
+        ]
+        return {
+            "search_space": search_space,
+            "data_config": self.data_config.model_dump(),
+            "logging_config": self.logging_config.model_dump(),
+            "embedder_config": self.embedder_config.model_dump(),
+            "cross_encoder_config": self.cross_encoder_config.model_dump(),
+            "transformer_config": self.transformer_config.model_dump(),
+            "hpo_config": self.hpo_config.model_dump(),
+        }
+
+    def _run_preflight(self, dataset: Dataset, *, refit_after: bool, mode: PreflightMode) -> PreflightReport:
+        """Run the advisor against this pipeline's effective config + dataset.
+
+        Logs each finding at INFO/WARNING/ERROR (by severity). When ``mode`` is
+        ``"strict"`` and any OVER finding is produced, raises ``PreflightError``.
+
+        Imported lazily: the advisor probes the HF Hub, so it must stay off the
+        ``import autointent`` path.
+        """
+        from autointent.advisor import PreflightError, Severity, dataset_stats, detect_hardware, run_preflight
+
+        config = self._build_advisor_config()
+        stats = dataset_stats(dataset)
+        hardware = detect_hardware()
+        report = run_preflight(config, stats, hardware, refit_after=refit_after)
+        _log_preflight_report(report, self._logger)
+        if mode == "strict":
+            over: list[Finding] = [f for f in report.findings if f.severity == Severity.OVER]
+            if over:
+                raise PreflightError(over)
+        return report
+
     def _fit(self, context: Context) -> None:
         """Optimize the pipeline.
 
@@ -193,21 +236,41 @@ class Pipeline:
         dataset: Dataset,
         refit_after: bool = False,
         incompatible_search_space: SearchSpaceValidationMode = "filter",
+        preflight: PreflightMode = "off",
     ) -> Context:
         """Optimize the pipeline from dataset.
 
         Args:
             dataset: dataset for optimization.
             refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
-            sampler: sampler type to use.
-            incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
+            incompatible_search_space: how to handle data-incompatible modules occurring in search space.
+            preflight: **experimental** gate that runs
+                :func:`autointent.advisor.run_preflight` over the pipeline's
+                effective config + dataset before any heavy work.
+                ``"off"`` (default) skips it entirely. ``"warn"`` logs findings —
+                INFO for AMPLE, WARNING for TIGHT, ERROR for OVER — but never
+                raises; note it probes the HF Hub for model metadata, so it adds
+                network round-trips. ``"strict"`` additionally raises
+                :class:`autointent.advisor.PreflightError` when any finding has
+                severity OVER, so unfeasible runs abort before fit.
 
         Raises:
             RuntimeError: If pipeline is in inference mode.
+            PreflightError: If ``preflight="strict"`` and any OVER finding is produced.
         """
         if self._is_inference():
             msg = "Pipeline in inference mode cannot be fitted"
             raise RuntimeError(msg)
+
+        # Filter the search space first: ``validate_modules`` drops modules this
+        # dataset cannot use (e.g. ``mlknn`` on multiclass, ``dnnc`` and its ~6.4 GB
+        # reranker on multilabel), and preflight must price what will actually run
+        # rather than what was requested. It takes ``dataset`` only, so it does not
+        # depend on the ``Context`` built below.
+        self.validate_modules(dataset, mode=incompatible_search_space)
+
+        if preflight != "off":
+            self._run_preflight(dataset, refit_after=refit_after, mode=preflight)
 
         context = Context(self._seed)
         context.set_dataset(dataset, self.data_config)
@@ -217,8 +280,6 @@ class Pipeline:
         context.configure_transformer(self.transformer_config)
         context.configure_hpo(self.hpo_config)
         context.configure_vector_index(self.vector_index_config)
-
-        self.validate_modules(dataset, mode=incompatible_search_space)
 
         test_utterances = context.data_handler.test_utterances()
         if test_utterances is None:
@@ -472,3 +533,25 @@ def make_report(logs: dict[str, Any], nodes: list[NodeType]) -> str:
     messages = [json.dumps(c, indent=4) for c in configs]
     msg = "\n".join(messages)
     return "resulting pipeline configuration is the following:\n" + msg
+
+
+def _log_preflight_report(report: PreflightReport, logger: logging.Logger) -> None:
+    """Log each preflight finding at the appropriate level."""
+    # Imported lazily for the same reason as in ``Pipeline._run_preflight``: the
+    # advisor probes the HF Hub, so it must stay off the ``import autointent``
+    # path. Do not hoist to module scope.
+    from autointent.advisor import Severity
+
+    level_for = {
+        Severity.AMPLE: logging.INFO,
+        Severity.TIGHT: logging.WARNING,
+        Severity.OVER: logging.ERROR,
+    }
+    header = (
+        f"Preflight ({report.preset_name or 'pipeline'}): verdict={'feasible' if report.is_feasible else 'INFEASIBLE'}"
+    )
+    logger.info(header)
+    for finding in report.findings:
+        logger.log(level_for[finding.severity], "[%s] %s", finding.phase, finding.message)
+    if report.low_confidence:
+        logger.info("Preflight: low-confidence (heuristic fallback in use)")
