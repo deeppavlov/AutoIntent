@@ -744,9 +744,7 @@ class TestEmbeddingCache:
                     "search_space": [
                         {
                             "module_name": "knn",
-                            "embedder_config": [
-                                {"model_name": "sentence-transformers/all-MiniLM-L6-v2"}
-                            ],
+                            "embedder_config": [{"model_name": "sentence-transformers/all-MiniLM-L6-v2"}],
                             "batch_size": [32],
                             "max_length": [128],
                         }
@@ -777,10 +775,19 @@ class TestCnnRnnHeuristic:
     def test_cnn_row_is_nonzero(self) -> None:
         cfg = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "cnn", "embed_dim": [128], "num_filters": [128],
-                     "kernel_sizes": [[3, 4, 5]], "batch_size": [64], "num_train_epochs": [60]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "cnn",
+                            "embed_dim": [128],
+                            "num_filters": [128],
+                            "kernel_sizes": [[3, 4, 5]],
+                            "batch_size": [64],
+                            "num_train_epochs": [60],
+                        },
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 10},
@@ -820,9 +827,12 @@ class TestNtrialsSharedAcrossVariants:
         cfg = {
             **embedder_cfg,
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "linear"},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {"module_name": "linear"},
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 200},
@@ -830,10 +840,13 @@ class TestNtrialsSharedAcrossVariants:
         cfg2 = {
             **embedder_cfg,
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "linear"},
-                    {"module_name": "knn", "k": [5]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {"module_name": "linear"},
+                        {"module_name": "knn", "k": [5]},
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 200},
@@ -913,12 +926,7 @@ class TestModuleCardinality:
         from autointent.advisor._estimates._search_space import _module_cardinality
 
         # module_name / target_metric are not search dimensions
-        assert (
-            _module_cardinality(
-                {"module_name": "bert", "target_metric": "scoring_f1", "batch_size": [32, 64]}
-            )
-            == 2
-        )
+        assert _module_cardinality({"module_name": "bert", "target_metric": "scoring_f1", "batch_size": [32, 64]}) == 2
 
 
 class TestNoOpHpoFinding:
@@ -927,11 +935,17 @@ class TestNoOpHpoFinding:
     def test_finding_on_singleton_bert_with_high_n_trials(self) -> None:
         cfg = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "bert",
-                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
-                     "num_train_epochs": [30], "batch_size": [64]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                            "num_train_epochs": [30],
+                            "batch_size": [64],
+                        },
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 40},
@@ -946,11 +960,16 @@ class TestNoOpHpoFinding:
     def test_no_finding_when_search_space_has_range(self) -> None:
         cfg = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "bert",
-                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
-                     "learning_rate": {"low": 1e-5, "high": 1e-4}},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                            "learning_rate": {"low": 1e-5, "high": 1e-4},
+                        },
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 40},
@@ -963,11 +982,17 @@ class TestNoOpHpoFinding:
         # n_trials=4, cardinality=2x2=4 → not a "no-op" waste
         cfg = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "bert",
-                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
-                     "batch_size": [32, 64], "num_train_epochs": [10, 20]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                            "batch_size": [32, 64],
+                            "num_train_epochs": [10, 20],
+                        },
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 4},
@@ -985,9 +1010,12 @@ class TestModeAwareVramBaseline:
         # Both use e5-large; only the training config triggers the bigger baseline.
         inference_only = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "knn", "k": [5]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {"module_name": "knn", "k": [5]},
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "embedder_config": {"model_name": "intfloat/multilingual-e5-large-instruct"},
@@ -995,11 +1023,17 @@ class TestModeAwareVramBaseline:
         }
         training = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "bert",
-                     "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
-                     "batch_size": [16], "num_train_epochs": [1]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {
+                            "module_name": "bert",
+                            "classification_model_config": [{"model_name": "microsoft/deberta-v3-small"}],
+                            "batch_size": [16],
+                            "num_train_epochs": [1],
+                        },
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "hpo_config": {"n_trials": 5},
@@ -1027,9 +1061,12 @@ class TestModeAwareVramBaseline:
         # embedder-only presets need no GPU memory.
         cfg = {
             "search_space": [
-                {"node_type": "scoring", "search_space": [
-                    {"module_name": "knn", "k": [5]},
-                ]},
+                {
+                    "node_type": "scoring",
+                    "search_space": [
+                        {"module_name": "knn", "k": [5]},
+                    ],
+                },
                 {"node_type": "decision", "search_space": [{"module_name": "argmax"}]},
             ],
             "embedder_config": {"model_name": "sentence-transformers/all-MiniLM-L6-v2"},

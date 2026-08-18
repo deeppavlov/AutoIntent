@@ -337,7 +337,9 @@ class ReduceToFitError(RuntimeError):
 
 
 def _drop_module_from_search_space(
-    search_space: list[dict[str, Any]], node_type: str, module_name: str,
+    search_space: list[dict[str, Any]],
+    node_type: str,
+    module_name: str,
 ) -> list[dict[str, Any]]:
     """Return a deep-copied search_space with ``module_name`` removed.
 
@@ -454,7 +456,9 @@ def reduce_to_fit(
             raise ReduceToFitError.nothing_droppable(pruned_config=current, last_report=report)
         node_type, module_name = pick
         current["search_space"] = _drop_module_from_search_space(
-            current["search_space"], node_type, module_name,
+            current["search_space"],
+            node_type,
+            module_name,
         )
         logger.info("reduce_to_fit: dropped %s/%s to fit budget", node_type, module_name)
         # An empty scoring node — after dropping the last scoring module —

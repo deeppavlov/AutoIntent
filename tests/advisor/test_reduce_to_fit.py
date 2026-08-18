@@ -121,9 +121,7 @@ def test_feasible_config_returns_unchanged() -> None:
     pruned, report = reduce_to_fit(config, stats, _profile(vram_gb=16.0))
     assert report.is_feasible
     # Passthrough: same module still present.
-    modules = [
-        e["module_name"] for node in pruned["search_space"] for e in node["search_space"]
-    ]
+    modules = [e["module_name"] for node in pruned["search_space"] for e in node["search_space"]]
     assert "linear" in modules
     assert "argmax" in modules
 
@@ -139,9 +137,7 @@ def test_prunes_infeasible_transformer_to_classic() -> None:
 
     pruned, report = reduce_to_fit(config, stats, _profile(vram_gb=1.0))
     assert report.is_feasible
-    modules = [
-        e["module_name"] for node in pruned["search_space"] for e in node["search_space"]
-    ]
+    modules = [e["module_name"] for node in pruned["search_space"] for e in node["search_space"]]
     assert "bert" not in modules, "expensive transformer should have been dropped"
     assert "linear" in modules, "cheap classic scorer should be preserved"
 
@@ -161,6 +157,4 @@ def test_raises_when_nothing_fits() -> None:
     # After pruning the only scoring module, the config's scoring node should
     # be gone entirely (or empty), leaving an unfittable pipeline.
     scoring_nodes = [n for n in err.pruned_config["search_space"] if n.get("node_type") == "scoring"]
-    assert scoring_nodes == [] or all(
-        not n.get("search_space") for n in scoring_nodes
-    )
+    assert scoring_nodes == [] or all(not n.get("search_space") for n in scoring_nodes)
