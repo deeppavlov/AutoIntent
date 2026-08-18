@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented in this file. Release notes are grouped by theme rather than listing every commit.
 
+## [0.4.0] — 2026-08-18
+
+Compared to [0.3.3.dev0](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.3.dev0). The headline of this release is the **compute feasibility advisor** — a pre-flight estimator that answers "will this search space fit on this machine, and how long will it take?" before anything is downloaded or trained. It also promotes everything from the `0.3.3.dev0` pre-release (OpenSearch vector-index correctness, the `inference_config.yaml` tuple fix, and the metadata-driven `require(extra)` guard) to a stable release. No breaking changes.
+
+### Compute feasibility advisor (experimental)
+
+- **New `autointent.advisor` subpackage** estimates VRAM, RAM, disk, and wall-time for a search space, scores them against the detected hardware budget, and returns a structured `PreflightReport`. Each `Finding` carries a severity — `ample`, `tight`, or `over` — and a single `over` finding makes the report infeasible. Public surface: `estimate`, `recommend`, `reduce_to_fit`, `dataset_stats`, `detect_hardware`, `run_preflight`, plus the `PreflightReport`, `ResourceEstimate`, `Finding`, `Severity`, `DatasetStats`, `HardwareProfile`, `RecommendationResult` types and the `PreflightError` / `ReduceToFitError` exceptions (#291).
+- **New `autointent-advisor` console script** with two subcommands: `inspect` prices a bundled preset or a config YAML, and `recommend` detects the hardware and picks the heaviest bundled preset that still fits. Both accept `--dataset` (or placeholder `--n-samples` / `--n-classes` / `--avg-tokens` / `--task` sizes for use before any data exists), `--budget-vram-gb`, and `--json` for machine-readable output; `recommend` also accepts `--budget-time-h`. Both exit non-zero when nothing is feasible, so they work as a CI gate (#291).
+- **`Pipeline.fit(preflight=...)`** wires the same machinery into a fit. It defaults to `"off"` — the advisor probes the Hugging Face Hub for model metadata, which does not belong on every fit. `"warn"` logs findings by severity (INFO / WARNING / ERROR) and always continues; `"strict"` raises `PreflightError` before any VRAM is allocated. The accepted values are captured by the new `PreflightMode` alias (#291).
+- **Findings are not only about hardware.** The advisor also prices the `DataConfig`: it reports `over` when a class has too few samples for the stratified split to succeed (using the same minimum as `check_split_readiness`), and when `LogisticRegressionCV` would not have `cv` samples per class *after* the train/validation split — per-class counts are discounted by whatever `validation_size`, `n_folds`, and `separation_ratio` will take away.
+- **`reduce_to_fit`** prunes the most expensive scoring module repeatedly until the search space fits, raising `ReduceToFitError` if nothing does. `recommend` ranks presets by the explicit `PRESET_COST_ORDER` cost ranking rather than by estimated time, so unstable time figures cannot reorder its choice. Note this is a *cost* ranking, not a quality ranking — a heavier preset is not strictly better.
+- **Accuracy caveats are documented, not implied.** The estimates are heuristic and were validated end to end on a single hardware class (RTX 3060 Laptop, 6 GB VRAM / 16 GB RAM). Feasibility verdicts are the reliable part; VRAM is close but not a guaranteed ceiling; wall-time estimates are indicative only; CPU parallelism is modelled, not measured. The subpackage is marked **experimental** and its Python surface may change in a minor release — see the new `advisor` docs page for the full list.
+
+### Behavior changes
+
+- **`Pipeline.fit` now filters the search space before building the `Context`.** `validate_modules` used to run after `Context` construction; it now runs first, so the pre-flight gate prices the modules that will actually run rather than the ones that were requested. `validate_modules` depends only on the dataset, so the reordering is otherwise transparent (#291).
+
+### Dependencies
+
+- **`psutil (>=5.9.0,<8.0.0)`** is now a core dependency — the advisor's hardware probe uses it for CPU, RAM, and disk detection (#291).
+
+### Documentation
+
+- New **Compute feasibility advisor** page (`docs/source/advisor.rst`) covering the CLI, how to read a report, the Python API, the `Pipeline.fit` gate, and the accuracy caveats (#291).
+
+---
+
 ## [0.3.3.dev0] — 2026-08-13
 
 Compared to [0.3.2](https://github.com/deeppavlov/AutoIntent/releases/tag/v0.3.2). A development pre-release focused on OpenSearch vector-index correctness and a stricter optional-dependency guard.
