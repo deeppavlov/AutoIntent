@@ -292,7 +292,7 @@ class HFTokenizerDumper(BaseObjectDumper["PreTrainedTokenizer | PreTrainedTokeni
         require("transformers")
         import transformers
 
-        return transformers.AutoTokenizer.from_pretrained(path)  # type: ignore[no-any-return,no-untyped-call]
+        return transformers.AutoTokenizer.from_pretrained(path)
 
     @classmethod
     def check_isinstance(cls, obj: Any) -> bool:  # noqa: ANN401

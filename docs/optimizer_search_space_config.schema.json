@@ -1302,6 +1302,8 @@
                 },
                 "warmup_ratio": {
                     "default": 0.1,
+                    "exclusiveMaximum": 1,
+                    "minimum": 0,
                     "title": "Warmup Ratio",
                     "type": "number"
                 },

@@ -299,9 +299,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
         from sentence_transformers import (
             SentenceTransformerTrainer,
             SentenceTransformerTrainingArguments,
-            losses,
-            training_args,
         )
+        from sentence_transformers.sentence_transformer import losses, training_args
         from transformers import EarlyStoppingCallback
 
         x_train, x_val, y_train, y_val = train_test_split(
@@ -324,7 +323,8 @@ class SentenceTransformerEmbeddingBackend(BaseEmbeddingBackend):
                 per_device_train_batch_size=config.batch_size,
                 per_device_eval_batch_size=config.batch_size,
                 learning_rate=config.learning_rate,
-                warmup_ratio=config.warmup_ratio,
+                # warmup_steps accepts a float < 1 as a fraction of total steps.
+                warmup_steps=config.warmup_ratio,
                 fp16=config.fp16,
                 bf16=config.bf16,
                 seed=config.seed,

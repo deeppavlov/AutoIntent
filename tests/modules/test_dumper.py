@@ -41,8 +41,7 @@ class TestTransformers:
     def init_attributes(self) -> None:
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-        # reason: transformers AutoTokenizer.from_pretrained is untyped in stubs
-        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")  # type: ignore[no-untyped-call]
+        self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
         self._tokenizer_predictions = np.array(self.tokenizer(["hello", "world"]).input_ids)
         self.transformer = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased")
 

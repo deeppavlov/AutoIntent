@@ -28,7 +28,10 @@ class EmbedderFineTuningConfig(BaseModel):
     batch_size: int
     margin: float = Field(default=0.5)
     learning_rate: float = Field(default=2e-5)
-    warmup_ratio: float = Field(default=0.1)
+    # Fed to TrainingArguments.warmup_steps in v5, which interprets float<1 as
+    # a fraction of total steps and float>=1 as a raw step count. Cap below 1
+    # so warmup_ratio=1.0 doesn't silently become a single step.
+    warmup_ratio: float = Field(default=0.1, ge=0, lt=1)
     early_stopping_patience: int = Field(default=1)
     early_stopping_threshold: float = Field(default=0.0)
     val_fraction: float = Field(default=0.2)

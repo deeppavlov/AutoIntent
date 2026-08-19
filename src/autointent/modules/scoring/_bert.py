@@ -130,17 +130,27 @@ class BertScorer(BaseScorer):
     def _initialize_model(self) -> Any:  # noqa: ANN401
         from transformers import AutoModelForSequenceClassification
 
-        label2id = {i: i for i in range(self._n_classes)}
-        id2label = {i: i for i in range(self._n_classes)}
+        # huggingface_hub v1 StrictDataclass requires label2id keys to be str
+        # (and id2label values to be str); int-keyed dicts raise
+        # StrictDataclassFieldValidationError on from_pretrained in v5.
+        label2id = {str(i): i for i in range(self._n_classes)}
+        id2label = {i: str(i) for i in range(self._n_classes)}
 
+        # transformers v5 + PEFT triggers find_adapter_config_file on every
+        # from_pretrained; it propagates _commit_hash for the cache lookup but
+        # NOT the outer `revision` to the fall-through hf_hub_download
+        # (auto_factory.py:308 only forwards adapter_kwargs). Set revision
+        # explicitly via adapter_kwargs so the adapter probe stays pinned.
+        revision = self.classification_model_config.revision
         return AutoModelForSequenceClassification.from_pretrained(
             self.classification_model_config.model_name,
             trust_remote_code=self.classification_model_config.trust_remote_code,
-            revision=self.classification_model_config.revision,
+            revision=revision,
             num_labels=self._n_classes,
             label2id=label2id,
             id2label=id2label,
             problem_type="multi_label_classification" if self._multilabel else "single_label_classification",
+            adapter_kwargs={"revision": revision} if revision is not None else None,
         )
 
     def fit(
@@ -152,7 +162,7 @@ class BertScorer(BaseScorer):
 
         self._validate_task(labels)
 
-        self._tokenizer = AutoTokenizer.from_pretrained(  # type: ignore[no-untyped-call]
+        self._tokenizer = AutoTokenizer.from_pretrained(
             self.classification_model_config.model_name, revision=self.classification_model_config.revision
         )
         self._model = self._initialize_model()
