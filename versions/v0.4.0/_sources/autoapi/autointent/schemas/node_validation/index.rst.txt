@@ -1,0 +1,100 @@
+autointent.schemas.node_validation
+==================================
+
+.. py:module:: autointent.schemas.node_validation
+
+.. autoapi-nested-parse::
+
+   Schemes.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.schemas.node_validation.ParamSpaceT
+   autointent.schemas.node_validation.DecisionMetrics
+   autointent.schemas.node_validation.EmbeddingMetrics
+   autointent.schemas.node_validation.ScoringMetrics
+   autointent.schemas.node_validation.RegexpMetrics
+   autointent.schemas.node_validation.NodeValidatorType
+   autointent.schemas.node_validation.SearchSpaceType
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/schemas/node_validation/ParamSpace
+   /autoapi/autointent/schemas/node_validation/ParamSpaceInt
+   /autoapi/autointent/schemas/node_validation/ParamSpaceFloat
+   /autoapi/autointent/schemas/node_validation/DecisionNodeValidator
+   /autoapi/autointent/schemas/node_validation/EmbeddingNodeValidator
+   /autoapi/autointent/schemas/node_validation/ScoringNodeValidator
+   /autoapi/autointent/schemas/node_validation/RegexNodeValidator
+   /autoapi/autointent/schemas/node_validation/SearchSpaceConfig
+   /autoapi/autointent/schemas/node_validation/OptimizationSearchSpaceConfig
+
+.. autoapisummary::
+
+   autointent.schemas.node_validation.ParamSpace
+   autointent.schemas.node_validation.ParamSpaceInt
+   autointent.schemas.node_validation.ParamSpaceFloat
+   autointent.schemas.node_validation.DecisionNodeValidator
+   autointent.schemas.node_validation.EmbeddingNodeValidator
+   autointent.schemas.node_validation.ScoringNodeValidator
+   autointent.schemas.node_validation.RegexNodeValidator
+   autointent.schemas.node_validation.SearchSpaceConfig
+   autointent.schemas.node_validation.OptimizationSearchSpaceConfig
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/schemas/node_validation/unwrap_annotated
+   /autoapi/autointent/schemas/node_validation/type_matches
+   /autoapi/autointent/schemas/node_validation/get_optuna_class
+   /autoapi/autointent/schemas/node_validation/generate_models_and_union_type_for_classes
+
+.. autoapisummary::
+
+   autointent.schemas.node_validation.unwrap_annotated
+   autointent.schemas.node_validation.type_matches
+   autointent.schemas.node_validation.get_optuna_class
+   autointent.schemas.node_validation.generate_models_and_union_type_for_classes
+
+
+Module Contents
+---------------
+
+.. py:data:: ParamSpaceT
+
+.. py:data:: DecisionMetrics
+
+.. py:type:: EmbeddingMetrics
+   :canonical: Literal[tuple(EmbeddingNodeInfo.metrics_available.keys())]
+
+
+.. py:type:: ScoringMetrics
+   :canonical: Literal[tuple(ScoringNodeInfo.metrics_available.keys())]
+
+
+.. py:type:: RegexpMetrics
+   :canonical: Literal[tuple(RegexNodeInfo.metrics_available.keys())]
+
+
+.. py:type:: NodeValidatorType
+   :canonical: EmbeddingNodeValidator | ScoringNodeValidator | DecisionNodeValidator | RegexNodeValidator
+
+
+.. py:type:: SearchSpaceType
+   :canonical: DecisionSearchSpaceType | EmbeddingSearchSpaceType | ScoringSearchSpaceType | RegexpSearchSpaceType
+
+

@@ -1,0 +1,68 @@
+autointent.advisor.DatasetStats
+===============================
+
+.. py:class:: autointent.advisor.DatasetStats
+
+   Minimal stats the advisor needs about the user's dataset.
+
+   Built either from a real ``Dataset`` or from CLI placeholder flags.
+
+
+   .. py:attribute:: n_samples
+      :type:  int
+
+
+   .. py:attribute:: n_classes
+      :type:  int
+
+
+   .. py:attribute:: avg_tokens
+      :type:  int
+
+
+   .. py:attribute:: p95_tokens
+      :type:  int | None
+      :value: None
+
+
+
+   .. py:attribute:: multilabel
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: has_descriptions
+      :type:  bool | None
+      :value: None
+
+
+
+   .. py:attribute:: class_counts
+      :type:  dict[str, int]
+
+
+   .. py:attribute:: source
+      :type:  str
+      :value: 'placeholder'
+
+
+
+   .. py:method:: placeholder(n_samples = 1000, n_classes = 10, avg_tokens = 32, multilabel = False)
+      :classmethod:
+
+
+      Build stats for a hypothetical dataset, for sizing a search space without data.
+
+      ``p95_tokens`` is derived as ``avg_tokens * 2.5`` and ``class_counts`` is
+      left empty. Use :func:`~autointent.advisor.dataset_stats` instead when a
+      real ``Dataset`` is available.
+
+      :param n_samples: number of training utterances to assume.
+      :param n_classes: number of intent classes to assume.
+      :param avg_tokens: average utterance length in whitespace-separated tokens.
+      :param multilabel: whether to assume a multilabel task.
+
+      :returns: Stats with ``source="placeholder"``.
+
+

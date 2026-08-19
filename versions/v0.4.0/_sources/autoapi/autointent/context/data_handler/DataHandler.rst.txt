@@ -1,0 +1,122 @@
+autointent.context.data_handler.DataHandler
+===========================================
+
+.. py:class:: autointent.context.data_handler.DataHandler(dataset, config = None, random_seed = 0)
+
+   Convenient wrapper for :py:class:`autointent.Dataset`.
+
+   Performs splitting of the wrapped dataset when instantiated.
+
+
+   .. py:attribute:: dataset
+      :type:  autointent.Dataset
+
+      Wrapped dataset.
+
+
+   .. py:attribute:: config
+      :type:  autointent.configs.DataConfig
+
+      Configuration used for instantiation.
+
+
+   .. py:property:: intent_descriptions
+      :type: list[str | None]
+
+
+      String descriptions for all intents.
+
+
+   .. py:property:: tags
+      :type: list[autointent.schemas.Tag]
+
+
+      Tags associated with intents.
+
+      Tagging is an experimental feature that is not guaranteed to work.
+
+
+   .. py:property:: multilabel
+      :type: bool
+
+
+      Check if the dataset is multilabel.
+
+
+   .. py:method:: train_utterances(idx = None)
+
+      Retrieve training utterances from the dataset.
+
+      If a specific training split index is provided, retrieves utterances
+      from the indexed training split. Otherwise, retrieves utterances from
+      the primary training split.
+
+      :param idx: Optional index for a specific training split.
+
+
+
+   .. py:method:: train_labels(idx = None)
+
+      Retrieve training labels from the dataset.
+
+      If a specific training split index is provided, retrieves labels
+      from the indexed training split. Otherwise, retrieves labels from
+      the primary training split.
+
+      :param idx: Optional index for a specific training split.
+
+
+
+   .. py:method:: train_labels_folded()
+
+      Retrieve train labels fold by fold.
+
+
+
+   .. py:method:: validation_utterances(idx = None)
+
+      Retrieve validation utterances from the dataset.
+
+      If a specific validation split index is provided, retrieves utterances
+      from the indexed validation split. Otherwise, retrieves utterances from
+      the primary validation split.
+
+      :param idx: Optional index for a specific validation split.
+
+
+
+   .. py:method:: validation_labels(idx = None)
+
+      Retrieve validation labels from the dataset.
+
+      If a specific validation split index is provided, retrieves labels
+      from the indexed validation split. Otherwise, retrieves labels from
+      the primary validation split.
+
+      :param idx: Optional index for a specific validation split.
+
+
+
+   .. py:method:: test_utterances()
+
+      Retrieve test utterances from the dataset.
+
+
+
+   .. py:method:: test_labels()
+
+      Retrieve test labels from the dataset.
+
+
+
+   .. py:method:: validation_iterator()
+
+      Yield folds for cross-validation.
+
+
+
+   .. py:method:: prepare_for_refit()
+
+      Merge all training folds into one in order to retrain configured optimal pipeline on it.
+
+

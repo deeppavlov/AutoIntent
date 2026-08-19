@@ -1,0 +1,29 @@
+autointent.advisor.reduce_to_fit
+================================
+
+.. py:function:: autointent.advisor.reduce_to_fit(config, stats, hardware, *, max_iters = 20, refit_after = False)
+
+   Iteratively drop the most expensive infeasible module until the search space fits.
+
+   Behavior:
+     * If ``config`` is already feasible, returns ``(config, report)`` unchanged.
+     * Otherwise picks the OVER-driving scoring-node module with the largest
+       cost along whichever budget breached (VRAM > time > RAM) and removes it
+       from the search_space, then re-runs preflight. Disk is deliberately not
+       in that order: driver rows carry no per-module disk figure, so disk
+       pressure reduces by the VRAM proxy — download size tracks model size.
+     * Repeats until feasible, ``max_iters`` reached, or no droppable module
+       remains — in the last two cases raises :class:`ReduceToFitError`
+       carrying the pruned config and final report.
+
+   :param config: an OptimizationConfig-shaped dict (same input as :func:`run_preflight`).
+   :param stats: dataset stats to score against.
+   :param hardware: detected hardware profile.
+   :param max_iters: safety cap; a valid pipeline has ≤ ~10 scoring modules so
+                     hitting the default cap means the picker is stuck (raises).
+   :param refit_after: forwarded to :func:`run_preflight`.
+
+   :returns: ``(pruned_config, report)`` where ``report.is_feasible`` is True.
+
+   :raises ReduceToFitError: nothing fits after pruning.
+

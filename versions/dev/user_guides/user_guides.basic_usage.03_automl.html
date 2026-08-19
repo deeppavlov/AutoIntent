@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>AutoML Pipeline Configuration &#8212; AutoIntent 0.3.3.dev0 documentation</title>
+    <title>AutoML Pipeline Configuration &#8212; AutoIntent 0.4.0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=157042c1"></script>
+    <script src="../_static/documentation_options.js?v=6c02275b"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Modules" href="user_guides.basic_usage.02_modules.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -225,6 +225,13 @@
 
 
 <li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../advisor.html">
+    Compute feasibility advisor
+  </a>
+</li>
+
+
+<li class=" ">
   <a class="nav-link dropdown-item nav-internal" href="../autoapi/autointent/index.html">
     autointent
   </a>
@@ -377,6 +384,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../server.html">
     Inference servers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../advisor.html">
+    Compute feasibility advisor
   </a>
 </li>
 
@@ -577,8 +591,8 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="c1"># Load the dataset from Hugging Face hub</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"DeepPavlov/clinc150_subset"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset contains </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits"</span><span class="p">)</span>
 <span class="n">dataset</span>
 </pre></div>
 </div>
@@ -624,9 +638,9 @@ Dataset contains 5 splits
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample utterance: &#39;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;utterance&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Intent label: &#39;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sample utterance: '</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">'utterance'</span><span class="p">]</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Intent label: '</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">'label'</span><span class="p">]</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 <span class="n">sample</span>
 </pre></div>
 </div>
@@ -656,7 +670,7 @@ Intent label: &#39;0&#39;
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -670,7 +684,7 @@ Intent label: &#39;0&#39;
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_preset</span>
 
-<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>
 <span class="n">pprint</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -710,7 +724,7 @@ Intent label: &#39;0&#39;
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: modify the maximum k value for KNN-based components</span>
-<span class="n">preset</span><span class="p">[</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;search_space&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;k&quot;</span><span class="p">][</span><span class="s2">&quot;high&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">preset</span><span class="p">[</span><span class="s2">"search_space"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"search_space"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"k"</span><span class="p">][</span><span class="s2">"high"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">custom_pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_optimization_config</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -735,8 +749,8 @@ Intent label: &#39;0&#39;
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingConfig</span>
 
 <span class="n">logging_config</span> <span class="o">=</span> <span class="n">LoggingConfig</span><span class="p">(</span>
-    <span class="n">project_dir</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;runs&quot;</span><span class="p">,</span>  <span class="c1"># Save results to &#39;runs&#39; directory</span>
-    <span class="n">dump_modules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Don&#39;t save large model files</span>
+    <span class="n">project_dir</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"runs"</span><span class="p">,</span>  <span class="c1"># Save results to 'runs' directory</span>
+    <span class="n">dump_modules</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Don't save large model files</span>
     <span class="n">clear_ram</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Keep models in memory for inference</span>
 <span class="p">)</span>
 <span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
@@ -759,11 +773,11 @@ Intent label: &#39;0&#39;
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrossEncoderConfig</span><span class="p">,</span> <span class="n">TokenizerConfig</span><span class="p">,</span> <span class="n">get_default_embedder_config</span>
 
 <span class="c1"># Configure embedding model (used for vector representations)</span>
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">get_default_embedder_config</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;cointegrated/rubert-tiny2&quot;</span><span class="p">))</span>
+<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">get_default_embedder_config</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">"cointegrated/rubert-tiny2"</span><span class="p">))</span>
 
 <span class="c1"># Configure cross-encoder model (used for scoring text pairs)</span>
 <span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span>
-    <span class="n">CrossEncoderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;cross-encoder/ms-marco-MiniLM-L2-v2&quot;</span><span class="p">,</span> <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+    <span class="n">CrossEncoderConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">"cross-encoder/ms-marco-MiniLM-L2-v2"</span><span class="p">,</span> <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -782,7 +796,7 @@ Intent label: &#39;0&#39;
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
 
 <span class="c1"># Use 3-fold cross-validation for better performance on small datasets</span>
-<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">DataConfig</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span> <span class="n">n_folds</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">custom_pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">DataConfig</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="s2">"cv"</span><span class="p">,</span> <span class="n">n_folds</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -800,13 +814,13 @@ Intent label: &#39;0&#39;
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_preset</span>
 
 <span class="c1"># Step 1: Load your dataset</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded dataset with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"DeepPavlov/clinc150_subset"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded dataset with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> splits"</span><span class="p">)</span>
 
 <span class="c1"># Step 2: Load and customize a preset configuration</span>
-<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="n">preset</span> <span class="o">=</span> <span class="n">load_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>
 <span class="c1"># You can modify the preset here if needed</span>
-<span class="c1"># preset[&quot;search_space&quot;][0][&quot;search_space&quot;][0][&quot;k&quot;][&quot;high&quot;] = 5</span>
+<span class="c1"># preset["search_space"][0]["search_space"][0]["k"]["high"] = 5</span>
 
 <span class="c1"># Step 3: Create pipeline from the configuration</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_optimization_config</span><span class="p">(</span><span class="n">preset</span><span class="p">)</span>
@@ -819,14 +833,14 @@ Intent label: &#39;0&#39;
 <span class="n">pipeline</span><span class="o">.</span><span class="n">set_config</span><span class="p">(</span><span class="n">logging_config</span><span class="p">)</span>
 
 <span class="c1"># Step 5: Run AutoML optimization</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting AutoML optimization...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Starting AutoML optimization..."</span><span class="p">)</span>
 <span class="n">context</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ AutoML optimization completed!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ AutoML optimization completed!"</span><span class="p">)</span>
 
 <span class="c1"># Step 6: Test the optimized pipeline</span>
-<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hello world!&quot;</span><span class="p">,</span> <span class="s2">&quot;I want to transfer money&quot;</span><span class="p">,</span> <span class="s2">&quot;book a flight&quot;</span><span class="p">]</span>
+<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"hello world!"</span><span class="p">,</span> <span class="s2">"I want to transfer money"</span><span class="p">,</span> <span class="s2">"book a flight"</span><span class="p">]</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predictions: </span><span class="si">{</span><span class="n">predictions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Predictions: </span><span class="si">{</span><span class="n">predictions</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -848,7 +862,7 @@ Starting AutoML optimization...
   sampler_instance = optuna.samplers.TPESampler(
 /home/runner/work/AutoIntent/AutoIntent/src/autointent/nodes/_node_optimizer.py:82: FutureWarning: `prior_weight` has been deprecated in v4.9.0. This feature will be removed in v6.0.0. See https://github.com/optuna/optuna/releases/tag/v4.9.0.
   sampler_instance = optuna.samplers.TPESampler(
-<span class="ansi-green-fg">[I 2026-08-13 11:15:29,675]</span> A new study created in RDB with name: NodeType.scoring
+<span class="ansi-green-fg">[I 2026-08-19 12:15:20,969]</span> A new study created in RDB with name: NodeType.scoring
 /home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:2092: FutureWarning: The default value for l1_ratios will change from None to (0.0,) in version 1.10. From version 1.10 onwards, only array-like with values in [0, 1] will be allowed, None will be forbidden. To avoid this warning, explicitly set a value, e.g. l1_ratios=(0,).
   warnings.warn(
 /home/runner/work/AutoIntent/AutoIntent/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:2137: FutureWarning: The default value of the parameter &#39;scoring&#39; will change from None, i.e. accuracy, to &#39;neg_log_loss&#39; in version 1.11. To silence this warning, explicitly set the scoring parameter: scoring=&#39;neg_log_loss&#39; for the new, scoring=&#39;accuracy&#39; or scoring=None for the old default.

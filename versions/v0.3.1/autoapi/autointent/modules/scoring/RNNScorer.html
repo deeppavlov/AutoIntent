@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="autointent.modules.scoring.CNNScorer" href="CNNScorer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -453,6 +453,24 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../advisor/index.html">autointent.advisor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/PreflightError.html">autointent.advisor.PreflightError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/ReduceToFitError.html">autointent.advisor.ReduceToFitError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/HardwareProfile.html">autointent.advisor.HardwareProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/DatasetStats.html">autointent.advisor.DatasetStats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/Finding.html">autointent.advisor.Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/PreflightReport.html">autointent.advisor.PreflightReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/RecommendationResult.html">autointent.advisor.RecommendationResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/ResourceEstimate.html">autointent.advisor.ResourceEstimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/Severity.html">autointent.advisor.Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/detect_hardware.html">autointent.advisor.detect_hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/run_preflight.html">autointent.advisor.run_preflight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/dataset_stats.html">autointent.advisor.dataset_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/estimate.html">autointent.advisor.estimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/recommend.html">autointent.advisor.recommend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/reduce_to_fit.html">autointent.advisor.reduce_to_fit</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/HashingVectorizerEmbeddingConfig.html">autointent.configs.HashingVectorizerEmbeddingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/OpenaiEmbeddingConfig.html">autointent.configs.OpenaiEmbeddingConfig</a></li>
@@ -916,14 +934,14 @@ in language. Supports both multiclass and multilabel classification tasks.</p>
 <span class="p">)</span>
 
 <span class="c1"># Training data</span>
-<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;This is great!&quot;</span><span class="p">,</span> <span class="s2">&quot;I didn&#39;t like it&quot;</span><span class="p">,</span> <span class="s2">&quot;Awesome product&quot;</span><span class="p">,</span> <span class="s2">&quot;Poor quality&quot;</span><span class="p">]</span>
+<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"This is great!"</span><span class="p">,</span> <span class="s2">"I didn't like it"</span><span class="p">,</span> <span class="s2">"Awesome product"</span><span class="p">,</span> <span class="s2">"Poor quality"</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># Fit the model</span>
 <span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">utterances</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
 <span class="c1"># Make predictions</span>
-<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Good product&quot;</span><span class="p">,</span> <span class="s2">&quot;Not worth it&quot;</span><span class="p">]</span>
+<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Good product"</span><span class="p">,</span> <span class="s2">"Not worth it"</span><span class="p">]</span>
 <span class="n">probabilities</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
 </pre></div>
 </div>

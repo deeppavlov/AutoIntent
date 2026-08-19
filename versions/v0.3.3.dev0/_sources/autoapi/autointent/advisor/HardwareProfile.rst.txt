@@ -1,0 +1,48 @@
+autointent.advisor.HardwareProfile
+==================================
+
+.. py:class:: autointent.advisor.HardwareProfile
+
+   The machine budget every estimate is scored against.
+
+   Produced by :func:`~autointent.advisor.detect_hardware`, or built by hand to
+   size a search space for a machine you are not currently on. All sizes are in
+   binary gigabytes (GiB). ``vram_gb`` is 0.0 on CPU-only hosts, and on Apple
+   silicon it is a fraction of unified memory rather than dedicated VRAM.
+   ``notes`` carries such caveats and any manual VRAM override that was applied.
+
+
+   .. py:attribute:: accelerator
+      :type:  Accelerator
+
+
+   .. py:attribute:: device_name
+      :type:  str
+
+
+   .. py:attribute:: vram_gb
+      :type:  float
+
+
+   .. py:attribute:: ram_gb
+      :type:  float
+
+
+   .. py:attribute:: free_disk_gb
+      :type:  float
+
+
+   .. py:attribute:: cpu_count
+      :type:  int
+
+
+   .. py:attribute:: notes
+      :type:  list[str]
+      :value: []
+
+
+
+   .. py:property:: device_class
+      :type: str
+
+

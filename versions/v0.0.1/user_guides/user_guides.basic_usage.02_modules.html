@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -537,11 +537,11 @@
 
 <span class="c1"># Initialize a KNN scorer with basic configuration</span>
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span>
-    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sergeyzh/rubert-tiny-turbo&quot;</span><span class="p">,</span>  <span class="c1"># Pre-trained embedding model</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">"sergeyzh/rubert-tiny-turbo"</span><span class="p">,</span>  <span class="c1"># Pre-trained embedding model</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>  <span class="c1"># Number of nearest neighbors</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initialized </span><span class="si">{</span><span class="n">scorer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with k=</span><span class="si">{</span><span class="n">scorer</span><span class="o">.</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Initialized </span><span class="si">{</span><span class="n">scorer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> with k=</span><span class="si">{</span><span class="n">scorer</span><span class="o">.</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -583,14 +583,14 @@ Initialized KNNScorer with k=5
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
 <span class="c1"># Load a pre-processed dataset from the hub</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"DeepPavlov/clinc150_subset"</span><span class="p">)</span>
 
-<span class="c1"># Let&#39;s explore the dataset structure</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset structure:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Train split size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_0&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Sample utterance: &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_0&#39;</span><span class="p">][</span><span class="s1">&#39;utterance&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Sample label: &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_0&#39;</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="c1"># Let's explore the dataset structure</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Dataset structure:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- Splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- Train split size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_0'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- Sample utterance: '</span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_0'</span><span class="p">][</span><span class="s1">'utterance'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"- Sample label: '</span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_0'</span><span class="p">][</span><span class="s1">'label'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -614,13 +614,13 @@ Dataset structure:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display sample data</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sample training examples:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Sample training examples:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-    <span class="n">utterance</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="s2">&quot;utterance&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">label</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">. &quot;</span><span class="si">{</span><span class="n">utterance</span><span class="si">}</span><span class="s1">&quot; → </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">utterance</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="s2">"utterance"</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">. "</span><span class="si">{</span><span class="n">utterance</span><span class="si">}</span><span class="s1">" → </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total unique intents: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_0&#39;</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Total unique intents: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_0'</span><span class="p">][</span><span class="s1">'label'</span><span class="p">]))</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -648,14 +648,14 @@ Total unique intents: 4
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🚀 Starting training...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 Starting training..."</span><span class="p">)</span>
 <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
 <span class="c1"># Train the module on utterances and their corresponding labels</span>
-<span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="s2">&quot;utterance&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
+<span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="s2">"utterance"</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
 
 <span class="n">training_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Training completed in </span><span class="si">{</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Training completed in </span><span class="si">{</span><span class="n">training_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds!"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -665,7 +665,7 @@ Total unique intents: 4
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 🚀 Starting training...
-✅ Training completed in 0.03 seconds!
+✅ Training completed in 0.02 seconds!
 </pre></div></div>
 </div>
 <section id="What-Happens-During-Training">
@@ -688,18 +688,18 @@ Total unique intents: 4
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test with some example utterances</span>
 <span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;hello world!&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;What&#39;s the weather like today?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;I want to book a flight to Paris&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Play some music please&quot;</span><span class="p">,</span>
+    <span class="s2">"hello world!"</span><span class="p">,</span>
+    <span class="s2">"What's the weather like today?"</span><span class="p">,</span>
+    <span class="s2">"I want to book a flight to Paris"</span><span class="p">,</span>
+    <span class="s2">"Play some music please"</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🔮 Making predictions...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🔮 Making predictions..."</span><span class="p">)</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Prediction results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Prediction results:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">utterance</span><span class="p">,</span> <span class="n">prediction</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;  &quot;</span><span class="si">{</span><span class="n">utterance</span><span class="si">}</span><span class="s1">&quot; → </span><span class="si">{</span><span class="n">prediction</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'  "</span><span class="si">{</span><span class="n">utterance</span><span class="si">}</span><span class="s1">" → </span><span class="si">{</span><span class="n">prediction</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -711,10 +711,10 @@ Total unique intents: 4
 🔮 Making predictions...
 
 Prediction results:
-  &#34;hello world!&#34; → [0.20099649 0.20127653 0.59772699 0.        ]
-  &#34;What&#39;s the weather like today?&#34; → [0.20246363 0.         0.59434916 0.20318721]
-  &#34;I want to book a flight to Paris&#34; → [0.59678798 0.         0.40321202 0.        ]
-  &#34;Play some music please&#34; → [0.59278865 0.         0.40721135 0.        ]
+  &#34;hello world!&#34; → [0.20099649 0.20127652 0.59772699 0.        ]
+  &#34;What&#39;s the weather like today?&#34; → [0.20246363 0.         0.59434918 0.20318718]
+  &#34;I want to book a flight to Paris&#34; → [0.59678797 0.         0.40321203 0.        ]
+  &#34;Play some music please&#34; → [0.59278864 0.         0.40721136 0.        ]
 </pre></div></div>
 </div>
 <section id="Understanding-Predictions">
@@ -734,14 +734,14 @@ Prediction results:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Single prediction</span>
-<span class="n">single_prediction</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;How do I reset my password?&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Single prediction: </span><span class="si">{</span><span class="n">single_prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">single_prediction</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">"How do I reset my password?"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Single prediction: </span><span class="si">{</span><span class="n">single_prediction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Batch prediction (more efficient for multiple utterances)</span>
 <span class="n">batch_predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-    <span class="p">[</span><span class="s2">&quot;Show me my account balance&quot;</span><span class="p">,</span> <span class="s2">&quot;What time does the store close?&quot;</span><span class="p">,</span> <span class="s2">&quot;Cancel my subscription&quot;</span><span class="p">]</span>
+    <span class="p">[</span><span class="s2">"Show me my account balance"</span><span class="p">,</span> <span class="s2">"What time does the store close?"</span><span class="p">,</span> <span class="s2">"Cancel my subscription"</span><span class="p">]</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batch predictions: </span><span class="si">{</span><span class="n">batch_predictions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Batch predictions: </span><span class="si">{</span><span class="n">batch_predictions</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -753,7 +753,7 @@ Prediction results:
 Single prediction: [0.        0.4013359 0.        0.5986641]
 Batch predictions: [[0.         1.         0.         0.        ]
  [0.79448988 0.         0.         0.20551012]
- [0.40325449 0.         0.19624548 0.40050003]]
+ [0.40325453 0.         0.19624549 0.40049999]]
 </pre></div></div>
 </div>
 </section>
@@ -770,18 +770,18 @@ Batch predictions: [[0.         1.         0.         0.        ]
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="c1"># Create a directory for saving the model</span>
-<span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;my_dumps/knnscorer_clinc150&quot;</span><span class="p">)</span>
+<span class="n">model_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"my_dumps/knnscorer_clinc150"</span><span class="p">)</span>
 <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 Saving model to: </span><span class="si">{</span><span class="n">model_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"💾 Saving model to: </span><span class="si">{</span><span class="n">model_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="n">scorer</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Model saved successfully!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Model saved successfully!"</span><span class="p">)</span>
 
-<span class="c1"># Let&#39;s see what files were created</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Saved files:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">model_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+<span class="c1"># Let's see what files were created</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Saved files:"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">model_path</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -819,19 +819,19 @@ Saved files:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the model from disk</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📁 Loading saved model...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"📁 Loading saved model..."</span><span class="p">)</span>
 <span class="n">loaded_scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Model loaded successfully!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Model loaded successfully!"</span><span class="p">)</span>
 
 <span class="c1"># Verify it works the same as the original</span>
-<span class="n">test_utterance</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hello world!&quot;</span><span class="p">]</span>
+<span class="n">test_utterance</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"hello world!"</span><span class="p">]</span>
 <span class="n">original_prediction</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterance</span><span class="p">)</span>
 <span class="n">loaded_prediction</span> <span class="o">=</span> <span class="n">loaded_scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterance</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Verification:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Original model: </span><span class="si">{</span><span class="n">original_prediction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Loaded model:   </span><span class="si">{</span><span class="n">loaded_prediction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Identical:      </span><span class="si">{</span><span class="n">original_prediction</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">loaded_prediction</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Verification:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Original model: </span><span class="si">{</span><span class="n">original_prediction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Loaded model:   </span><span class="si">{</span><span class="n">loaded_prediction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Identical:      </span><span class="si">{</span><span class="n">original_prediction</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">loaded_prediction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -844,8 +844,8 @@ Saved files:
 ✅ Model loaded successfully!
 
 Verification:
-  Original model: [[0.2009965  0.20127652 0.59772698 0.        ]]
-  Loaded model:   [[0.2009965  0.20127652 0.59772698 0.        ]]
+  Original model: [[0.20099649 0.20127652 0.59772699 0.        ]]
+  Loaded model:   [[0.20099649 0.20127652 0.59772699 0.        ]]
   Identical:      [[ True  True  True  True]]
 </pre></div></div>
 </div>
@@ -859,16 +859,16 @@ Verification:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get detailed prediction information</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🔍 Analyzing prediction with metadata...&quot;</span><span class="p">)</span>
-<span class="n">scores</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">loaded_scorer</span><span class="o">.</span><span class="n">predict_with_metadata</span><span class="p">([</span><span class="s2">&quot;hello world!&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🔍 Analyzing prediction with metadata..."</span><span class="p">)</span>
+<span class="n">scores</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">loaded_scorer</span><span class="o">.</span><span class="n">predict_with_metadata</span><span class="p">([</span><span class="s2">"hello world!"</span><span class="p">])</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Detailed prediction analysis:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Input: &#39;hello world!&#39;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Prediction: </span><span class="si">{</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Detailed prediction analysis:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"  Input: 'hello world!'"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Prediction: </span><span class="si">{</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Display additional metadata if available</span>
 <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Similar examples found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;neighbors&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Similar examples found: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'neighbors'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -880,7 +880,7 @@ Verification:
 🔍 Analyzing prediction with metadata...
 Detailed prediction analysis:
   Input: &#39;hello world!&#39;
-  Prediction: [0.2009965  0.20127652 0.59772698 0.        ]
+  Prediction: [0.20099649 0.20127652 0.59772699 0.        ]
   Similar examples found: 5
 </pre></div></div>
 </div>
@@ -938,9 +938,9 @@ Detailed prediction analysis:
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clean up the saved files</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🧹 Cleaning up demo files...&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🧹 Cleaning up demo files..."</span><span class="p">)</span>
 <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">model_path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Cleanup completed!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Cleanup completed!"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

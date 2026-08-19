@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="AutoIntent documentation" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -534,17 +534,17 @@
 </pre></div>
 </div>
 <p>Add stacks you need with extras, for example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[sentence-transformers,catboost]&quot;</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[openai]&quot;</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[transformers,peft]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[sentence-transformers,catboost]"</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[openai]"</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[transformers,peft]"</span>
 </pre></div>
 </div>
 </section>
 <section id="with-experiment-tracking">
 <h3>With Experiment Tracking<a class="headerlink" href="#with-experiment-tracking" title="Link to this heading">#</a></h3>
 <p>Optional integrations are installed by name, for example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[wandb]&quot;</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[codecarbon]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[wandb]"</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[codecarbon]"</span>
 </pre></div>
 </div>
 </section>
@@ -565,23 +565,23 @@ make<span class="w"> </span>install
 
 <span class="c1"># Prepare your data</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to check my account balance&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How do I transfer money?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s my current balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need to send money to my friend&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you help me make a payment?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Show me my transaction history&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you show me my account details?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to send funds to someone&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What is my available balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How can I make a transfer?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Please help me with a payment&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need to view my recent transactions&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to check my account balance"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How do I transfer money?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's my current balance?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I need to send money to my friend"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Can you help me make a payment?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Show me my transaction history"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Can you show me my account details?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to send funds to someone"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What is my available balance?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How can I make a transfer?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Please help me with a payment"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I need to view my recent transactions"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
     <span class="p">],</span>
-    <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Display my account info&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to transfer funds&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="s2">"validation"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Display my account info"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to transfer funds"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
     <span class="p">]</span>
 <span class="p">}</span>
 
@@ -589,13 +589,13 @@ make<span class="w"> </span>install
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="c1"># Initialize and train the AutoML pipeline</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
 <span class="c1"># Make predictions on new data</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
-    <span class="s2">&quot;What is my available balance?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Transfer money to John&quot;</span>
+    <span class="s2">"What is my available balance?"</span><span class="p">,</span>
+    <span class="s2">"Transfer money to John"</span>
 <span class="p">])</span>
 </pre></div>
 </div>
@@ -607,16 +607,16 @@ make<span class="w"> </span>install
 <section id="single-label-classification">
 <h3>Single-Label Classification<a class="headerlink" href="#single-label-classification" title="Link to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, how are you?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Book a flight to Paris&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather like?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Hello, how are you?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Book a flight to Paris"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's the weather like?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
     <span class="p">],</span>
-    <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Hi there!&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="s2">"validation"</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Hi there!"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
     <span class="p">],</span>
-    <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional but highly recommended</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Good morning&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="s2">"test"</span><span class="p">:</span> <span class="p">[</span>  <span class="c1"># Optional but highly recommended</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Good morning"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
     <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
@@ -626,9 +626,9 @@ make<span class="w"> </span>install
 <h3>Multi-Label Classification<a class="headerlink" href="#multi-label-classification" title="Link to this heading">#</a></h3>
 <p>For multi-label tasks, use lists of 0s and 1s:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Book urgent flight to Paris&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]},</span>  <span class="c1"># booking=1, weather=0, urgent=1</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Book urgent flight to Paris"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]},</span>  <span class="c1"># booking=1, weather=0, urgent=1</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's the weather?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
     <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
@@ -642,10 +642,10 @@ make<span class="w"> </span>install
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="c1"># From JSON file</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;/path/to/your/data.json&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">"/path/to/your/data.json"</span><span class="p">)</span>
 
 <span class="c1"># From Hugging Face Hub</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;your-username/your-dataset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"your-username/your-dataset"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -656,13 +656,13 @@ make<span class="w"> </span>install
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
 <span class="c1"># Our quick and accurate SoTA</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>
 
 <span class="c1"># If you have more training time</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-heavy&quot;</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-heavy"</span><span class="p">)</span>
 
 <span class="c1"># Experimental preset with fine-tuning methods</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;transformers-light&quot;</span><span class="p">)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"transformers-light"</span><span class="p">)</span>
 
 <span class="c1"># Train the pipeline</span>
 <span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
@@ -687,9 +687,9 @@ make<span class="w"> </span>install
 <p>Once trained, use your pipeline for inference:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Batch predictions</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
-    <span class="s2">&quot;What&#39;s my account balance?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Transfer $100 to John&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Show me recent transactions&quot;</span>
+    <span class="s2">"What's my account balance?"</span><span class="p">,</span>
+    <span class="s2">"Transfer $100 to John"</span><span class="p">,</span>
+    <span class="s2">"Show me recent transactions"</span>
 <span class="p">])</span>
 </pre></div>
 </div>
@@ -701,15 +701,15 @@ make<span class="w"> </span>install
 
 <span class="c1"># Initialize a specific scorer</span>
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span>
-    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">3</span>
 <span class="p">)</span>
 
 <span class="c1"># Train on your data</span>
 <span class="n">train_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;Check my account balance&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Transfer money to account&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Show transaction history&quot;</span>
+    <span class="s2">"Check my account balance"</span><span class="p">,</span>
+    <span class="s2">"Transfer money to account"</span><span class="p">,</span>
+    <span class="s2">"Show transaction history"</span>
 <span class="p">]</span>
 <span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -717,8 +717,8 @@ make<span class="w"> </span>install
 
 <span class="c1"># Make predictions</span>
 <span class="n">predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span>
-    <span class="s2">&quot;What&#39;s my current balance?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Send money to my friend&quot;</span>
+    <span class="s2">"What's my current balance?"</span><span class="p">,</span>
+    <span class="s2">"Send money to my friend"</span>
 <span class="p">])</span>
 </pre></div>
 </div>

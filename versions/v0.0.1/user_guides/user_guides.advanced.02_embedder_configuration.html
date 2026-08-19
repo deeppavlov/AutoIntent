@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -509,7 +509,7 @@
 <li><p><strong>HashingVectorizer</strong>: fast, dependency-light vectors from scikit-learn (useful for tests and baselines).</p></li>
 </ul>
 <p>Optional dependencies are grouped as pip extras (see <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>). For the default Sentence Transformers path, install:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[sentence-transformers]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[sentence-transformers]"</span>
 </pre></div>
 </div>
 <p>Other backends need their own extras, for example <code class="docutils literal notranslate"><span class="pre">autointent[openai]</span></code> or <code class="docutils literal notranslate"><span class="pre">autointent[vllm]</span></code>, as shown in the sections below. When a backend package is missing, code paths that need it typically call <code class="docutils literal notranslate"><span class="pre">autointent._deps.require</span></code>, which raises an <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> that includes the matching <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">autointent[&lt;extra&gt;]</span></code> hint.</p>
@@ -526,7 +526,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules.scoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNScorer</span><span class="p">,</span> <span class="n">LinearScorer</span>
 
 <span class="c1"># Using just the model name - sentence-transformers handles device detection</span>
-<span class="n">scorer</span><span class="p">:</span> <span class="n">KNNScorer</span> <span class="o">|</span> <span class="n">LinearScorer</span> <span class="o">=</span> <span class="n">LinearScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">)</span>
+<span class="n">scorer</span><span class="p">:</span> <span class="n">KNNScorer</span> <span class="o">|</span> <span class="n">LinearScorer</span> <span class="o">=</span> <span class="n">LinearScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -551,16 +551,16 @@
 
 <span class="c1"># Using a dictionary for detailed configuration</span>
 <span class="n">advanced_embedder_config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;model_name&quot;</span><span class="p">:</span> <span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># Increase batch size for faster processing</span>
-    <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cuda:0&quot;</span><span class="p">,</span>  <span class="c1"># Override automatic detection if needed</span>
-    <span class="s2">&quot;tokenizer_config&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;max_length&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>  <span class="c1"># Set custom max sequence length</span>
-        <span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s2">&quot;truncation&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"model_name"</span><span class="p">:</span> <span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">,</span>
+    <span class="s2">"batch_size"</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>  <span class="c1"># Increase batch size for faster processing</span>
+    <span class="s2">"device"</span><span class="p">:</span> <span class="s2">"cuda:0"</span><span class="p">,</span>  <span class="c1"># Override automatic detection if needed</span>
+    <span class="s2">"tokenizer_config"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"max_length"</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>  <span class="c1"># Set custom max sequence length</span>
+        <span class="s2">"padding"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">"truncation"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;similarity_fn_name&quot;</span><span class="p">:</span> <span class="s2">&quot;cosine&quot;</span><span class="p">,</span>  <span class="c1"># Choose similarity function</span>
-    <span class="s2">&quot;use_cache&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable embedding caching</span>
+    <span class="s2">"similarity_fn_name"</span><span class="p">:</span> <span class="s2">"cosine"</span><span class="p">,</span>  <span class="c1"># Choose similarity function</span>
+    <span class="s2">"use_cache"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable embedding caching</span>
 <span class="p">}</span>
 
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">LinearScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="n">advanced_embedder_config</span><span class="p">)</span>
@@ -580,13 +580,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">TokenizerConfig</span>
 
 <span class="n">embedder_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-mpnet-base-v2&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"sentence-transformers/all-mpnet-base-v2"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="c1"># Device is auto-detected, but you can override if needed</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">"cuda"</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">"cpu"</span><span class="p">,</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-    <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">&quot;Classify the following text: &quot;</span><span class="p">,</span>  <span class="c1"># Task-specific prompt</span>
-    <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
+    <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">"Classify the following text: "</span><span class="p">,</span>  <span class="c1"># Task-specific prompt</span>
+    <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">"cosine"</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -661,7 +661,7 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Performance-optimized configuration</span>
 <span class="n">perf_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>  <span class="c1"># Fast, lightweight model</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">,</span>  <span class="c1"># Fast, lightweight model</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>  <span class="c1"># Large batch for speed</span>
     <span class="c1"># Device auto-detected by sentence-transformers</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">),</span>  <span class="c1"># Shorter sequences for speed</span>
@@ -682,12 +682,12 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Quality-optimized configuration</span>
 <span class="n">quality_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-mpnet-base-v2&quot;</span><span class="p">,</span>  <span class="c1"># High-quality model</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"sentence-transformers/all-mpnet-base-v2"</span><span class="p">,</span>  <span class="c1"># High-quality model</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>  <span class="c1"># Smaller batch to handle longer sequences</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">),</span>  <span class="c1"># Longer sequences for context</span>
-    <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">&quot;Classify the intent of this message: &quot;</span><span class="p">,</span>
+    <span class="n">classification_prompt</span><span class="o">=</span><span class="s2">"Classify the intent of this message: "</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">&quot;cosine&quot;</span><span class="p">,</span>
+    <span class="n">similarity_fn_name</span><span class="o">=</span><span class="s2">"cosine"</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">LinearScorer</span><span class="p">(</span><span class="n">embedder_config</span><span class="o">=</span><span class="n">quality_config</span><span class="p">)</span>
@@ -703,7 +703,7 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Multilingual setup</span>
 <span class="n">multilingual_config</span> <span class="o">=</span> <span class="n">get_default_embedder_config</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="n">tokenizer_config</span><span class="o">=</span><span class="n">TokenizerConfig</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">),</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -731,7 +731,7 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenaiEmbeddingConfig</span>
 
 <span class="n">openai_embedder_config</span> <span class="o">=</span> <span class="n">OpenaiEmbeddingConfig</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;text-embedding-3-small&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"text-embedding-3-small"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
     <span class="n">max_tokens_in_batch</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -753,9 +753,9 @@
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">VllmEmbeddingConfig</span>
 
 <span class="n">vllm_embedder_config</span> <span class="o">=</span> <span class="n">VllmEmbeddingConfig</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;BAAI/bge-base-en-v1.5&quot;</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">"BAAI/bge-base-en-v1.5"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
     <span class="n">gpu_memory_utilization</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
@@ -807,7 +807,7 @@
 <span class="p">)</span>
 
 <span class="c1"># Example (does not run training here): construct an embedder and call train when you have data.</span>
-<span class="n">_embedder_for_ft</span> <span class="o">=</span> <span class="n">Embedder</span><span class="p">(</span><span class="n">SentenceTransformerEmbeddingConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">))</span>
+<span class="n">_embedder_for_ft</span> <span class="o">=</span> <span class="n">Embedder</span><span class="p">(</span><span class="n">SentenceTransformerEmbeddingConfig</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">))</span>
 <span class="c1"># _embedder_for_ft.train(utterances=[...], labels=[...], config=ft_cfg)</span>
 </pre></div>
 </div>
@@ -820,7 +820,7 @@
 
 <span class="n">_retrieval_with_ft</span> <span class="o">=</span> <span class="n">RetrievalAimedEmbedding</span><span class="p">(</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sentence-transformers/all-MiniLM-L6-v2&quot;</span><span class="p">,</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">"sentence-transformers/all-MiniLM-L6-v2"</span><span class="p">,</span>
     <span class="n">ft_config</span><span class="o">=</span><span class="n">ft_cfg</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># _retrieval_with_ft.fit(utterances=[...], labels=[...])  # runs fine-tuning when ft_config is set</span>

@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -486,10 +486,10 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <h2>Data Format<a class="headerlink" href="#data-format" title="Link to this heading">#</a></h2>
 <p>To work with AutoIntent, you need to format your training data in a specific way. You need to provide a training split containing samples with utterances and labels, as shown below:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;train&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"train"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">        </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;utterance&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Hello!&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="nt">"utterance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hello!"</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>
@@ -499,18 +499,18 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <p>To use it with our Python API, you can use our <a class="reference internal" href="autoapi/autointent/Dataset.html#autointent.Dataset" title="autointent.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.Dataset</span></code></a> object.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]})</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">]})</span>
 </pre></div>
 </div>
 <p>To load a dataset from the file system into Python, the <a class="reference internal" href="autoapi/autointent/Dataset.html#autointent.Dataset.from_json" title="autointent.Dataset.from_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">autointent.Dataset.from_json()</span></code></a> method exists:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;/path/to/json&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">"/path/to/json"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="automl-goes-brrr">
 <h2>AutoML goes brrr…<a class="headerlink" href="#automl-goes-brrr" title="Link to this heading">#</a></h2>
 <p>Once the data is ready, you can start building the optimal classifier from the command line:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autointent<span class="w"> </span>data.train_path<span class="o">=</span><span class="s2">&quot;path/to/your/data.json&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>autointent<span class="w"> </span>data.train_path<span class="o">=</span><span class="s2">"path/to/your/data.json"</span>
 </pre></div>
 </div>
 <p>This command will start the hyperparameter search in the default <a class="reference internal" href="concepts.html#key-search-space"><span class="std std-ref">search space</span></a>.</p>
@@ -528,8 +528,8 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <p>To apply the built classifier to new data, you can use our Python API:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;path/to/run/directory&quot;</span><span class="p">)</span>
-<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="s2">&quot;hello world&quot;</span><span class="p">]</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"path/to/run/directory"</span><span class="p">)</span>
+<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"123"</span><span class="p">,</span> <span class="s2">"hello world"</span><span class="p">]</span>
 <span class="n">prediction</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">utterances</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -539,17 +539,17 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <p>If there is no need to iterate over pipelines and hyperparameters, you can import classification methods directly.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNScorer</span>
 
-<span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_name</span><span class="o">=</span><span class="s2">&quot;sergeyzh/rubert-tiny-turbo&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">KNNScorer</span><span class="p">(</span><span class="n">embedder_name</span><span class="o">=</span><span class="s2">"sergeyzh/rubert-tiny-turbo"</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">train_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;why is there a hold on my american saving bank account&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;i am not sure why my account is blocked&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;why is there a hold on my capital one checking account&quot;</span><span class="p">,</span>
+    <span class="s2">"why is there a hold on my american saving bank account"</span><span class="p">,</span>
+    <span class="s2">"i am not sure why my account is blocked"</span><span class="p">,</span>
+    <span class="s2">"why is there a hold on my capital one checking account"</span><span class="p">,</span>
 <span class="p">]</span>
 <span class="n">train_labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_utterances</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)</span>
 <span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;i think my account is blocked but i do not know the reason&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;can you tell me why is my bank account frozen&quot;</span><span class="p">,</span>
+    <span class="s2">"i think my account is blocked but i do not know the reason"</span><span class="p">,</span>
+    <span class="s2">"can you tell me why is my bank account frozen"</span><span class="p">,</span>
 <span class="p">]</span>
 <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
 </pre></div>

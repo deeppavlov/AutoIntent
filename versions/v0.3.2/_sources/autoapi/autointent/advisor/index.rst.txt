@@ -1,0 +1,83 @@
+autointent.advisor
+==================
+
+.. py:module:: autointent.advisor
+
+.. autoapi-nested-parse::
+
+   Pre-flight compute feasibility advisor.
+
+   **Experimental.** This subpackage estimates VRAM, RAM, disk, and wall-time for a
+   search space before any training starts. Estimates are heuristic and calibrated
+   against a limited hardware sample, so treat them as guidance rather than
+   guarantees — see the accuracy caveats in the ``advisor`` page of the docs. The
+   public surface may change in a minor release.
+
+   Two ways in: the ``autointent-advisor`` console script, and the functions below.
+   ``Pipeline.fit(preflight=...)`` wires the same machinery into a fit, opt-in.
+
+
+
+Exceptions
+----------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/advisor/PreflightError
+   /autoapi/autointent/advisor/ReduceToFitError
+
+.. autoapisummary::
+
+   autointent.advisor.PreflightError
+   autointent.advisor.ReduceToFitError
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/advisor/HardwareProfile
+   /autoapi/autointent/advisor/DatasetStats
+   /autoapi/autointent/advisor/Finding
+   /autoapi/autointent/advisor/PreflightReport
+   /autoapi/autointent/advisor/RecommendationResult
+   /autoapi/autointent/advisor/ResourceEstimate
+   /autoapi/autointent/advisor/Severity
+
+.. autoapisummary::
+
+   autointent.advisor.HardwareProfile
+   autointent.advisor.DatasetStats
+   autointent.advisor.Finding
+   autointent.advisor.PreflightReport
+   autointent.advisor.RecommendationResult
+   autointent.advisor.ResourceEstimate
+   autointent.advisor.Severity
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/advisor/detect_hardware
+   /autoapi/autointent/advisor/run_preflight
+   /autoapi/autointent/advisor/dataset_stats
+   /autoapi/autointent/advisor/estimate
+   /autoapi/autointent/advisor/recommend
+   /autoapi/autointent/advisor/reduce_to_fit
+
+.. autoapisummary::
+
+   autointent.advisor.detect_hardware
+   autointent.advisor.run_preflight
+   autointent.advisor.dataset_stats
+   autointent.advisor.estimate
+   autointent.advisor.recommend
+   autointent.advisor.reduce_to_fit
+
+

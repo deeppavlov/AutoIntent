@@ -1,0 +1,22 @@
+autointent.server.mcp.PaginationInfo
+====================================
+
+.. py:class:: autointent.server.mcp.PaginationInfo(/, **data)
+
+   Bases: :py:obj:`pydantic.BaseModel`
+
+
+   Information about data pages.
+
+
+   .. py:attribute:: total_items
+      :type:  int
+      :value: None
+
+
+
+   .. py:attribute:: total_pages
+      :type:  int
+      :value: None
+
+

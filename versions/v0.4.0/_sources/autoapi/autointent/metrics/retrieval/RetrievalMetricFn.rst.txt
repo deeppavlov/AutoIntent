@@ -1,0 +1,26 @@
+autointent.metrics.retrieval.RetrievalMetricFn
+==============================================
+
+.. py:class:: autointent.metrics.retrieval.RetrievalMetricFn
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol for retrieval metrics.
+
+
+   .. py:method:: __call__(query_labels, candidates_labels, k = None)
+
+      Calculate retrieval metric.
+
+      - multiclass case: labels are integer
+      - multilabel case: labels are binary
+
+
+      :param query_labels: For each query, this list contains its class labels
+      :param candidates_labels: For each query, these lists contain class labels of items ranked by a retrieval model
+       (from most to least relevant)
+      :param k: Number of top items to consider for each query
+      :return: Score of the retrieval metric
+
+

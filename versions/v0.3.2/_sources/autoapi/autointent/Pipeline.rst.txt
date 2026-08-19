@@ -48,16 +48,25 @@ autointent.Pipeline
 
 
 
-   .. py:method:: fit(dataset, refit_after = False, incompatible_search_space = 'filter')
+   .. py:method:: fit(dataset, refit_after = False, incompatible_search_space = 'filter', preflight = 'off')
 
       Optimize the pipeline from dataset.
 
       :param dataset: dataset for optimization.
       :param refit_after: whether to refit on whole data after optimization. Valid only for hold-out validaiton.
-      :param sampler: sampler type to use.
-      :param incompatible_search_space: wow to handle data-incompatible modules occurring in search space.
+      :param incompatible_search_space: how to handle data-incompatible modules occurring in search space.
+      :param preflight: **experimental** gate that runs
+                        :func:`autointent.advisor.run_preflight` over the pipeline's
+                        effective config + dataset before any heavy work.
+                        ``"off"`` (default) skips it entirely. ``"warn"`` logs findings —
+                        INFO for AMPLE, WARNING for TIGHT, ERROR for OVER — but never
+                        raises; note it probes the HF Hub for model metadata, so it adds
+                        network round-trips. ``"strict"`` additionally raises
+                        :class:`autointent.advisor.PreflightError` when any finding has
+                        severity OVER, so unfeasible runs abort before fit.
 
       :raises RuntimeError: If pipeline is in inference mode.
+      :raises PreflightError: If ``preflight="strict"`` and any OVER finding is produced.
 
 
 

@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Text Embeddings and Representation Learning" href="learn/text_embeddings.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -519,10 +519,10 @@
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>Install the core package, then add the extra that matches the server you need:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[fastapi]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[fastapi]"</span>
 </pre></div>
 </div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[fastmcp]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[fastmcp]"</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">fastapi</span></code> extra pulls in FastAPI, Uvicorn, and <code class="docutils literal notranslate"><span class="pre">pydantic-settings</span></code>. The <code class="docutils literal notranslate"><span class="pre">fastmcp</span></code> extra pulls in FastMCP and <code class="docutils literal notranslate"><span class="pre">pydantic-settings</span></code>.</p>
@@ -569,7 +569,7 @@
 </div>
 <p>Bind address and port can follow your deployment; ensure <code class="docutils literal notranslate"><span class="pre">AUTOINTENT_PATH</span></code> still points at the pipeline directory.</p>
 <p><strong>Run via the module entrypoint</strong> (uses <code class="docutils literal notranslate"><span class="pre">AUTOINTENT_HOST</span></code> and <code class="docutils literal notranslate"><span class="pre">AUTOINTENT_PORT</span></code> from settings):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from autointent.server.http import main; main()&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"from autointent.server.http import main; main()"</span>
 </pre></div>
 </div>
 <section id="endpoints">
@@ -590,7 +590,7 @@
 <section id="mcp-server-fastmcp">
 <h2>MCP server (FastMCP)<a class="headerlink" href="#mcp-server-fastmcp" title="Link to this heading">#</a></h2>
 <p><strong>Stdio (default)</strong> — typical for MCP clients that spawn a subprocess:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from autointent.server.mcp import main; main()&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">"from autointent.server.mcp import main; main()"</span>
 </pre></div>
 </div>
 <p>With <code class="docutils literal notranslate"><span class="pre">AUTOINTENT_TRANSPORT</span></code> unset or <code class="docutils literal notranslate"><span class="pre">stdio</span></code>, <code class="docutils literal notranslate"><span class="pre">main()</span></code> calls <code class="docutils literal notranslate"><span class="pre">mcp.run()</span></code> with stdio transport.</p>

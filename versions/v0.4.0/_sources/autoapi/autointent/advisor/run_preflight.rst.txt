@@ -1,0 +1,24 @@
+autointent.advisor.run_preflight
+================================
+
+.. py:function:: autointent.advisor.run_preflight(config, stats, hardware, *, preset_name = None, refit_after = False, embedding_cache_probe = None)
+
+   Run all three preflight phases and return one report.
+
+   :param config: parsed preset / ``OptimizationConfig`` dict (top-level keys:
+                  ``search_space``, ``hpo_config``, optional ``embedder_config``,
+                  optional ``logging_config.dump_modules``).
+   :param stats: dataset statistics (real or placeholder).
+   :param hardware: detected hardware profile.
+   :param preset_name: optional friendly name for the report header.
+   :param refit_after: matches the ``Pipeline.fit(refit_after=...)`` argument.
+                       When True, time estimates include the extra refit-on-full-data pass.
+   :param embedding_cache_probe: optional callable ``(embedder_model_name) -> bool``.
+                                 Return True when the embedding cache already holds this model's
+                                 embeddings for the current dataset — the advisor then predicts 0
+                                 forward time and 0 ``disk_embedding_cache_gb`` for that embedder
+                                 (mirrors the ``cached_locally`` treatment for HF weights). Default
+                                 is the pessimistic cold assumption every embedder pays once.
+
+   :returns: ``PreflightReport`` with findings across resource / data / config phases.
+

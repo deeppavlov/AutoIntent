@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -59,7 +59,7 @@
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -983,7 +983,15 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/autointent/VectorIndex.html#autointent.VectorIndex.add">add() (autointent.VectorIndex method)</a>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.accelerator">accelerator (autointent.advisor.HardwareProfile attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.add">add() (autointent.advisor.PreflightReport method)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/VectorIndex.html#autointent.VectorIndex.add">(autointent.VectorIndex method)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/Severity.html#autointent.advisor.Severity.AMPLE">AMPLE (autointent.advisor.Severity attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/HashingVectorizerEmbeddingConfig.html#autointent.configs.HashingVectorizerEmbeddingConfig.analyzer">analyzer (autointent.configs.HashingVectorizerEmbeddingConfig attribute)</a>
 </li>
@@ -1024,6 +1032,73 @@
         <li><a href="autoapi/autointent/index.html#module-autointent">module</a>
 </li>
       </ul></li>
+      <li>
+    autointent.advisor
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/index.html#module-autointent.advisor">module</a>
+</li>
+      </ul></li>
+      <li>
+    autointent.advisor.dataset_stats()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/dataset_stats.html#autointent.advisor.dataset_stats">built-in function</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats">autointent.advisor.DatasetStats (built-in class)</a>
+</li>
+      <li>
+    autointent.advisor.detect_hardware()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/detect_hardware.html#autointent.advisor.detect_hardware">built-in function</a>
+</li>
+      </ul></li>
+      <li>
+    autointent.advisor.estimate()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/estimate.html#autointent.advisor.estimate">built-in function</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/Finding.html#autointent.advisor.Finding">autointent.advisor.Finding (built-in class)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile">autointent.advisor.HardwareProfile (built-in class)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/PreflightError.html#autointent.advisor.PreflightError">autointent.advisor.PreflightError</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport">autointent.advisor.PreflightReport (built-in class)</a>
+</li>
+      <li>
+    autointent.advisor.recommend()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/recommend.html#autointent.advisor.recommend">built-in function</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/RecommendationResult.html#autointent.advisor.RecommendationResult">autointent.advisor.RecommendationResult (built-in class)</a>
+</li>
+      <li>
+    autointent.advisor.reduce_to_fit()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/reduce_to_fit.html#autointent.advisor.reduce_to_fit">built-in function</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError">autointent.advisor.ReduceToFitError</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate">autointent.advisor.ResourceEstimate (built-in class)</a>
+</li>
+      <li>
+    autointent.advisor.run_preflight()
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/run_preflight.html#autointent.advisor.run_preflight">built-in function</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/Severity.html#autointent.advisor.Severity">autointent.advisor.Severity (built-in class)</a>
+</li>
       <li>
     autointent.configs
 
@@ -1578,6 +1653,8 @@
         <li><a href="autoapi/autointent/metrics/retrieval_map_intersecting.html#autointent.metrics.retrieval_map_intersecting">built-in function</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     autointent.metrics.retrieval_map_macro()
 
@@ -1620,8 +1697,6 @@
         <li><a href="autoapi/autointent/metrics/retrieval_ndcg_intersecting.html#autointent.metrics.retrieval_ndcg_intersecting">built-in function</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     autointent.metrics.retrieval_ndcg_macro()
 
@@ -2239,6 +2314,8 @@
       </ul></li>
       <li><a href="autoapi/autointent/VectorIndex.html#autointent.VectorIndex">autointent.VectorIndex (built-in class)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.avg_tokens">avg_tokens (autointent.advisor.DatasetStats attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -2281,6 +2358,18 @@
     built-in function
 
       <ul>
+        <li><a href="autoapi/autointent/advisor/dataset_stats.html#autointent.advisor.dataset_stats">autointent.advisor.dataset_stats()</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/detect_hardware.html#autointent.advisor.detect_hardware">autointent.advisor.detect_hardware()</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/estimate.html#autointent.advisor.estimate">autointent.advisor.estimate()</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/recommend.html#autointent.advisor.recommend">autointent.advisor.recommend()</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/reduce_to_fit.html#autointent.advisor.reduce_to_fit">autointent.advisor.reduce_to_fit()</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/run_preflight.html#autointent.advisor.run_preflight">autointent.advisor.run_preflight()</a>
+</li>
         <li><a href="autoapi/autointent/configs/get_default_embedder_config.html#autointent.configs.get_default_embedder_config">autointent.configs.get_default_embedder_config()</a>
 </li>
         <li><a href="autoapi/autointent/configs/get_default_hfmodel_config.html#autointent.configs.get_default_hfmodel_config">autointent.configs.get_default_hfmodel_config()</a>
@@ -2500,6 +2589,10 @@
       </ul></li>
       <li><a href="autoapi/autointent/generation/chat_templates/PromptDescription.html#autointent.generation.chat_templates.PromptDescription.check_valid_prompt">check_valid_prompt() (autointent.generation.chat_templates.PromptDescription class method)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/RecommendationResult.html#autointent.advisor.RecommendationResult.chosen">chosen (autointent.advisor.RecommendationResult attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.class_counts">class_counts (autointent.advisor.DatasetStats attribute)</a>
+</li>
       <li><a href="autoapi/autointent/server/mcp/ClassesOutput.html#autointent.server.mcp.ClassesOutput.classes">classes (autointent.server.mcp.ClassesOutput attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/TaskTypeEnum.html#autointent.configs.TaskTypeEnum.classification">classification (autointent.configs.TaskTypeEnum attribute)</a>
@@ -2646,6 +2739,8 @@
 </li>
       <li><a href="autoapi/autointent/custom_types/RerankedItem.html#autointent.custom_types.RerankedItem.corpus_id">corpus_id (autointent.custom_types.RerankedItem attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.cpu_count">cpu_count (autointent.advisor.HardwareProfile attribute)</a>
+</li>
       <li><a href="autoapi/autointent/generation/utterances/HumanUtteranceGenerator.html#autointent.generation.utterances.HumanUtteranceGenerator.critic">critic (autointent.generation.utterances.HumanUtteranceGenerator attribute)</a>
 </li>
       <li><a href="autoapi/autointent/custom_types/LogLevel.html#autointent.custom_types.LogLevel.CRITICAL">CRITICAL (autointent.custom_types.LogLevel attribute)</a>
@@ -2692,9 +2787,11 @@
         <li><a href="autoapi/autointent/context/Context.html#autointent.context.Context.data_handler">(autointent.context.Context attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.dataset">dataset (autointent.context.data_handler.DataHandler attribute)</a>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.dataset">dataset (autointent.advisor.PreflightReport attribute)</a>
 
       <ul>
+        <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.dataset">(autointent.context.data_handler.DataHandler attribute)</a>
+</li>
         <li><a href="autoapi/autointent/generation/chat_templates/BaseSynthesizerTemplate.html#autointent.generation.chat_templates.BaseSynthesizerTemplate.dataset">(autointent.generation.chat_templates.BaseSynthesizerTemplate attribute)</a>
 </li>
       </ul></li>
@@ -2722,9 +2819,23 @@
         <li><a href="autoapi/autointent/configs/TorchTrainingConfig.html#autointent.configs.TorchTrainingConfig.device">(autointent.configs.TorchTrainingConfig attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.device_class">device_class (autointent.advisor.HardwareProfile property)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.device_name">device_name (autointent.advisor.HardwareProfile attribute)</a>
+</li>
       <li><a href="autoapi/autointent/configs/OpenaiEmbeddingConfig.html#autointent.configs.OpenaiEmbeddingConfig.dimensions">dimensions (autointent.configs.OpenaiEmbeddingConfig attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/LoggingConfig.html#autointent.configs.LoggingConfig.dirpath">dirpath (autointent.configs.LoggingConfig property)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.disk_cached_gb">disk_cached_gb (autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.disk_download_gb">disk_download_gb (autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.disk_dump_gb">disk_dump_gb (autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.disk_embedding_cache_gb">disk_embedding_cache_gb (autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.drivers">drivers (autointent.advisor.ResourceEstimate attribute)</a>
 </li>
       <li><a href="autoapi/autointent/modules/CNNScorer.html#autointent.modules.CNNScorer.dropout">dropout (autointent.modules.CNNScorer attribute)</a>
 
@@ -2736,14 +2847,14 @@
         <li><a href="autoapi/autointent/modules/scoring/RNNScorer.html#autointent.modules.scoring.RNNScorer.dropout">(autointent.modules.scoring.RNNScorer attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/configs/HashingVectorizerEmbeddingConfig.html#autointent.configs.HashingVectorizerEmbeddingConfig.dtype">dtype (autointent.configs.HashingVectorizerEmbeddingConfig attribute)</a>
 
       <ul>
         <li><a href="autoapi/autointent/configs/VllmEmbeddingConfig.html#autointent.configs.VllmEmbeddingConfig.dtype">(autointent.configs.VllmEmbeddingConfig attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/Context.html#autointent.Context.dump">dump() (autointent.Context method)</a>
 
       <ul>
@@ -2912,6 +3023,12 @@
         <li><a href="autoapi/autointent/modules/scoring/CatBoostScorer.html#autointent.modules.scoring.CatBoostScorer.features_type">(autointent.modules.scoring.CatBoostScorer attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/PreflightError.html#autointent.advisor.PreflightError.findings">findings (autointent.advisor.PreflightError attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.findings">(autointent.advisor.PreflightReport attribute)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/autointent/modules/AdaptiveDecision.html#autointent.modules.AdaptiveDecision.fit">fit() (autointent.modules.AdaptiveDecision method)</a>
 
       <ul>
@@ -3006,6 +3123,8 @@
         <li><a href="autoapi/autointent/configs/HFModelConfig.html#autointent.configs.HFModelConfig.fp16">(autointent.configs.HFModelConfig attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.free_disk_gb">free_disk_gb (autointent.advisor.HardwareProfile attribute)</a>
+</li>
       <li><a href="autoapi/autointent/nodes/InferenceNode.html#autointent.nodes.InferenceNode.from_config">from_config() (autointent.nodes.InferenceNode class method)</a>
 
       <ul>
@@ -3330,8 +3449,14 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.has_descriptions">has_descriptions (autointent.Dataset attribute)</a>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.hardware">hardware (autointent.advisor.PreflightReport attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.has_descriptions">has_descriptions (autointent.advisor.DatasetStats attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.has_descriptions">(autointent.Dataset attribute)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/autointent/context/data_handler/StratifiedSplitter.html#autointent.context.data_handler.StratifiedSplitter.has_oos_samples">has_oos_samples() (autointent.context.data_handler.StratifiedSplitter method)</a>
 </li>
       <li><a href="autoapi/autointent/Context.html#autointent.Context.has_saved_modules">has_saved_modules() (autointent.Context method)</a>
@@ -3342,6 +3467,10 @@
       </ul></li>
       <li><a href="autoapi/autointent/Hasher.html#autointent.Hasher.hash">hash() (autointent.Hasher method)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.headroom">headroom (autointent.advisor.PreflightReport property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/Hasher.html#autointent.Hasher.hexdigest">hexdigest() (autointent.Hasher method)</a>
 </li>
       <li><a href="autoapi/autointent/modules/RNNScorer.html#autointent.modules.RNNScorer.hidden_dim">hidden_dim (autointent.modules.RNNScorer attribute)</a>
@@ -3350,8 +3479,6 @@
         <li><a href="autoapi/autointent/modules/scoring/RNNScorer.html#autointent.modules.scoring.RNNScorer.hidden_dim">(autointent.modules.scoring.RNNScorer attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/schemas/node_validation/ParamSpaceFloat.html#autointent.schemas.node_validation.ParamSpaceFloat.high">high (autointent.schemas.node_validation.ParamSpaceFloat attribute)</a>
 
       <ul>
@@ -3400,11 +3527,13 @@
 </li>
       <li><a href="autoapi/autointent/schemas/Tag.html#autointent.schemas.Tag.intent_ids">intent_ids (autointent.schemas.Tag attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/custom_types/Split.html#autointent.custom_types.Split.INTENTS">INTENTS (autointent.custom_types.Split attribute)</a>, <a href="autoapi/autointent/custom_types/Split.html#id3">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.intents">intents (autointent.Dataset attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.is_feasible">is_feasible (autointent.advisor.PreflightReport property)</a>
 </li>
       <li><a href="autoapi/autointent/context/data_handler/StratifiedSplitter.html#autointent.context.data_handler.StratifiedSplitter.is_few_shot">is_few_shot (autointent.context.data_handler.StratifiedSplitter attribute)</a>
 </li>
@@ -3510,6 +3639,8 @@
 </li>
       <li><a href="autoapi/autointent/custom_types/index.html#autointent.custom_types.LabelWithOOS">LabelWithOOS (in module autointent.custom_types)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError.last_report">last_report (autointent.advisor.ReduceToFitError attribute)</a>
+</li>
       <li><a href="autoapi/autointent/configs/EmbedderFineTuningConfig.html#autointent.configs.EmbedderFineTuningConfig.learning_rate">learning_rate (autointent.configs.EmbedderFineTuningConfig attribute)</a>
 
       <ul>
@@ -3598,6 +3729,8 @@
         <li><a href="autoapi/autointent/schemas/node_validation/ParamSpaceInt.html#autointent.schemas.node_validation.ParamSpaceInt.low">(autointent.schemas.node_validation.ParamSpaceInt attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.low_confidence">low_confidence (autointent.advisor.PreflightReport attribute)</a>
+</li>
       <li><a href="autoapi/autointent/configs/HashingVectorizerEmbeddingConfig.html#autointent.configs.HashingVectorizerEmbeddingConfig.lowercase">lowercase (autointent.configs.HashingVectorizerEmbeddingConfig attribute)</a>
 </li>
   </ul></td>
@@ -3660,14 +3793,20 @@
 </li>
       <li><a href="autoapi/autointent/server/mcp/index.html#autointent.server.mcp.mcp">mcp (in module autointent.server.mcp)</a>
 </li>
-      <li><a href="autoapi/autointent/exceptions/MismatchNumClassesError.html#autointent.exceptions.MismatchNumClassesError.message">message (autointent.exceptions.MismatchNumClassesError attribute)</a>
+      <li><a href="autoapi/autointent/advisor/Finding.html#autointent.advisor.Finding.message">message (autointent.advisor.Finding attribute)</a>
 
       <ul>
+        <li><a href="autoapi/autointent/exceptions/MismatchNumClassesError.html#autointent.exceptions.MismatchNumClassesError.message">(autointent.exceptions.MismatchNumClassesError attribute)</a>
+</li>
         <li><a href="autoapi/autointent/exceptions/WrongClassificationError.html#autointent.exceptions.WrongClassificationError.message">(autointent.exceptions.WrongClassificationError attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/autointent/configs/EarlyStoppingConfig.html#autointent.configs.EarlyStoppingConfig.metric">metric (autointent.configs.EarlyStoppingConfig attribute)</a>
+      <li><a href="autoapi/autointent/advisor/Finding.html#autointent.advisor.Finding.metric">metric (autointent.advisor.Finding attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/configs/EarlyStoppingConfig.html#autointent.configs.EarlyStoppingConfig.metric">(autointent.configs.EarlyStoppingConfig attribute)</a>
 </li>
+      </ul></li>
       <li><a href="autoapi/autointent/metrics/index.html#autointent.metrics.METRIC_FN">METRIC_FN (in module autointent.metrics)</a>
 </li>
       <li><a href="autoapi/autointent/nodes/NodeOptimizer.html#autointent.nodes.NodeOptimizer.metrics">metrics (autointent.nodes.NodeOptimizer attribute)</a>
@@ -3747,6 +3886,8 @@
 
       <ul>
         <li><a href="autoapi/autointent/index.html#module-autointent">autointent</a>
+</li>
+        <li><a href="autoapi/autointent/advisor/index.html#module-autointent.advisor">autointent.advisor</a>
 </li>
         <li><a href="autoapi/autointent/configs/index.html#module-autointent.configs">autointent.configs</a>
 </li>
@@ -3843,9 +3984,11 @@
         <li><a href="autoapi/autointent/nodes/info/ScoringNodeInfo.html#autointent.nodes.info.ScoringNodeInfo.multiclass_available_metrics">(autointent.nodes.info.ScoringNodeInfo attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.multilabel">multilabel (autointent.context.data_handler.DataHandler property)</a>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.multilabel">multilabel (autointent.advisor.DatasetStats attribute)</a>
 
       <ul>
+        <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.multilabel">(autointent.context.data_handler.DataHandler property)</a>
+</li>
         <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.multilabel">(autointent.Dataset property)</a>
 </li>
       </ul></li>
@@ -3871,8 +4014,12 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.n_classes">n_classes (autointent.Dataset property)</a>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.n_classes">n_classes (autointent.advisor.DatasetStats attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.n_classes">(autointent.Dataset property)</a>
 </li>
+      </ul></li>
       <li><a href="autoapi/autointent/configs/HPOConfig.html#autointent.configs.HPOConfig.n_ei_candidates">n_ei_candidates (autointent.configs.HPOConfig attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/HashingVectorizerEmbeddingConfig.html#autointent.configs.HashingVectorizerEmbeddingConfig.n_features">n_features (autointent.configs.HashingVectorizerEmbeddingConfig attribute)</a>
@@ -3901,6 +4048,8 @@
         <li><a href="autoapi/autointent/schemas/node_validation/ParamSpaceInt.html#autointent.schemas.node_validation.ParamSpaceInt.n_possible_values">(autointent.schemas.node_validation.ParamSpaceInt method)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.n_samples">n_samples (autointent.advisor.DatasetStats attribute)</a>
+</li>
       <li><a href="autoapi/autointent/configs/HPOConfig.html#autointent.configs.HPOConfig.n_startup_trials">n_startup_trials (autointent.configs.HPOConfig attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/HPOConfig.html#autointent.configs.HPOConfig.n_trials">n_trials (autointent.configs.HPOConfig attribute)</a>
@@ -4067,6 +4216,16 @@
 </li>
       <li><a href="autoapi/autointent/configs/HashingVectorizerEmbeddingConfig.html#autointent.configs.HashingVectorizerEmbeddingConfig.norm">norm (autointent.configs.HashingVectorizerEmbeddingConfig attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError.not_converged">not_converged() (autointent.advisor.ReduceToFitError class method)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.notes">notes (autointent.advisor.HardwareProfile attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.notes">(autointent.advisor.PreflightReport attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError.nothing_droppable">nothing_droppable() (autointent.advisor.ReduceToFitError class method)</a>
+</li>
       <li><a href="autoapi/autointent/modules/CNNScorer.html#autointent.modules.CNNScorer.num_filters">num_filters (autointent.modules.CNNScorer attribute)</a>
 
       <ul>
@@ -4099,12 +4258,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/Ranker.html#autointent.Ranker.output_range">output_range (autointent.Ranker attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/Severity.html#autointent.advisor.Severity.OVER">OVER (autointent.advisor.Severity attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.p95_tokens">p95_tokens (autointent.advisor.DatasetStats attribute)</a>
+</li>
       <li><a href="autoapi/autointent/modules/GCNScorer.html#autointent.modules.GCNScorer.p_reweight">p_reweight (autointent.modules.GCNScorer attribute)</a>
 
       <ul>
@@ -4125,6 +4288,8 @@
         <li><a href="autoapi/autointent/server/mcp/TrainDataOutput.html#autointent.server.mcp.TrainDataOutput.pagination_info">(autointent.server.mcp.TrainDataOutput attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.parallel_factor">parallel_factor (autointent.advisor.ResourceEstimate attribute)</a>
+</li>
       <li><a href="autoapi/autointent/schemas/node_validation/index.html#autointent.schemas.node_validation.ParamSpaceT">ParamSpaceT (in module autointent.schemas.node_validation)</a>
 </li>
       <li><a href="autoapi/autointent/configs/TaskTypeEnum.html#autointent.configs.TaskTypeEnum.passage">passage (autointent.configs.TaskTypeEnum attribute)</a>
@@ -4137,7 +4302,11 @@
       </ul></li>
       <li><a href="autoapi/autointent/configs/EarlyStoppingConfig.html#autointent.configs.EarlyStoppingConfig.patience">patience (autointent.configs.EarlyStoppingConfig attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/Finding.html#autointent.advisor.Finding.phase">phase (autointent.advisor.Finding attribute)</a>
+</li>
       <li><a href="autoapi/autointent/context/optimization_info/OptimizationInfo.html#autointent.context.optimization_info.OptimizationInfo.pipeline_metrics">pipeline_metrics (autointent.context.optimization_info.OptimizationInfo attribute)</a>, <a href="autoapi/autointent/context/optimization_info/OptimizationInfo.html#id3">[1]</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.placeholder">placeholder() (autointent.advisor.DatasetStats class method)</a>
 </li>
       <li><a href="autoapi/autointent/server/http/Settings.html#autointent.server.http.Settings.port">port (autointent.server.http.Settings attribute)</a>
 
@@ -4263,6 +4432,8 @@
       </ul></li>
       <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.prepare_for_refit">prepare_for_refit() (autointent.context.data_handler.DataHandler method)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.preset_name">preset_name (autointent.advisor.PreflightReport attribute)</a>
+</li>
       <li><a href="autoapi/autointent/modules/BertScorer.html#autointent.modules.BertScorer.print_progress">print_progress (autointent.modules.BertScorer attribute)</a>
 
       <ul>
@@ -4276,6 +4447,8 @@
       <li><a href="autoapi/autointent/generation/utterances/UtteranceGenerator.html#autointent.generation.utterances.UtteranceGenerator.prompt_maker">prompt_maker (autointent.generation.utterances.UtteranceGenerator attribute)</a>
 </li>
       <li><a href="autoapi/autointent/generation/utterances/UtteranceEvolver.html#autointent.generation.utterances.UtteranceEvolver.prompt_makers">prompt_makers (autointent.generation.utterances.UtteranceEvolver attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError.pruned_config">pruned_config (autointent.advisor.ReduceToFitError attribute)</a>
 </li>
       <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.push_to_hub">push_to_hub() (autointent.Dataset method)</a>
 </li>
@@ -4297,6 +4470,12 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.ram_gb">ram_gb (autointent.advisor.HardwareProfile attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.ram_gb">(autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/autointent/context/data_handler/StratifiedSplitter.html#autointent.context.data_handler.StratifiedSplitter.random_seed">random_seed (autointent.context.data_handler.StratifiedSplitter attribute)</a>
 </li>
       <li><a href="autoapi/autointent/Ranker.html#autointent.Ranker.rank">rank() (autointent.Ranker method)</a>
@@ -4343,6 +4522,10 @@
         <li><a href="autoapi/autointent/context/Context.html#autointent.context.Context.resolve_transformer">(autointent.context.Context method)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.resource">resource (autointent.advisor.PreflightReport attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/RecommendationResult.html#autointent.advisor.RecommendationResult.results">results (autointent.advisor.RecommendationResult attribute)</a>
+</li>
       <li><a href="autoapi/autointent/configs/HFModelConfig.html#autointent.configs.HFModelConfig.revision">revision (autointent.configs.HFModelConfig attribute)</a>
 </li>
       <li><a href="autoapi/autointent/generation/chat_templates/Message.html#autointent.generation.chat_templates.Message.role">role (autointent.generation.chat_templates.Message attribute)</a>
@@ -4443,6 +4626,8 @@
 </li>
       <li><a href="autoapi/autointent/custom_types/NodeType.html#autointent.custom_types.NodeType.scoring">scoring (autointent.custom_types.NodeType attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/ReduceToFitError.html#autointent.advisor.ReduceToFitError.scoring_exhausted">scoring_exhausted() (autointent.advisor.ReduceToFitError class method)</a>
+</li>
       <li><a href="autoapi/autointent/modules/index.html#autointent.modules.SCORING_MODULES">SCORING_MODULES (in module autointent.modules)</a>
 </li>
       <li><a href="autoapi/autointent/schemas/node_validation/index.html#autointent.schemas.node_validation.ScoringMetrics">ScoringMetrics (in module autointent.schemas.node_validation)</a>
@@ -4511,6 +4696,8 @@
       </ul></li>
       <li><a href="autoapi/autointent/server/http/index.html#autointent.server.http.settings">settings (in module autointent.server.http)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/Finding.html#autointent.advisor.Finding.severity">severity (autointent.advisor.Finding attribute)</a>
+</li>
       <li><a href="autoapi/autointent/context/data_handler/StratifiedSplitter.html#autointent.context.data_handler.StratifiedSplitter.shuffle">shuffle (autointent.context.data_handler.StratifiedSplitter attribute)</a>
 </li>
       <li><a href="autoapi/autointent/Embedder.html#autointent.Embedder.similarity">similarity() (autointent.Embedder method)</a>
@@ -4520,6 +4707,8 @@
       <li><a href="autoapi/autointent/custom_types/index.html#autointent.custom_types.SimpleLabel">SimpleLabel (in module autointent.custom_types)</a>
 </li>
       <li><a href="autoapi/autointent/custom_types/index.html#autointent.custom_types.SimpleLabelWithOOS">SimpleLabelWithOOS (in module autointent.custom_types)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/DatasetStats.html#autointent.advisor.DatasetStats.source">source (autointent.advisor.DatasetStats attribute)</a>
 </li>
       <li><a href="autoapi/autointent/generation/chat_templates/BaseSynthesizerTemplate.html#autointent.generation.chat_templates.BaseSynthesizerTemplate.split">split (autointent.generation.chat_templates.BaseSynthesizerTemplate attribute)</a>
 </li>
@@ -4791,9 +4980,13 @@
         <li><a href="autoapi/autointent/modules/ThresholdDecision.html#autointent.modules.ThresholdDecision.thresh">(autointent.modules.ThresholdDecision attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/configs/EarlyStoppingConfig.html#autointent.configs.EarlyStoppingConfig.threshold">threshold (autointent.configs.EarlyStoppingConfig attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="autoapi/autointent/configs/EarlyStoppingConfig.html#autointent.configs.EarlyStoppingConfig.threshold">threshold (autointent.configs.EarlyStoppingConfig attribute)</a>
+      <li><a href="autoapi/autointent/advisor/Severity.html#autointent.advisor.Severity.TIGHT">TIGHT (autointent.advisor.Severity attribute)</a>
+</li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.time_hours">time_hours (autointent.advisor.ResourceEstimate attribute)</a>
 </li>
       <li><a href="autoapi/autointent/configs/HPOConfig.html#autointent.configs.HPOConfig.timeout">timeout (autointent.configs.HPOConfig attribute)</a>
 
@@ -4801,8 +4994,14 @@
         <li><a href="autoapi/autointent/configs/OpenaiEmbeddingConfig.html#autointent.configs.OpenaiEmbeddingConfig.timeout">(autointent.configs.OpenaiEmbeddingConfig attribute)</a>
 </li>
       </ul></li>
-      <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.to_dict">to_dict() (autointent.Dataset method)</a>
+      <li><a href="autoapi/autointent/advisor/PreflightReport.html#autointent.advisor.PreflightReport.to_dict">to_dict() (autointent.advisor.PreflightReport method)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/RecommendationResult.html#autointent.advisor.RecommendationResult.to_dict">(autointent.advisor.RecommendationResult method)</a>
 </li>
+        <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.to_dict">(autointent.Dataset method)</a>
+</li>
+      </ul></li>
       <li><a href="autoapi/autointent/Dataset.html#autointent.Dataset.to_json">to_json() (autointent.Dataset method)</a>
 </li>
       <li><a href="autoapi/autointent/generation/chat_templates/PromptDescription.html#autointent.generation.chat_templates.PromptDescription.to_messages">to_messages() (autointent.generation.chat_templates.PromptDescription method)</a>
@@ -4815,6 +5014,8 @@
         <li><a href="autoapi/autointent/configs/HFModelConfig.html#autointent.configs.HFModelConfig.tokenizer_config">(autointent.configs.HFModelConfig attribute)</a>
 </li>
       </ul></li>
+      <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.total_disk_gb">total_disk_gb (autointent.advisor.ResourceEstimate property)</a>
+</li>
       <li><a href="autoapi/autointent/server/mcp/PaginationInfo.html#autointent.server.mcp.PaginationInfo.total_items">total_items (autointent.server.mcp.PaginationInfo attribute)</a>
 </li>
       <li><a href="autoapi/autointent/server/mcp/PaginationInfo.html#autointent.server.mcp.PaginationInfo.total_pages">total_pages (autointent.server.mcp.PaginationInfo attribute)</a>
@@ -4939,10 +5140,10 @@
 </li>
       <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.validation_labels">validation_labels() (autointent.context.data_handler.DataHandler method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/context/optimization_info/ScorerArtifact.html#autointent.context.optimization_info.ScorerArtifact.validation_scores">validation_scores (autointent.context.optimization_info.ScorerArtifact attribute)</a>, <a href="autoapi/autointent/context/optimization_info/ScorerArtifact.html#id1">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="autoapi/autointent/configs/DataConfig.html#autointent.configs.DataConfig.validation_size">validation_size (autointent.configs.DataConfig attribute)</a>
 </li>
       <li><a href="autoapi/autointent/context/data_handler/DataHandler.html#autointent.context.data_handler.DataHandler.validation_utterances">validation_utterances() (autointent.context.data_handler.DataHandler method)</a>
@@ -4979,6 +5180,12 @@
       </ul></li>
       <li><a href="autoapi/autointent/configs/VocabConfig.html#autointent.configs.VocabConfig.vocab">vocab (autointent.configs.VocabConfig attribute)</a>
 </li>
+      <li><a href="autoapi/autointent/advisor/HardwareProfile.html#autointent.advisor.HardwareProfile.vram_gb">vram_gb (autointent.advisor.HardwareProfile attribute)</a>
+
+      <ul>
+        <li><a href="autoapi/autointent/advisor/ResourceEstimate.html#autointent.advisor.ResourceEstimate.vram_gb">(autointent.advisor.ResourceEstimate attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

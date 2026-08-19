@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Balancing Datasets with DatasetBalancer" href="balancer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -572,7 +572,7 @@
 <section id="installation">
 <h2><a class="toc-backref" href="#id4" role="doc-backlink">Installation</a><a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>Ensure you have the required dependencies installed:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[dspy]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[dspy]"</span>
 </pre></div>
 </div>
 </section>
@@ -595,14 +595,14 @@
 <h2><a class="toc-backref" href="#id6" role="doc-backlink">Usage Example</a><a class="headerlink" href="#usage-example" title="Link to this heading">#</a></h2>
 <p>Before running the following code, refer to the <a class="reference external" href="https://docs.litellm.ai/docs/providers">LiteLLM documentation</a> for proper model configuration.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OPENAI_API_KEY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;your-api-key&quot;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"OPENAI_API_KEY"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"your-api-key"</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">autointent.custom_types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Split</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;AutoIntent/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"AutoIntent/clinc150_subset"</span><span class="p">)</span>
 <span class="n">evolver</span> <span class="o">=</span> <span class="n">DSPYIncrementalUtteranceEvolver</span><span class="p">(</span>
-    <span class="s2">&quot;openai/gpt-4o-mini&quot;</span>
+    <span class="s2">"openai/gpt-4o-mini"</span>
 <span class="p">)</span>
 
 <span class="n">augmented_dataset</span> <span class="o">=</span> <span class="n">evolver</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span>
@@ -610,14 +610,14 @@
     <span class="n">split_name</span><span class="o">=</span><span class="n">Split</span><span class="o">.</span><span class="n">TEST</span><span class="p">,</span>
     <span class="n">n_evolutions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">mipro_init_params</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;auto&quot;</span><span class="p">:</span> <span class="s2">&quot;light&quot;</span><span class="p">,</span>
+        <span class="s2">"auto"</span><span class="p">:</span> <span class="s2">"light"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">mipro_compile_params</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;minibatch&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">"minibatch"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 
-<span class="n">augmented_dataset</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;clinc150_dspy_augment.csv&quot;</span><span class="p">)</span>
+<span class="n">augmented_dataset</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">"clinc150_dspy_augment.csv"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

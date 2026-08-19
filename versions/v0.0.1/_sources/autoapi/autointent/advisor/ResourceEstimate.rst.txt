@@ -1,0 +1,66 @@
+autointent.advisor.ResourceEstimate
+===================================
+
+.. py:class:: autointent.advisor.ResourceEstimate
+
+   Aggregated resource numbers across the search space.
+
+
+   .. py:attribute:: disk_download_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: disk_cached_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: disk_dump_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: disk_embedding_cache_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: ram_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: vram_gb
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: time_hours
+      :type:  float
+      :value: 0.0
+
+
+
+   .. py:attribute:: parallel_factor
+      :type:  int
+      :value: 1
+
+
+
+   .. py:attribute:: drivers
+      :type:  list[dict[str, Any]]
+      :value: []
+
+
+
+   .. py:property:: total_disk_gb
+      :type: float
+
+

@@ -1,0 +1,34 @@
+autointent.advisor.Severity
+===========================
+
+.. py:class:: autointent.advisor.Severity
+
+   Bases: :py:obj:`str`, :py:obj:`enum.Enum`
+
+
+   How much headroom a finding leaves against the detected budget.
+
+   * ``AMPLE`` — comfortably within budget; informational only.
+   * ``TIGHT`` — expected to fit, but with little margin; the estimate is
+     heuristic, so treat this as "may not fit".
+   * ``OVER`` — the budget is expected to be exceeded.
+
+   A single ``OVER`` finding makes the whole report infeasible
+   (:attr:`PreflightReport.is_feasible` is ``False``) and is what
+   ``Pipeline.fit(preflight="strict")`` raises on.
+
+
+   .. py:attribute:: AMPLE
+      :value: 'ample'
+
+
+
+   .. py:attribute:: TIGHT
+      :value: 'tight'
+
+
+
+   .. py:attribute:: OVER
+      :value: 'over'
+
+

@@ -1,0 +1,37 @@
+autointent.advisor.ReduceToFitError
+===================================
+
+.. py:exception:: autointent.advisor.ReduceToFitError(message, *, pruned_config, last_report)
+
+   Bases: :py:obj:`RuntimeError`
+
+
+   Raised by :func:`reduce_to_fit` when no subset of the search space fits.
+
+   The exception carries the final pruned config and the last report so callers
+   can still inspect what was tried — the review's contract was "raise, don't
+   silently degrade," which is exactly what this signals: even after removing
+   every module the advisor knows how to drop, at least one scoring node has
+   an OVER finding that no further pruning can resolve.
+
+
+   .. py:attribute:: pruned_config
+
+
+   .. py:attribute:: last_report
+
+
+   .. py:method:: nothing_droppable(*, pruned_config, last_report)
+      :classmethod:
+
+
+
+   .. py:method:: scoring_exhausted(*, pruned_config, last_report)
+      :classmethod:
+
+
+
+   .. py:method:: not_converged(max_iters, *, pruned_config, last_report)
+      :classmethod:
+
+

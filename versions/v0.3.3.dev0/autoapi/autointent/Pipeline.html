@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="autointent.OptimizationConfig" href="OptimizationConfig.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -453,6 +453,24 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="advisor/index.html">autointent.advisor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="advisor/PreflightError.html">autointent.advisor.PreflightError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/ReduceToFitError.html">autointent.advisor.ReduceToFitError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/HardwareProfile.html">autointent.advisor.HardwareProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/DatasetStats.html">autointent.advisor.DatasetStats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/Finding.html">autointent.advisor.Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/PreflightReport.html">autointent.advisor.PreflightReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/RecommendationResult.html">autointent.advisor.RecommendationResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/ResourceEstimate.html">autointent.advisor.ResourceEstimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/Severity.html">autointent.advisor.Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/detect_hardware.html">autointent.advisor.detect_hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/run_preflight.html">autointent.advisor.run_preflight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/dataset_stats.html">autointent.advisor.dataset_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/estimate.html">autointent.advisor.estimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/recommend.html">autointent.advisor.recommend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advisor/reduce_to_fit.html">autointent.advisor.reduce_to_fit</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="configs/HashingVectorizerEmbeddingConfig.html">autointent.configs.HashingVectorizerEmbeddingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="configs/OpenaiEmbeddingConfig.html">autointent.configs.OpenaiEmbeddingConfig</a></li>
@@ -948,19 +966,30 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="autointent.Pipeline.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refit_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incompatible_search_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'filter'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.Pipeline.fit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refit_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incompatible_search_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'filter'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preflight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#autointent.Pipeline.fit" title="Link to this definition">#</a></dt>
 <dd><p>Optimize the pipeline from dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dataset</strong> (<a class="reference internal" href="Dataset.html#autointent.Dataset" title="autointent.Dataset"><em>autointent.Dataset</em></a>) – dataset for optimization.</p></li>
 <li><p><strong>refit_after</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – whether to refit on whole data after optimization. Valid only for hold-out validaiton.</p></li>
-<li><p><strong>sampler</strong> – sampler type to use.</p></li>
-<li><p><strong>incompatible_search_space</strong> (<em>autointent.custom_types.SearchSpaceValidationMode</em>) – wow to handle data-incompatible modules occurring in search space.</p></li>
+<li><p><strong>incompatible_search_space</strong> (<em>autointent.custom_types.SearchSpaceValidationMode</em>) – how to handle data-incompatible modules occurring in search space.</p></li>
+<li><p><strong>preflight</strong> (<em>PreflightMode</em>) – <strong>experimental</strong> gate that runs
+<a class="reference internal" href="advisor/run_preflight.html#autointent.advisor.run_preflight" title="autointent.advisor.run_preflight"><code class="xref py py-func docutils literal notranslate"><span class="pre">autointent.advisor.run_preflight()</span></code></a> over the pipeline’s
+effective config + dataset before any heavy work.
+<code class="docutils literal notranslate"><span class="pre">&quot;off&quot;</span></code> (default) skips it entirely. <code class="docutils literal notranslate"><span class="pre">&quot;warn&quot;</span></code> logs findings —
+INFO for AMPLE, WARNING for TIGHT, ERROR for OVER — but never
+raises; note it probes the HF Hub for model metadata, so it adds
+network round-trips. <code class="docutils literal notranslate"><span class="pre">&quot;strict&quot;</span></code> additionally raises
+<a class="reference internal" href="advisor/PreflightError.html#autointent.advisor.PreflightError" title="autointent.advisor.PreflightError"><code class="xref py py-class docutils literal notranslate"><span class="pre">autointent.advisor.PreflightError</span></code></a> when any finding has
+severity OVER, so unfeasible runs abort before fit.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If pipeline is in inference mode.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If pipeline is in inference mode.</p></li>
+<li><p><a class="reference internal" href="advisor/PreflightError.html#autointent.advisor.PreflightError" title="autointent.advisor.PreflightError"><strong>PreflightError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">preflight=&quot;strict&quot;</span></code> and any OVER finding is produced.</p></li>
+</ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="Context.html#autointent.Context" title="autointent.Context">autointent.Context</a></p>

@@ -1,0 +1,64 @@
+autointent.generation.utterances.UtteranceGenerator
+===================================================
+
+.. py:class:: autointent.generation.utterances.UtteranceGenerator(generator, prompt_maker, async_mode = False)
+
+   Basic generation of new utterances from existing ones.
+
+   This augmentation method simply prompts LLM to look at existing examples
+   and generate similar. Additionally, it can consider some aspects of style,
+   punctuation, and length of the desired generations.
+
+   :param generator: Generator instance for generating utterances.
+   :param prompt_maker: Prompt maker instance for generating prompts.
+   :param async_mode: Whether to use asynchronous mode for generation.
+
+   Usage
+   -----
+
+   .. code-block:: python
+
+       from autointent import Dataset
+       from autointent.generation import Generator
+       from autointent.generation.utterances import UtteranceGenerator
+       from autointent.generation.chat_templates import RussianSynthesizerTemplate
+
+       dataset = Dataset.from_json(path_to_json)
+       generator = Generator()
+       prompt = RussianSynthesizerTemplate(dataset)
+       augmenter = UtteranceGenerator(generator, prompt_maker=prompt)
+       augmenter.augment(dataset)
+
+
+
+   .. py:attribute:: generator
+
+
+   .. py:attribute:: prompt_maker
+
+
+   .. py:attribute:: async_mode
+      :value: False
+
+
+
+   .. py:method:: __call__(intent_data, n_generations)
+
+      Call the generator to generate new utterances.
+
+      :param intent_data: Intent data for which to generate utterances.
+      :param n_generations: Number of utterances to generate.
+
+
+
+   .. py:method:: augment(dataset, split_name = Split.TRAIN, n_generations = 5, update_split = True, batch_size = 4)
+
+      Add LLM-generated samples to some split of dataset.
+
+      :param dataset: Dataset object.
+      :param split_name: Dataset split (default is TRAIN).
+      :param n_generations: Number of utterances to generate per intent.
+      :param update_split: Whether to update the dataset split.
+      :param batch_size: Batch size for async generation.
+
+

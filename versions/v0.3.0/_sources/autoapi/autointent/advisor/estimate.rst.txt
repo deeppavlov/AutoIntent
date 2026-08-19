@@ -1,0 +1,16 @@
+autointent.advisor.estimate
+===========================
+
+.. py:function:: autointent.advisor.estimate(target, *, stats = None, budget_vram_gb = None)
+
+   Estimate what a preset (or YAML config path) will cost on the local hardware.
+
+   :param target: Bundled preset name (e.g. ``'transformers-light'``) or a YAML
+                  config path. The friendly name surfaced in the report is the file
+                  stem for paths and the preset name otherwise.
+   :param stats: Dataset stats to score against. Defaults to a placeholder if
+                 ``None``.
+   :param budget_vram_gb: Optional VRAM-budget override for the hardware probe.
+
+   :returns: ``PreflightReport`` covering resource / data / config phases.
+

@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="autointent.generation.chat_templates.InformalEvolution" href="InformalEvolution.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../../../../_static/searchtools.js"></script>
@@ -453,6 +453,24 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../advisor/index.html">autointent.advisor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/PreflightError.html">autointent.advisor.PreflightError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/ReduceToFitError.html">autointent.advisor.ReduceToFitError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/HardwareProfile.html">autointent.advisor.HardwareProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/DatasetStats.html">autointent.advisor.DatasetStats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/Finding.html">autointent.advisor.Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/PreflightReport.html">autointent.advisor.PreflightReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/RecommendationResult.html">autointent.advisor.RecommendationResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/ResourceEstimate.html">autointent.advisor.ResourceEstimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/Severity.html">autointent.advisor.Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/detect_hardware.html">autointent.advisor.detect_hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/run_preflight.html">autointent.advisor.run_preflight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/dataset_stats.html">autointent.advisor.dataset_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/estimate.html">autointent.advisor.estimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/recommend.html">autointent.advisor.recommend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../advisor/reduce_to_fit.html">autointent.advisor.reduce_to_fit</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/HashingVectorizerEmbeddingConfig.html">autointent.configs.HashingVectorizerEmbeddingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../configs/OpenaiEmbeddingConfig.html">autointent.configs.OpenaiEmbeddingConfig</a></li>
@@ -885,7 +903,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.generation.chat_templates.PromptDescription.system_text">
 <span class="sig-name descname"><span class="pre">system_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="headerlink" href="#autointent.generation.chat_templates.PromptDescription.system_text" title="Link to this definition">#</a></dt>
-<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
 <span class="sd">Your task is to write a description of the intent.</span>
 
 <span class="sd">You are given the name of the intent, user intentions related to it. The description should be:</span>
@@ -903,7 +921,7 @@
 <span class="sd">name:</span>
 <span class="sd">activate_my_card</span>
 <span class="sd">user utterances:</span>
-<span class="sd">- Please help me with my card. It won&#39;t activate.</span>
+<span class="sd">- Please help me with my card. It won't activate.</span>
 <span class="sd">- I tried but am unable to activate my card.</span>
 <span class="sd">- I want to start using my card.</span>
 
@@ -917,7 +935,7 @@
 
 <span class="sd">Output:</span>
 <span class="sd">User wants to know why his beneficiary is not allowed.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 </pre></div>
 </div>
 </details></dd></dl>
@@ -925,12 +943,12 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="autointent.generation.chat_templates.PromptDescription.user_text">
 <span class="sig-name descname"><span class="pre">user_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Multiline-String</span></em><a class="headerlink" href="#autointent.generation.chat_templates.PromptDescription.user_text" title="Link to this definition">#</a></dt>
-<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<dd><details><summary>Show Value</summary><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""</span>
 <span class="sd">name:</span>
 <span class="sd">{intent_name}</span>
 <span class="sd">user utterances:</span>
 <span class="sd">{user_utterances}</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 </pre></div>
 </div>
 </details><p>The template for the prompt to generate descriptions for intents.

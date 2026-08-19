@@ -1,0 +1,24 @@
+autointent.advisor.recommend
+============================
+
+.. py:function:: autointent.advisor.recommend(*, stats = None, presets = None, budget_vram_gb = None, budget_time_h = None)
+
+   Walk bundled presets and return the best feasible fit plus all per-preset reports.
+
+   :param stats: Dataset stats to score against. Defaults to a placeholder if ``None``.
+   :param presets: Override of the preset list (defaults to ``PRESET_COST_ORDER``).
+   :param budget_vram_gb: Optional VRAM-budget override for the hardware probe.
+   :param budget_time_h: Optional wall-time ceiling in hours; presets exceeding it
+                         get an extra ``Severity.OVER`` finding so they drop out of the
+                         feasible ranking.
+
+   :returns: ``RecommendationResult`` with the chosen preset name and full results list.
+
+   .. note::
+
+      Among feasible presets we pick the heaviest one that still fits the
+      hardware budget — "use what you have" semantics. This is a *cost*
+      ranking, not a quality ranking: a heavier preset is not strictly better
+      and may overfit on small datasets where a classic-* preset would win on
+      accuracy. Override ``presets=`` if you want a different ranking.
+

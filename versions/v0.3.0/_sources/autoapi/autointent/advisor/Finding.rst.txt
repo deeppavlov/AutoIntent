@@ -1,0 +1,25 @@
+autointent.advisor.Finding
+==========================
+
+.. py:class:: autointent.advisor.Finding
+
+   A single advisor finding rendered as one line in the summary.
+
+
+   .. py:attribute:: phase
+      :type:  Phase
+
+
+   .. py:attribute:: severity
+      :type:  Severity
+
+
+   .. py:attribute:: message
+      :type:  str
+
+
+   .. py:attribute:: metric
+      :type:  str | None
+      :value: None
+
+

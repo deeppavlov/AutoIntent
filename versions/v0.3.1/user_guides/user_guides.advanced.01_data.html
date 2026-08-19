@@ -53,7 +53,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Advanced Usage" href="index_advanced_usage.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -584,38 +584,38 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a dataset with out-of-scope samples</span>
 <span class="n">banking_with_oos</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
         <span class="c1"># In-domain samples</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s my account balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Check my current balance&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to transfer money to my friend&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How do I send funds to someone?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Cancel my last transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Reverse the payment I just made&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's my account balance?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Check my current balance"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to transfer money to my friend"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How do I send funds to someone?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Cancel my last transaction"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Reverse the payment I just made"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
         <span class="c1"># Out-of-scope samples (no label field)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather like today?&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Tell me a joke&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How do I cook pasta?&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What time is it?&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I love pizza&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's the weather like today?"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Tell me a joke"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How do I cook pasta?"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What time is it?"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I love pizza"</span><span class="p">},</span>
     <span class="p">],</span>
-    <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Show me my current balance&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Transfer $100 to my savings&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Stop my recent payment&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s your favorite movie?&quot;</span><span class="p">},</span>  <span class="c1"># OOS</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How&#39;s the traffic today?&quot;</span><span class="p">},</span>  <span class="c1"># OOS</span>
+    <span class="s2">"test"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Show me my current balance"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Transfer $100 to my savings"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Stop my recent payment"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's your favorite movie?"</span><span class="p">},</span>  <span class="c1"># OOS</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How's the traffic today?"</span><span class="p">},</span>  <span class="c1"># OOS</span>
     <span class="p">],</span>
-    <span class="s2">&quot;intents&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;balance_inquiry&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;money_transfer&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;transaction_cancellation&quot;</span><span class="p">},</span>
+    <span class="s2">"intents"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"balance_inquiry"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"money_transfer"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"transaction_cancellation"</span><span class="p">},</span>
     <span class="p">],</span>
 <span class="p">}</span>
 
 <span class="n">dataset_with_oos</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">banking_with_oos</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Dataset with OOS samples created&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Available splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset_with_oos</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dataset with OOS samples created"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Available splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset_with_oos</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -643,21 +643,21 @@ Available splits: [&#39;train&#39;, &#39;test&#39;]
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example of well-curated OOS samples for a banking domain</span>
 <span class="n">sophisticated_oos_data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
         <span class="c1"># In-scope samples</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s my account balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to transfer money&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's my account balance?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to transfer money"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
         <span class="c1"># Sophisticated out-of-scope samples</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, how are you?&quot;</span><span class="p">},</span>  <span class="c1"># Greeting</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Thanks for your help!&quot;</span><span class="p">},</span>  <span class="c1"># Courtesy</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What other services do you offer?&quot;</span><span class="p">},</span>  <span class="c1"># Domain-adjacent</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;m having trouble with the app&quot;</span><span class="p">},</span>  <span class="c1"># Technical support (different domain)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you recommend a good investment?&quot;</span><span class="p">},</span>  <span class="c1"># Financial advice (borderline)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What are your business hours?&quot;</span><span class="p">},</span>  <span class="c1"># Information request (different domain)</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Hello, how are you?"</span><span class="p">},</span>  <span class="c1"># Greeting</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Thanks for your help!"</span><span class="p">},</span>  <span class="c1"># Courtesy</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What other services do you offer?"</span><span class="p">},</span>  <span class="c1"># Domain-adjacent</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I'm having trouble with the app"</span><span class="p">},</span>  <span class="c1"># Technical support (different domain)</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Can you recommend a good investment?"</span><span class="p">},</span>  <span class="c1"># Financial advice (borderline)</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What are your business hours?"</span><span class="p">},</span>  <span class="c1"># Information request (different domain)</span>
     <span class="p">],</span>
-    <span class="s2">&quot;intents&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;balance_inquiry&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;money_transfer&quot;</span><span class="p">},</span>
+    <span class="s2">"intents"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"balance_inquiry"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"money_transfer"</span><span class="p">},</span>
     <span class="p">],</span>
 <span class="p">}</span>
 
@@ -679,46 +679,46 @@ Available splits: [&#39;train&#39;, &#39;test&#39;]
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a dataset with rich intent metadata</span>
 <span class="n">comprehensive_banking_data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s my account balance?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Check my current balance&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How much money do I have?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to transfer money&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Send funds to my friend&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Make a payment to someone&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Cancel my last transaction&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Reverse this payment&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Stop my transfer&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need help with my account&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can someone assist me?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I have a question about my account&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's my account balance?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Check my current balance"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How much money do I have?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to transfer money"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Send funds to my friend"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Make a payment to someone"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Cancel my last transaction"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Reverse this payment"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Stop my transfer"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I need help with my account"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Can someone assist me?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I have a question about my account"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
     <span class="p">],</span>
-    <span class="s2">&quot;intents&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"intents"</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;balance_inquiry&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;User wants to check their account balance or available funds&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"balance_inquiry"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"User wants to check their account balance or available funds"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;money_transfer&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;User wants to transfer money or make a payment to another person or account&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"money_transfer"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"User wants to transfer money or make a payment to another person or account"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;transaction_cancellation&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;User wants to cancel, reverse, or stop a transaction or payment&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"transaction_cancellation"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"User wants to cancel, reverse, or stop a transaction or payment"</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;general_help&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;User is requesting general assistance or has a question&quot;</span><span class="p">,</span>
+            <span class="s2">"id"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"general_help"</span><span class="p">,</span>
+            <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"User is requesting general assistance or has a question"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">],</span>
 <span class="p">}</span>
 
 <span class="n">rich_dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">comprehensive_banking_data</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Dataset with rich intent metadata created&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Dataset with rich intent metadata created"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -739,10 +739,10 @@ Available splits: [&#39;train&#39;, &#39;test&#39;]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Examine the intent metadata</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Intent metadata breakdown:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Intent metadata breakdown:</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">intent</span> <span class="ow">in</span> <span class="n">rich_dataset</span><span class="o">.</span><span class="n">intents</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🎯 Intent: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Description: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"🎯 Intent: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Description: </span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -789,22 +789,22 @@ calculate semantic similarity between utterances and intent descriptions</p></li
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load a larger dataset for demonstration</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">&quot;DeepPavlov/clinc150_subset&quot;</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_hub</span><span class="p">(</span><span class="s2">"DeepPavlov/clinc150_subset"</span><span class="p">)</span>
 
 <span class="c1"># Dataset analysis</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;📊 Dataset Analysis&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total training samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_0&#39;</span><span class="p">])</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_1&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of intents: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">intents</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"📊 Dataset Analysis"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset splits: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total training samples: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_0'</span><span class="p">])</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">'train_1'</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of intents: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">intents</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Examine class distribution</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
 
-<span class="n">label_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">][</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Class distribution (top 5):&quot;</span><span class="p">)</span>
+<span class="n">label_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">][</span><span class="s2">"label"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Class distribution (top 5):"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">label_counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
     <span class="n">intent_name</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">intents</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">intent_name</span><span class="si">}</span><span class="s2"> (label </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">intent_name</span><span class="si">}</span><span class="s2"> (label </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -834,22 +834,22 @@ Class distribution (top 5):
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Filter samples by length</span>
-<span class="n">short_utterances</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;utterance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Short utterances (≤5 words): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">short_utterances</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+<span class="n">short_utterances</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">]</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">"utterance"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Short utterances (≤5 words): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">short_utterances</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 
 
 <span class="c1"># Example: Add computed features</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">add_utterance_length</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
-    <span class="n">example</span><span class="p">[</span><span class="s2">&quot;utterance_length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;utterance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">example</span><span class="p">[</span><span class="s2">"utterance_length"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">"utterance"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">example</span>
 
 
-<span class="n">enriched_train</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_utterance_length</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added utterance_length feature to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enriched_train</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+<span class="n">enriched_train</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train_0"</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_utterance_length</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Added utterance_length feature to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">enriched_train</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 
 <span class="c1"># Show example with new feature</span>
 <span class="n">sample</span> <span class="o">=</span> <span class="n">enriched_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sample: &#39;</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;utterance&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; (length: </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">&#39;utterance_length&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> words)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Sample: '</span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">'utterance'</span><span class="p">]</span><span class="si">}</span><span class="s2">' (length: </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="s1">'utterance_length'</span><span class="p">]</span><span class="si">}</span><span class="s2"> words)"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -873,13 +873,13 @@ Sample: &#39;do they take reservations at mcdonalds&#39; (length: 6 words)
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Create a custom split based on utterance characteristics</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_length_based_splits</span><span class="p">(</span><span class="n">dataset_split</span><span class="p">,</span> <span class="n">short_threshold</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">long_threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split data based on utterance length for targeted evaluation.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Split data based on utterance length for targeted evaluation."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_short</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;utterance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="n">short_threshold</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">"utterance"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="n">short_threshold</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">is_long</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">&quot;utterance&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="n">long_threshold</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">example</span><span class="p">[</span><span class="s2">"utterance"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="n">long_threshold</span>
 
     <span class="n">short_split</span> <span class="o">=</span> <span class="n">dataset_split</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_short</span><span class="p">)</span>
     <span class="n">long_split</span> <span class="o">=</span> <span class="n">dataset_split</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_long</span><span class="p">)</span>
@@ -887,10 +887,10 @@ Sample: &#39;do they take reservations at mcdonalds&#39; (length: 6 words)
     <span class="k">return</span> <span class="n">short_split</span><span class="p">,</span> <span class="n">long_split</span>
 
 
-<span class="n">short_test</span><span class="p">,</span> <span class="n">long_test</span> <span class="o">=</span> <span class="n">create_length_based_splits</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Custom splits created:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Short utterances: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">short_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Long utterances: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">long_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+<span class="n">short_test</span><span class="p">,</span> <span class="n">long_test</span> <span class="o">=</span> <span class="n">create_length_based_splits</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">"test"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Custom splits created:"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Short utterances: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">short_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Long utterances: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">long_test</span><span class="p">)</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

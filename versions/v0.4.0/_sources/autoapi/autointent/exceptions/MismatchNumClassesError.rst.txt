@@ -1,0 +1,20 @@
+autointent.exceptions.MismatchNumClassesError
+=============================================
+
+.. py:exception:: autointent.exceptions.MismatchNumClassesError(message = None)
+
+   Bases: :py:obj:`Exception`
+
+
+   Exception raised when the data contains an incompatible number of classes.
+
+   This error indicates that the number of classes in the input data does not match
+   the expected number of classes for the module.
+
+   :param message: Error message, defaults to a standard class incompatibility message
+
+
+   .. py:attribute:: message
+      :value: "Provided scores number don't match with number of classes which module was trained on."
+
+

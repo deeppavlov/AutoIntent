@@ -1,0 +1,83 @@
+autointent.VectorIndex
+======================
+
+.. py:class:: autointent.VectorIndex(embedder_config, config)
+
+   A class for managing a vector index and embedding models.
+
+   This class allows adding, querying, and managing embeddings and their associated
+   labels for efficient nearest neighbor search.
+
+
+   .. py:attribute:: embedder
+      :type:  autointent._wrappers.Embedder
+
+
+   .. py:attribute:: index
+      :type:  autointent._wrappers.vector_index.base_backend.BaseIndexBackend
+
+
+   .. py:attribute:: config
+
+
+   .. py:method:: add(texts, labels)
+
+      Add texts and their corresponding labels to the index.
+
+      The first ``add()`` call creates the backend; per the backend contract, a fresh
+      backend's first write starts from empty index contents (fit-replaces semantics) —
+      for OpenSearch this clears any pre-existing documents in the configured index.
+      Subsequent calls append.
+
+      :param texts: List of input texts.
+      :param labels: List of labels corresponding to the texts.
+
+
+
+   .. py:method:: clear_ram()
+
+      Clear the vector index from RAM.
+
+
+
+   .. py:method:: get_all_embeddings()
+
+      Retrieve all embeddings stored in the index.
+
+      :returns: Array of all embeddings.
+
+      :raises ValueError: If the index has not been created yet.
+
+
+
+   .. py:method:: query(queries, k)
+
+      Query the index to retrieve nearest neighbors.
+
+      :param queries: List of text queries or embedding vectors.
+      :param k: Number of nearest neighbors to return for each query.
+
+      :returns:     - `distances`: Corresponding distances for each neighbor.
+                    - `documents`: Corresponding documents for each neighbor.
+      :rtype: A tuple containing
+
+
+
+   .. py:method:: dump(dir_path)
+
+      Save the index and associated data to disk.
+
+      :param dir_path: Directory path where the data will be stored.
+
+
+
+   .. py:method:: load(dir_path, embedder_override_config = None)
+      :classmethod:
+
+
+      Load the index and associated data from disk.
+
+      :param dir_path: Directory path where the data is stored.
+      :param embedder_override_config: override some settings like device and inference batch size
+
+

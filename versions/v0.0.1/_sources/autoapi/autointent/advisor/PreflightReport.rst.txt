@@ -1,0 +1,84 @@
+autointent.advisor.PreflightReport
+==================================
+
+.. py:class:: autointent.advisor.PreflightReport
+
+   One report covering all three phases.
+
+
+   .. py:attribute:: findings
+      :type:  list[Finding]
+      :value: []
+
+
+
+   .. py:attribute:: resource
+      :type:  ResourceEstimate
+
+
+   .. py:attribute:: hardware
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: dataset
+      :type:  dict[str, Any]
+
+
+   .. py:attribute:: preset_name
+      :type:  str | None
+      :value: None
+
+
+
+   .. py:attribute:: low_confidence
+      :type:  bool
+      :value: False
+
+
+
+   .. py:attribute:: notes
+      :type:  list[str]
+      :value: []
+
+
+
+   .. py:method:: add(phase, severity, message, metric = None)
+
+      Append a :class:`Finding` to this report.
+
+      :param phase: which check produced it — ``"resource"``, ``"data"`` or ``"config"``.
+      :param severity: headroom level; a single ``OVER`` makes the report infeasible.
+      :param message: one-line human-readable explanation, shown as-is in reports.
+      :param metric: short budget name the finding is about (``"vram"``, ``"ram"``,
+                     ``"disk"``, ``"time"``), or ``None`` for findings not tied to a budget.
+
+
+
+   .. py:property:: headroom
+      :type: Severity
+
+
+      Worst headroom level across all findings — the column shown in CLI reports.
+
+
+   .. py:property:: is_feasible
+      :type: bool
+
+
+      True unless some finding is OVER.
+
+      :type: Whether the run is expected to fit
+
+
+   .. py:method:: to_dict()
+
+      Render the report as JSON-serializable data.
+
+      Severities become their string values, and the derived ``headroom`` and
+      ``is_feasible`` properties are included as keys. This is what the CLI's
+      ``--json`` output emits.
+
+      :returns: A plain dict of the report, its findings, resource estimate,
+                hardware and dataset summaries.
+
+

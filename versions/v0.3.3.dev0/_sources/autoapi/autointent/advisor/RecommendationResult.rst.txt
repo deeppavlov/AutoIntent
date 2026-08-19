@@ -1,0 +1,21 @@
+autointent.advisor.RecommendationResult
+=======================================
+
+.. py:class:: autointent.advisor.RecommendationResult
+
+   Output of the recommend workflow: ranked per-preset reports plus the pick.
+
+   ``chosen`` is the best feasible preset name, or ``None`` if none fit.
+   ``results`` is the full per-preset report list in evaluation order.
+
+
+   .. py:attribute:: chosen
+      :type:  str | None
+
+
+   .. py:attribute:: results
+      :type:  list[tuple[str, PreflightReport]]
+
+
+   .. py:method:: to_dict()
+

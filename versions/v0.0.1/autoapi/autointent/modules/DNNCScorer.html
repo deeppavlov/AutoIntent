@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -415,6 +415,24 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advisor/index.html">autointent.advisor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/PreflightError.html">autointent.advisor.PreflightError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/ReduceToFitError.html">autointent.advisor.ReduceToFitError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/HardwareProfile.html">autointent.advisor.HardwareProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/DatasetStats.html">autointent.advisor.DatasetStats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/Finding.html">autointent.advisor.Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/PreflightReport.html">autointent.advisor.PreflightReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/RecommendationResult.html">autointent.advisor.RecommendationResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/ResourceEstimate.html">autointent.advisor.ResourceEstimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/Severity.html">autointent.advisor.Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/detect_hardware.html">autointent.advisor.detect_hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/run_preflight.html">autointent.advisor.run_preflight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/dataset_stats.html">autointent.advisor.dataset_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/estimate.html">autointent.advisor.estimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/recommend.html">autointent.advisor.recommend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/reduce_to_fit.html">autointent.advisor.reduce_to_fit</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../configs/HashingVectorizerEmbeddingConfig.html">autointent.configs.HashingVectorizerEmbeddingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/OpenaiEmbeddingConfig.html">autointent.configs.OpenaiEmbeddingConfig</a></li>
@@ -851,16 +869,16 @@ train a logistic regression head on top of cross-encoder features.</p>
 <section id="examples">
 <h2>Examples:<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.modules.scoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">DNNCScorer</span>
-<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;what is your name?&quot;</span><span class="p">,</span> <span class="s2">&quot;how are you?&quot;</span><span class="p">]</span>
+<span class="n">utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"what is your name?"</span><span class="p">,</span> <span class="s2">"how are you?"</span><span class="p">]</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="n">scorer</span> <span class="o">=</span> <span class="n">DNNCScorer</span><span class="p">(</span>
-    <span class="n">cross_encoder_config</span><span class="o">=</span><span class="s2">&quot;cross-encoder/ms-marco-MiniLM-L6-v2&quot;</span><span class="p">,</span>
-    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">&quot;sergeyzh/rubert-tiny-turbo&quot;</span><span class="p">,</span>
+    <span class="n">cross_encoder_config</span><span class="o">=</span><span class="s2">"cross-encoder/ms-marco-MiniLM-L6-v2"</span><span class="p">,</span>
+    <span class="n">embedder_config</span><span class="o">=</span><span class="s2">"sergeyzh/rubert-tiny-turbo"</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">utterances</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
-<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Hello!&quot;</span><span class="p">,</span> <span class="s2">&quot;What&#39;s up?&quot;</span><span class="p">]</span>
+<span class="n">test_utterances</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Hello!"</span><span class="p">,</span> <span class="s2">"What's up?"</span><span class="p">]</span>
 <span class="n">scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_utterances</span><span class="p">)</span>
 </pre></div>
 </div>

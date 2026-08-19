@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Learn" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -614,7 +614,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">autointent.configs</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataConfig</span>
 
 <span class="n">data_config</span> <span class="o">=</span> <span class="n">DataConfig</span><span class="p">(</span>
-    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span>           <span class="c1"># Cross-validation</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">"cv"</span><span class="p">,</span>           <span class="c1"># Cross-validation</span>
     <span class="n">n_folds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>             <span class="c1"># 5-fold CV</span>
     <span class="n">validation_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>   <span class="c1"># 20% for validation in HO</span>
     <span class="n">separation_ratio</span><span class="o">=</span><span class="mf">0.5</span>   <span class="c1"># Prevent data leakage between modules</span>
@@ -644,11 +644,11 @@
 <p><strong>Presets as Multi-Objective Solutions</strong></p>
 <p>AutoIntent provides presets that balance different objectives:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Different computational budgets</span>
-<span class="n">pipeline_light</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-light&quot;</span><span class="p">)</span>    <span class="c1"># Speed-focused</span>
-<span class="n">pipeline_heavy</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;classic-heavy&quot;</span><span class="p">)</span>    <span class="c1"># Performance-focused</span>
+<span class="n">pipeline_light</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-light"</span><span class="p">)</span>    <span class="c1"># Speed-focused</span>
+<span class="n">pipeline_heavy</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"classic-heavy"</span><span class="p">)</span>    <span class="c1"># Performance-focused</span>
 
 <span class="c1"># Different model types</span>
-<span class="n">pipeline_zero_shot</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">&quot;zero-shot-encoders&quot;</span><span class="p">)</span>  <span class="c1"># No training data</span>
+<span class="n">pipeline_zero_shot</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_preset</span><span class="p">(</span><span class="s2">"zero-shot-encoders"</span><span class="p">)</span>  <span class="c1"># No training data</span>
 </pre></div>
 </div>
 </section>
@@ -675,7 +675,7 @@
 <h2>Practical Optimization Strategies<a class="headerlink" href="#practical-optimization-strategies" title="Link to this heading">#</a></h2>
 <p><strong>Budget Allocation</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">hpo_config</span> <span class="o">=</span> <span class="n">HPOConfig</span><span class="p">(</span>
-    <span class="n">sampler</span><span class="o">=</span><span class="s2">&quot;tpe&quot;</span><span class="p">,</span>
+    <span class="n">sampler</span><span class="o">=</span><span class="s2">"tpe"</span><span class="p">,</span>
     <span class="n">n_trials</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>              <span class="c1"># Total optimization budget</span>
     <span class="n">n_startup_trials</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>      <span class="c1"># Random initialization</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>             <span class="c1"># 1-hour time limit</span>
@@ -687,8 +687,8 @@
 <p>AutoIntent can resume interrupted optimization. This is the approximate code we use for creating optuna studies:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Optimization state is automatically saved</span>
 <span class="n">study</span> <span class="o">=</span> <span class="n">optuna</span><span class="o">.</span><span class="n">create_study</span><span class="p">(</span>
-    <span class="n">study_name</span><span class="o">=</span><span class="s2">&quot;intent_classification&quot;</span><span class="p">,</span>
-    <span class="n">storage</span><span class="o">=</span><span class="s2">&quot;sqlite:///optuna.db&quot;</span><span class="p">,</span>
+    <span class="n">study_name</span><span class="o">=</span><span class="s2">"intent_classification"</span><span class="p">,</span>
+    <span class="n">storage</span><span class="o">=</span><span class="s2">"sqlite:///optuna.db"</span><span class="p">,</span>
     <span class="n">load_if_exists</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>

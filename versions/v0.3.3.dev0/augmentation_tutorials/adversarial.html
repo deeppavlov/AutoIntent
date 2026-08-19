@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="DSPY Augmentation" href="dspy_augmentation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -556,7 +556,7 @@
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
 <p>Install the OpenAI-backed generator extra (the <code class="docutils literal notranslate"><span class="pre">Generator</span></code> wrapper loads the OpenAI client):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;autointent[openai]&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"autointent[openai]"</span>
 </pre></div>
 </div>
 <p>Set <code class="docutils literal notranslate"><span class="pre">OPENAI_API_KEY</span></code> (and optional base URL) as required by your deployment. No separate DSPy extra is needed for this augmentation path.</p>
@@ -569,11 +569,11 @@
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span><span class="o">...</span><span class="p">})</span>  <span class="c1"># your train split, with intent names if you use them in prompts</span>
 
-<span class="n">llm</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<span class="n">llm</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">model_name</span><span class="o">=</span><span class="s2">"gpt-4o-mini"</span><span class="p">)</span>
 <span class="n">critic</span> <span class="o">=</span> <span class="n">CriticHumanLike</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span>
 <span class="n">augmenter</span> <span class="o">=</span> <span class="n">HumanUtteranceGenerator</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span> <span class="n">critic</span><span class="o">=</span><span class="n">critic</span><span class="p">,</span> <span class="n">async_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="n">new_samples</span> <span class="o">=</span> <span class="n">augmenter</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">split_name</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">n_final_per_class</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">new_samples</span> <span class="o">=</span> <span class="n">augmenter</span><span class="o">.</span><span class="n">augment</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">split_name</span><span class="o">=</span><span class="s2">"train"</span><span class="p">,</span> <span class="n">n_final_per_class</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>See the API reference for full argument lists (<a class="reference internal" href="../autoapi/autointent/generation/utterances/HumanUtteranceGenerator.html#autointent.generation.utterances.HumanUtteranceGenerator" title="autointent.generation.utterances.HumanUtteranceGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">HumanUtteranceGenerator</span></code></a>, <a class="reference internal" href="../autoapi/autointent/generation/utterances/CriticHumanLike.html#autointent.generation.utterances.CriticHumanLike" title="autointent.generation.utterances.CriticHumanLike"><code class="xref py py-class docutils literal notranslate"><span class="pre">CriticHumanLike</span></code></a>).</p>

@@ -1,0 +1,13 @@
+autointent.advisor.PreflightError
+=================================
+
+.. py:exception:: autointent.advisor.PreflightError(findings)
+
+   Bases: :py:obj:`RuntimeError`
+
+
+   Raised when ``Pipeline.fit(preflight="strict")`` finds OVER-budget resources.
+
+
+   .. py:attribute:: findings
+

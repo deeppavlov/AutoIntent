@@ -1,0 +1,22 @@
+autointent.advisor.dataset_stats
+================================
+
+.. py:function:: autointent.advisor.dataset_stats(dataset)
+
+   Summarize an in-memory :class:`~autointent.Dataset` for the advisor.
+
+   Reads the train split (``train``, or ``train_0`` once the dataset has been
+   split) to count samples and measure utterance length — average and 95th
+   percentile word counts, over at most the first 1000 rows — and takes
+   ``n_classes``, ``multilabel`` and ``has_descriptions`` from the dataset
+   itself. Returns a placeholder when no train split is present.
+
+   This is how a caller gets from a ``Dataset`` to the ``DatasetStats`` that
+   :func:`run_preflight` and :func:`reduce_to_fit` require. Use
+   :meth:`DatasetStats.placeholder` instead when no dataset exists yet and you
+   only want to size a search space against hypothetical numbers.
+
+   :param dataset: the dataset the pipeline would be fitted on.
+
+   :returns: Stats describing that dataset, with ``source="dataset:in-memory"``.
+

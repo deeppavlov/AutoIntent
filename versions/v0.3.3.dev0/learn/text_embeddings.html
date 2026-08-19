@@ -52,7 +52,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -64,7 +64,7 @@
     <link rel="prev" title="Optimization" href="optimization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -591,13 +591,13 @@
 
 <span class="c1"># Intent descriptions instead of training data</span>
 <span class="n">descriptions</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;User wants to book a flight&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;User wants to cancel a reservation&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;User asks about flight status&quot;</span>
+    <span class="s2">"User wants to book a flight"</span><span class="p">,</span>
+    <span class="s2">"User wants to cancel a reservation"</span><span class="p">,</span>
+    <span class="s2">"User asks about flight status"</span>
 <span class="p">]</span>
 
 <span class="n">scorer</span><span class="o">.</span><span class="n">fit</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">descriptions</span><span class="p">)</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">&quot;I want to fly to London&quot;</span><span class="p">])</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="s2">"I want to fly to London"</span><span class="p">])</span>
 </pre></div>
 </div>
 <p><strong>Few-Shot Learning</strong></p>

@@ -1,0 +1,124 @@
+autointent.modules.decision.ThresholdDecision
+=============================================
+
+.. py:class:: autointent.modules.decision.ThresholdDecision(thresh = 0.5)
+
+   Bases: :py:obj:`autointent.modules.base.BaseDecision`
+
+
+   Threshold predictor module.
+
+   ThresholdDecision uses a predefined threshold (or array of thresholds) to predict
+   labels for single-label or multi-label classification tasks.
+
+   :param thresh: Threshold for the scores, shape (n_classes,) or float
+
+   Examples:
+   --------
+   Single-label classification
+   ===========================
+   .. testcode::
+
+       from autointent.modules import ThresholdDecision
+       import numpy as np
+       scores = np.array([[0.2, 0.8], [0.6, 0.4], [0.1, 0.9]])
+       labels = [1, 0, 1]
+       threshold = 0.5
+       predictor = ThresholdDecision(thresh=threshold)
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.5, 0.5]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [1, 0]
+
+   Multi-label classification
+   ==========================
+   .. testcode::
+
+       labels = [[1, 0], [0, 1], [1, 1]]
+       predictor = ThresholdDecision(thresh=[0.5, 0.5])
+       predictor.fit(scores, labels)
+       test_scores = np.array([[0.3, 0.7], [0.6, 0.4]])
+       predictions = predictor.predict(test_scores)
+       print(predictions)
+
+   .. testoutput::
+
+       [[0, 1], [1, 0]]
+
+
+
+   .. py:attribute:: tags
+      :type:  list[autointent.schemas.Tag] | None
+
+
+   .. py:attribute:: name
+      :value: 'threshold'
+
+
+      Name of the module to reference in search space configuration.
+
+
+   .. py:attribute:: supports_oos
+      :value: True
+
+
+      Whether the module supports oos data
+
+
+   .. py:attribute:: supports_multilabel
+      :value: True
+
+
+      Whether the module supports multilabel classification
+
+
+   .. py:attribute:: supports_multiclass
+      :value: True
+
+
+      Whether the module supports multiclass classification
+
+
+   .. py:attribute:: thresh
+      :value: 0.5
+
+
+
+   .. py:method:: from_context(context, thresh = 0.5)
+      :classmethod:
+
+
+      Initialize from context.
+
+      :param context: Context containing configurations and utilities
+      :param thresh: Threshold for classification
+
+
+
+   .. py:method:: fit(scores, labels, tags = None)
+
+      Fit the model.
+
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+      :param labels: List of true labels
+      :param tags: List of Tag objects for mutually exclusive classes, or None
+
+      :raises MismatchNumClassesError: If number of thresholds doesn't match number of classes
+
+
+
+   .. py:method:: predict(scores)
+
+      Predict labels using thresholds.
+
+      :param scores: Array of shape (n_samples, n_classes) with predicted scores
+
+      :returns: Predicted labels (either single-label or multi-label)
+
+      :raises MismatchNumClassesError: If number of classes in scores doesn't match training data
+
+

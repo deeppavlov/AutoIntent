@@ -1,0 +1,68 @@
+autointent.server.http
+======================
+
+.. py:module:: autointent.server.http
+
+.. autoapi-nested-parse::
+
+   FastAPI application for AutoIntent pipeline inference.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   autointent.server.http.settings
+   autointent.server.http.logger
+   autointent.server.http.app
+
+
+Classes
+-------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/server/http/Settings
+   /autoapi/autointent/server/http/PredictRequest
+   /autoapi/autointent/server/http/PredictResponse
+
+.. autoapisummary::
+
+   autointent.server.http.Settings
+   autointent.server.http.PredictRequest
+   autointent.server.http.PredictResponse
+
+
+Functions
+---------
+
+.. toctree::
+   :hidden:
+
+   /autoapi/autointent/server/http/load_pipeline
+   /autoapi/autointent/server/http/lifespan
+   /autoapi/autointent/server/http/health_check
+   /autoapi/autointent/server/http/predict
+   /autoapi/autointent/server/http/main
+
+.. autoapisummary::
+
+   autointent.server.http.load_pipeline
+   autointent.server.http.lifespan
+   autointent.server.http.health_check
+   autointent.server.http.predict
+   autointent.server.http.main
+
+
+Module Contents
+---------------
+
+.. py:data:: settings
+
+.. py:data:: logger
+
+.. py:data:: app
+

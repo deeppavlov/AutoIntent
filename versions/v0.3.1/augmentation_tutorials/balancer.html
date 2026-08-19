@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="Data augmentation tutorials" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -574,26 +574,26 @@
 
 <span class="c1"># Create a simple imbalanced dataset</span>
 <span class="n">sample_data</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;intents&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;restaurant_booking&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Booking a table at a restaurant&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;weather_query&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Checking weather conditions&quot;</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;navigation&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Getting directions to a location&quot;</span><span class="p">},</span>
+    <span class="s2">"intents"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"restaurant_booking"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Booking a table at a restaurant"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"weather_query"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Checking weather conditions"</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"navigation"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Getting directions to a location"</span><span class="p">},</span>
     <span class="p">],</span>
-    <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">"train"</span><span class="p">:</span> <span class="p">[</span>
         <span class="c1"># Restaurant booking examples (5)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Book a table for two tonight&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I need a reservation at Le Bistro&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Can you reserve a table for me?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;I want to book a restaurant for my anniversary&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Make a dinner reservation for 8pm&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Book a table for two tonight"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I need a reservation at Le Bistro"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Can you reserve a table for me?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"I want to book a restaurant for my anniversary"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Make a dinner reservation for 8pm"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
 
         <span class="c1"># Weather query examples (3)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;What&#39;s the weather like today?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Will it rain tomorrow?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;Weather forecast for New York&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"What's the weather like today?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Will it rain tomorrow?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"Weather forecast for New York"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
 
         <span class="c1"># Navigation example (1)</span>
-        <span class="p">{</span><span class="s2">&quot;utterance&quot;</span><span class="p">:</span> <span class="s2">&quot;How do I get to the museum?&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"utterance"</span><span class="p">:</span> <span class="s2">"How do I get to the museum?"</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
     <span class="p">]</span>
 <span class="p">}</span>
 
@@ -614,7 +614,7 @@
 <span class="n">generator</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">()</span>
 
 <span class="c1"># Create a template for generating utterances</span>
-<span class="n">template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+<span class="n">template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">"train"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -635,17 +635,17 @@
 <p>Let’s examine the class distribution before balancing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check the initial distribution of classes in the training set</span>
 <span class="n">initial_distribution</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]:</span>
     <span class="n">label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span>
     <span class="n">initial_distribution</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_distribution</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial class distribution:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Initial class distribution:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">initial_distribution</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="n">intent</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">intents</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">class_id</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Class </span><span class="si">{</span><span class="n">class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Most represented class: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">initial_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Least represented class: </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">initial_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Most represented class: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">initial_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Least represented class: </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">initial_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -658,7 +658,7 @@
 <span class="c1"># Balance the training split</span>
 <span class="n">balanced_dataset</span> <span class="o">=</span> <span class="n">balancer</span><span class="o">.</span><span class="n">balance</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">=</span><span class="n">dataset_copy</span><span class="p">,</span>
-    <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
+    <span class="n">split</span><span class="o">=</span><span class="s2">"train"</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># Process generations in batches of 2</span>
 <span class="p">)</span>
 </pre></div>
@@ -669,17 +669,17 @@
 <p>Let’s examine the class distribution after balancing:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check the balanced distribution</span>
 <span class="n">balanced_distribution</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">balanced_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">balanced_dataset</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]:</span>
     <span class="n">label</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span>
     <span class="n">balanced_distribution</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">balanced_distribution</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Balanced class distribution:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Balanced class distribution:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">balanced_distribution</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
     <span class="n">intent</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">intents</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">class_id</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Class </span><span class="si">{</span><span class="n">class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Most represented class: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">balanced_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Least represented class: </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">balanced_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Most represented class: </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">balanced_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Least represented class: </span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="n">balanced_distribution</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2"> samples"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -691,24 +691,24 @@ which was the most underrepresented:</p>
 <span class="n">navigation_class_id</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">intent</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">intents</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">navigation_class_id</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Examples for class </span><span class="si">{</span><span class="n">navigation_class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Examples for class </span><span class="si">{</span><span class="n">navigation_class_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">intent</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">):"</span><span class="p">)</span>
 
 <span class="c1"># Original examples</span>
 <span class="n">original_examples</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">utterance_feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span> <span class="o">==</span> <span class="n">navigation_class_id</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">utterance_feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span> <span class="o">==</span> <span class="n">navigation_class_id</span>
 <span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Original examples:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Original examples:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">example</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original_examples</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">example</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">example</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Generated examples</span>
 <span class="n">all_examples</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">utterance_feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">balanced_dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span> <span class="o">==</span> <span class="n">navigation_class_id</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">utterance_feature</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">balanced_dataset</span><span class="p">[</span><span class="s2">"train"</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">Dataset</span><span class="o">.</span><span class="n">label_feature</span><span class="p">]</span> <span class="o">==</span> <span class="n">navigation_class_id</span>
 <span class="p">]</span>
 <span class="n">generated_examples</span> <span class="o">=</span> <span class="p">[</span><span class="n">ex</span> <span class="k">for</span> <span class="n">ex</span> <span class="ow">in</span> <span class="n">all_examples</span> <span class="k">if</span> <span class="n">ex</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">original_examples</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Generated examples:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Generated examples:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">example</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">generated_examples</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">example</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">example</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -717,7 +717,7 @@ which was the most underrepresented:</p>
 <p>You can configure how many samples each class should have:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># To bring all classes to exactly 10 samples</span>
 <span class="n">original_dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">sample_data</span><span class="p">)</span>
-<span class="n">exact_template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+<span class="n">exact_template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">"train"</span><span class="p">)</span>
 
 <span class="n">exact_balancer</span> <span class="o">=</span> <span class="n">DatasetBalancer</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
@@ -726,7 +726,7 @@ which was the most underrepresented:</p>
 <span class="p">)</span>
 
 <span class="c1"># Balance to the level of the most represented class</span>
-<span class="n">max_template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+<span class="n">max_template</span> <span class="o">=</span> <span class="n">EnglishSynthesizerTemplate</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">"train"</span><span class="p">)</span>
 
 <span class="n">max_balancer</span> <span class="o">=</span> <span class="n">DatasetBalancer</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>

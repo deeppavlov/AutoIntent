@@ -15,6 +15,7 @@ Submodules
 .. toctree::
    :maxdepth: 1
 
+   /autoapi/autointent/advisor/index
    /autoapi/autointent/configs/index
    /autoapi/autointent/context/index
    /autoapi/autointent/custom_types/index

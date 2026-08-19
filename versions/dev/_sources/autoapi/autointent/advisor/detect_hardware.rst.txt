@@ -1,0 +1,14 @@
+autointent.advisor.detect_hardware
+==================================
+
+.. py:function:: autointent.advisor.detect_hardware(*, vram_budget_gb = None, mps_budget_ratio = MPS_DEFAULT_BUDGET_RATIO)
+
+   Detect the local hardware, with optional manual overrides.
+
+   :param vram_budget_gb: when set, overrides the detected VRAM (use for
+                          shared-GPU machines where part of the device is taken).
+   :param mps_budget_ratio: fraction of total RAM treated as the MPS
+                            "VRAM" budget on Apple Silicon.
+
+   :returns: HardwareProfile reflecting current machine state.
+

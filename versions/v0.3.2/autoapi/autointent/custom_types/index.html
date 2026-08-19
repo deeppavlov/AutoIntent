@@ -50,7 +50,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://deeppavlov.github.io/AutoIntent/versions/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.3.3.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.0';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
@@ -62,7 +62,7 @@
     <link rel="prev" title="autointent.context.load_dataset" href="../context/load_dataset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.3.3.0" />
+  <meta name="docsearch:version" content="0.4.0" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -453,6 +453,24 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../advisor/index.html">autointent.advisor</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/PreflightError.html">autointent.advisor.PreflightError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/ReduceToFitError.html">autointent.advisor.ReduceToFitError</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/HardwareProfile.html">autointent.advisor.HardwareProfile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/DatasetStats.html">autointent.advisor.DatasetStats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/Finding.html">autointent.advisor.Finding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/PreflightReport.html">autointent.advisor.PreflightReport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/RecommendationResult.html">autointent.advisor.RecommendationResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/ResourceEstimate.html">autointent.advisor.ResourceEstimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/Severity.html">autointent.advisor.Severity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/detect_hardware.html">autointent.advisor.detect_hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/run_preflight.html">autointent.advisor.run_preflight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/dataset_stats.html">autointent.advisor.dataset_stats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/estimate.html">autointent.advisor.estimate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/recommend.html">autointent.advisor.recommend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../advisor/reduce_to_fit.html">autointent.advisor.reduce_to_fit</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../configs/index.html">autointent.configs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../configs/HashingVectorizerEmbeddingConfig.html">autointent.configs.HashingVectorizerEmbeddingConfig</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../configs/OpenaiEmbeddingConfig.html">autointent.configs.OpenaiEmbeddingConfig</a></li>
@@ -899,7 +917,7 @@
 <td><p>Hyperparameter tuning strategies:</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#autointent.custom_types.SearchSpacePreset" title="autointent.custom_types.SearchSpacePreset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchSpacePreset</span></code></a></p></td>
-<td><p>Some presets that our library supports.</p></td>
+<td><p>Bundled search-space presets that our library supports.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#autointent.custom_types.SearchSpaceValidationMode" title="autointent.custom_types.SearchSpaceValidationMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchSpaceValidationMode</span></code></a></p></td>
 <td><p>Behavior when meet a data-incompatible module in search space:</p></td>
@@ -1012,7 +1030,13 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="autointent.custom_types.SearchSpacePreset">
 <span class="sig-prename descclassname"><span class="pre">autointent.custom_types.</span></span><span class="sig-name descname"><span class="pre">SearchSpacePreset</span></span><a class="headerlink" href="#autointent.custom_types.SearchSpacePreset" title="Link to this definition">#</a></dt>
-<dd><p>Some presets that our library supports.</p>
+<dd><p>Bundled search-space presets that our library supports.</p>
+<p>The order here carries no meaning. Resource-cost ranking lives in
+<code class="docutils literal notranslate"><span class="pre">autointent.advisor._workflows.PRESET_COST_ORDER</span></code>, which <code class="docutils literal notranslate"><span class="pre">recommend</span></code> uses to
+pick the heaviest preset that still fits the hardware budget. That is a cost
+ranking, <strong>not</strong> a quality ranking: a heavier preset is not strictly better —
+<code class="docutils literal notranslate"><span class="pre">transformers-heavy</span></code> will overfit on tiny datasets where a <code class="docutils literal notranslate"><span class="pre">classic-*</span></code>
+preset wins on accuracy.</p>
 </dd></dl>
 
 <dl class="py data">

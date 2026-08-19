@@ -1,0 +1,20 @@
+autointent.metrics.scoring.ScoringMetricFnWithOOS
+=================================================
+
+.. py:class:: autointent.metrics.scoring.ScoringMetricFnWithOOS
+
+   Bases: :py:obj:`Protocol`
+
+
+   Protocol for scoring metrics that accept OOS-bearing labels.
+
+   Returned by `ignore_oos`: the decorator filters out `None` entries from
+   `labels` (and their paired score rows) before delegating to the
+   underlying `ScoringMetricFn`.
+
+
+   .. py:method:: __call__(labels, scores)
+
+      Calculate scoring metric, dropping OOS-flagged samples first.
+
+
