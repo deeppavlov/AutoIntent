@@ -7,6 +7,7 @@ import json
 import logging
 import os
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import aiometer
@@ -17,6 +18,7 @@ from pydantic import BaseModel, PositiveFloat, PositiveInt
 
 from autointent import Context
 from autointent._deps import require
+from autointent._dump_tools import Dumper
 from autointent._hash import Hasher
 from autointent.generation._cache import PydanticDiskCache
 
@@ -24,6 +26,8 @@ from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
 
@@ -311,3 +315,30 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         for attribute in ("_client", "_async_client", "_cache", "_event_loop"):
             if hasattr(self, attribute):
                 delattr(self, attribute)
+
+    def dump(self, path: str) -> None:
+        """Persist config and descriptions; clients, cache handle and questions are rebuilt on load.
+
+        Simple attributes (``question_type``, ``model``, ``temperature``, concurrency settings,
+        ``use_cache``, ``_description_texts``) are written by the generic Dumper. The SDK clients
+        and the disk-cache handle are runtime objects it cannot serialize, so they are detached
+        for the duration of the dump; ``_questions`` is a dict and is excluded.
+        """
+        detached = {
+            key: self.__dict__.pop(key) for key in ("_client", "_async_client", "_cache") if key in self.__dict__
+        }
+        try:
+            Dumper.dump(self, Path(path), exclude=[asyncio.BaseEventLoop, dict])
+        finally:
+            self.__dict__.update(detached)
+
+    @classmethod
+    def load(
+        cls,
+        path: str,
+        embedder_config: EmbedderConfig | None = None,
+        cross_encoder_config: CrossEncoderConfig | None = None,
+    ) -> TypeSafeDescriptionScorer:
+        instance = super().load(path=path, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
+        instance._init_runtime()  # noqa: SLF001
+        return instance

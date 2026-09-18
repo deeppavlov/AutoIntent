@@ -14,6 +14,8 @@ from tests._fixtures.mock_typesafe import fake_response
 from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from autointent import Dataset
     from tests._fixtures.mock_typesafe import FakeAsyncTypeSafeClient, FakeTypeSafeClient
 
@@ -211,3 +213,38 @@ def test_predict_logs_usage(
         scorer.predict(TEST_UTTERANCES)
     assert "2 requests" in caplog.text
     assert "200 input tokens" in caplog.text
+
+
+def test_dump_and_load_roundtrip(
+    dataset: Dataset,
+    patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient],
+    tmp_path: Path,
+) -> None:
+    descriptions = _descriptions(DataHandler(dataset))
+    scorer = TypeSafeDescriptionScorer(
+        question_type="noul", model="jev-preview", temperature=0.7, max_concurrent=None, max_retries=5, use_cache=False
+    )
+    scorer.fit([], [], descriptions)
+    before = scorer.predict(TEST_UTTERANCES)
+
+    dump_dir = tmp_path / "dump"
+    scorer.dump(str(dump_dir))
+    loaded = TypeSafeDescriptionScorer.load(str(dump_dir))
+
+    assert loaded.question_type == "noul"
+    assert loaded.model == "jev-preview"
+    assert loaded.temperature == pytest.approx(0.7)
+    assert loaded.max_concurrent is None
+    assert loaded.max_retries == 5
+    assert loaded.use_cache is False
+    assert loaded._description_texts == descriptions
+    np.testing.assert_allclose(loaded.predict(TEST_UTTERANCES), before)
+
+    # dump() must leave the live instance usable
+    np.testing.assert_allclose(scorer.predict(TEST_UTTERANCES), before)
+
+
+def test_registered_in_scoring_modules() -> None:
+    from autointent.modules import SCORING_MODULES
+
+    assert SCORING_MODULES["description_typesafe"] is TypeSafeDescriptionScorer
