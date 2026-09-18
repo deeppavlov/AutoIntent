@@ -3,7 +3,7 @@ from __future__ import annotations
 import importlib
 import json
 import logging
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import aiofiles
 import joblib
@@ -215,7 +215,8 @@ class PeftModelDumper(BaseObjectDumper["PeftModel"]):
             ptuning_path = path / "ptuning"
             ptuning_path.mkdir(parents=True, exist_ok=exists_ok)
             obj.save_pretrained(str(ptuning_path / "peft"))
-            obj.base_model.save_pretrained(ptuning_path / "base_model")
+            base_model = cast("PreTrainedModel", obj.base_model)
+            base_model.save_pretrained(ptuning_path / "base_model")
         else:
             # strategy to save lora models: merge adapters and save as usual hugging face model
             lora_path = path / "lora"
