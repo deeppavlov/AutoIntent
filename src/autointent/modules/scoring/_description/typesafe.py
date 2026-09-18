@@ -37,17 +37,42 @@ CACHE_SUBDIR = "typesafe_answers"
 CHOICE_KEY = "intent"
 DEFAULT_MODEL = "jev-latest"
 DEFAULT_MODEL_ENV = "TYPESAFE_DEFAULT_MODEL"
+DEFAULT_BASE_URL = "https://api.typesafe.ai"
+BASE_URL_ENV = "TYPESAFE_BASE_URL"
+MAX_CHOICE_OPTIONS = 255
+"""The TypeSafe API's limit on ``choice`` options; above this, ``question_type='noul'`` must be used instead."""
 _EPS = 1e-6
+_CLIENT_ERROR_STATUS_MIN = 400
+_SERVER_ERROR_STATUS_MIN = 500
+_RETRYABLE_CLIENT_ERROR_STATUSES = frozenset({408, 429})  # request timeout, rate limit: transient, like a 5xx
 
 QuestionType = Literal["choice", "noul"]
-_Result = tuple[list[float], int, int] | Exception
-"""Either ``(probability_row, input_tokens, output_tokens)`` or the failure that produced no row."""
+_Result = tuple[list[float], int, int, str | None] | Exception
+"""Either ``(probability_row, input_tokens, output_tokens, model)`` or the failure that produced no row."""
+
+
+def _is_fatal(error: BaseException) -> bool:
+    """Whether an API error means the request itself is wrong rather than a transient failure.
+
+    A 4xx status other than 408 (timeout) or 429 (rate limit) means a wrong API key, model name,
+    or malformed question, none of which a retry or a uniform-row fallback would fix or even
+    surface; degrading it to a uniform row (as ``_ask_one_*`` do for everything else, mirroring
+    the LLM scorer) would silently hide a misconfiguration behind plausible-looking scores. 408
+    and 429 behave like a 5xx (transient) and fall back like any other failure.
+    """
+    status = getattr(error, "status", None)
+    return (
+        isinstance(status, int)
+        and _CLIENT_ERROR_STATUS_MIN <= status < _SERVER_ERROR_STATUS_MIN
+        and status not in _RETRYABLE_CLIENT_ERROR_STATUSES
+    )
 
 
 class TypeSafeAnswer(BaseModel):
     """Per-utterance probabilities in intent-description order, as stored in the disk cache."""
 
     probabilities: list[float]
+    model: str | None = None
 
 
 def build_questions(question_type: QuestionType, descriptions: list[str]) -> dict[str, dict[str, Any]]:
@@ -161,9 +186,21 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         max_retries: PositiveInt = 3,
         use_cache: bool = True,
     ) -> TypeSafeDescriptionScorer:
+        """Build a scorer from pipeline context, defaulting/coercing ``question_type`` by task type.
+
+        ``question_type=None`` defaults to ``"noul"`` on a multilabel dataset, ``"choice"`` otherwise. An
+        HPO-sampled ``question_type="choice"`` on a multilabel dataset (e.g. the ``zero-shot-typesafe``
+        preset's search space) cannot express multilabel targets either, so it is downgraded to
+        ``"noul"`` with a warning instead of raising, so a single bad trial does not abort the whole
+        ``Pipeline.fit()``. An explicit ``TypeSafeDescriptionScorer(question_type="choice", multilabel=True)``
+        still raises ``ValueError`` (see the constructor).
+        """
         multilabel = context.is_multilabel()
         if question_type is None:
             question_type = "noul" if multilabel else "choice"
+        if multilabel and question_type == "choice":
+            logger.warning("question_type='choice' cannot express multilabel targets; using 'noul' for this trial")
+            question_type = "noul"
         return cls(
             question_type=question_type,
             model=model,
@@ -176,7 +213,7 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         )
 
     def get_implicit_initialization_params(self) -> dict[str, Any]:
-        return {"multilabel": self._multilabel}
+        return {"multilabel": self._multilabel, "question_type": self.question_type}
 
     @property
     def resolved_model(self) -> str:
@@ -184,7 +221,19 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         default = os.getenv(DEFAULT_MODEL_ENV, DEFAULT_MODEL)
         return self.model or default
 
+    @property
+    def resolved_base_url(self) -> str:
+        """Base URL the SDK client targets: ``TYPESAFE_BASE_URL`` if set, else TypeSafe's default."""
+        return os.getenv(BASE_URL_ENV, DEFAULT_BASE_URL)
+
     def _fit_implementation(self, descriptions: list[str]) -> None:
+        """Reject ``choice`` past the API's option limit, then store descriptions and build runtime objects."""
+        if self.question_type == "choice" and len(descriptions) > MAX_CHOICE_OPTIONS:
+            msg = (
+                f"question_type='choice' supports at most {MAX_CHOICE_OPTIONS} options "
+                f"(got {len(descriptions)} descriptions); use question_type='noul' instead"
+            )
+            raise ValueError(msg)
         self._description_texts = descriptions
         self._init_runtime()
 
@@ -213,16 +262,19 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
                 loop = asyncio.get_event_loop()
             except RuntimeError:
                 loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
             else:
                 if loop.is_closed():
                     loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
             self._event_loop = loop
 
     def _cache_key(self, utterance: str) -> str:
+        """Hash everything that changes the answer: resolved model, base URL, questions, utterance."""
         hasher = Hasher()
         hasher.update(self.resolved_model)
-        hasher.update(self.question_type)
-        hasher.update(json.dumps(self._description_texts))
+        hasher.update(self.resolved_base_url)
+        hasher.update(json.dumps(self._questions, sort_keys=True))
         hasher.update(utterance)
         return hasher.hexdigest()
 
@@ -245,6 +297,7 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
                 probabilities[i] = cached.probabilities
 
         input_tokens = output_tokens = 0
+        seen_model: str | None = None
         if pending:
             results = self._ask_many([utterances[i] for i in pending])
             for i, result in zip(pending, results, strict=True):
@@ -253,20 +306,26 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
                         "TypeSafe request failed for utterance %r; using uniform scores: %s", utterances[i], result
                     )
                     continue
-                row, row_input_tokens, row_output_tokens = result
+                row, row_input_tokens, row_output_tokens, model = result
                 probabilities[i] = row
                 input_tokens += row_input_tokens
                 output_tokens += row_output_tokens
-                self._cache.set_by_key(cache_keys[i], TypeSafeAnswer(probabilities=row))
+                if model is not None:
+                    seen_model = model
+                self._cache.set_by_key(cache_keys[i], TypeSafeAnswer(probabilities=row, model=model))
 
-        logger.info(
-            "TypeSafe predict: %d utterances, %d from cache, %d requests, %d input tokens, %d output tokens",
+        log_message = "TypeSafe predict: %d utterances, %d from cache, %d requests, %d input tokens, %d output tokens"
+        log_args: list[Any] = [
             len(utterances),
             len(utterances) - len(pending),
             len(pending),
             input_tokens,
             output_tokens,
-        )
+        ]
+        if seen_model is not None:
+            log_message += ", model %s"
+            log_args.append(seen_model)
+        logger.info(log_message, *log_args)
         return self._to_similarities(probabilities)
 
     def _ask_many(self, utterances: list[str]) -> list[_Result]:
@@ -281,27 +340,39 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         return self._event_loop.run_until_complete(task)
 
     def _ask_one_sync(self, utterance: str) -> _Result:
+        """Ask one question synchronously; re-raise a fatal API error, else return the row or the failure."""
         try:
             response = self._client.system_one(state={"utterance": utterance}, questions=self._questions)
-        except Exception as e:  # noqa: BLE001  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
+        except Exception as e:  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
+            if _is_fatal(e):
+                raise
             return e
         return self._unpack(response)
 
     async def _ask_one_async(self, utterance: str) -> _Result:
+        """Ask one question asynchronously; re-raise a fatal API error, else return the row or the failure."""
         try:
             response = await self._async_client.system_one(state={"utterance": utterance}, questions=self._questions)
-        except Exception as e:  # noqa: BLE001  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
+        except Exception as e:  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
+            if _is_fatal(e):
+                raise
             return e
         return self._unpack(response)
 
     def _unpack(self, response: Any) -> _Result:  # noqa: ANN401
-        """Turn an SDK response into ``(row, input_tokens, output_tokens)``; a malformed answer is a failure."""
+        """Turn an SDK response into ``(row, input_tokens, output_tokens, model)``; a malformed answer is a failure."""
         try:
             row = parse_answers(self.question_type, response.answers, len(self._description_texts))
         except (KeyError, AttributeError, TypeError, ValueError) as e:
             return e
         usage = getattr(response, "usage", None)
-        return row, int(getattr(usage, "input_tokens", 0) or 0), int(getattr(usage, "output_tokens", 0) or 0)
+        model = getattr(response, "model", None)
+        return (
+            row,
+            int(getattr(usage, "input_tokens", 0) or 0),
+            int(getattr(usage, "output_tokens", 0) or 0),
+            model if isinstance(model, str) else None,
+        )
 
     def _to_similarities(self, probabilities: NDArray[np.float64]) -> NDArray[np.float64]:
         """``log p`` for choice, ``logit p`` for noul, so the base class's scaling is the identity at T=1."""
@@ -339,6 +410,7 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         embedder_config: EmbedderConfig | None = None,
         cross_encoder_config: CrossEncoderConfig | None = None,
     ) -> TypeSafeDescriptionScorer:
+        """Load a dumped scorer and rebuild its runtime objects (SDK clients, disk cache, event loop)."""
         instance = super().load(path=path, embedder_config=embedder_config, cross_encoder_config=cross_encoder_config)
         instance._init_runtime()  # noqa: SLF001
         return instance

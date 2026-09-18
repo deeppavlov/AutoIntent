@@ -353,6 +353,8 @@ class StructuredOutputCache(PydanticDiskCache):
         Returns:
             Cached result if available, None otherwise.
         """
+        if not self.use_cache:
+            return None
         return self.get_by_key(
             self._get_cache_key(messages, output_model, generation_params, model_name, base_url), output_model
         )
@@ -376,6 +378,8 @@ class StructuredOutputCache(PydanticDiskCache):
             model_name: Name of the language model that will serve the request.
             base_url: Base URL of the API endpoint, or None for the default.
         """
+        if not self.use_cache:
+            return
         self.set_by_key(self._get_cache_key(messages, output_model, generation_params, model_name, base_url), result)
 
     async def get_async(
@@ -398,6 +402,8 @@ class StructuredOutputCache(PydanticDiskCache):
         Returns:
             Cached result if available, None otherwise.
         """
+        if not self.use_cache:
+            return None
         return await self.get_by_key_async(
             self._get_cache_key(messages, output_model, generation_params, model_name, base_url), output_model
         )
@@ -421,6 +427,8 @@ class StructuredOutputCache(PydanticDiskCache):
             model_name: Name of the language model that will serve the request.
             base_url: Base URL of the API endpoint, or None for the default.
         """
+        if not self.use_cache:
+            return
         await self.set_by_key_async(
             self._get_cache_key(messages, output_model, generation_params, model_name, base_url), result
         )
