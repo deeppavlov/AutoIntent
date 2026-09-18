@@ -319,6 +319,7 @@ module = [
     "dspy.evaluate.auto_evaluation",
     "codecarbon",
     "catboost",
+    "typesafe_sdk",
     "jupytext",
     "docs_utils.*",
 ]

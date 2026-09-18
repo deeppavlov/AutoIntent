@@ -1,6 +1,11 @@
 from ._bert import BertScorer
 from ._catboost import CatBoostScorer, FeaturesType
-from ._description import BiEncoderDescriptionScorer, CrossEncoderDescriptionScorer, LLMDescriptionScorer
+from ._description import (
+    BiEncoderDescriptionScorer,
+    CrossEncoderDescriptionScorer,
+    LLMDescriptionScorer,
+    TypeSafeDescriptionScorer,
+)
 from ._dnnc import DNNCScorer
 from ._gcn import GCNScorer
 from ._knn import KNNScorer, RerankScorer
@@ -29,4 +34,5 @@ __all__ = [
     "RNNScorer",
     "RerankScorer",
     "SklearnScorer",
+    "TypeSafeDescriptionScorer",
 ]
