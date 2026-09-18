@@ -31,6 +31,7 @@ from .scoring import (
     RerankScorer,
     RNNScorer,
     SklearnScorer,
+    TypeSafeDescriptionScorer,
 )
 
 if TYPE_CHECKING:
@@ -59,6 +60,7 @@ SCORING_MODULES: dict[str, type[BaseScorer]] = _create_modules_dict(
         BiEncoderDescriptionScorer,
         CrossEncoderDescriptionScorer,
         LLMDescriptionScorer,
+        TypeSafeDescriptionScorer,
         RerankScorer,
         SklearnScorer,
         MLKnnScorer,

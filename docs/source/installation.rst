@@ -45,6 +45,9 @@ The table below lists each published extra, what it is typically used for in Aut
    * - ``openai``
      - OpenAI API clients for OpenAI-backed embedders and the ``zero-shot-llm`` style workflows.
      - ``pip install "autointent[openai]"``
+   * - ``typesafe``
+     - TypeSafe API client for the ``description_typesafe`` scorer and the ``zero-shot-typesafe`` preset.
+     - ``pip install "autointent[typesafe]"``
    * - ``dspy``
      - DSPy-based augmentation and related generation utilities.
      - ``pip install "autointent[dspy]"``

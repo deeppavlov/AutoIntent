@@ -240,3 +240,55 @@ async def test_async_same_identity_still_hits_cache() -> None:
 
     hit = await cache.get_async(MESSAGES, CacheModel, PARAMS, model_name="gpt-4o", base_url=None)
     assert hit == result
+
+
+# --- PydanticDiskCache (key-agnostic base) ---------------------------------------------
+
+
+def test_disk_cache_by_key_roundtrip_memory_and_disk() -> None:
+    from autointent.generation._cache import PydanticDiskCache
+
+    cache = PydanticDiskCache("unit_test_subdir")
+    cache.set_by_key("k1", CacheModel(name="a", value=1))
+    assert cache.get_by_key("k1", CacheModel) == CacheModel(name="a", value=1)
+
+    fresh = PydanticDiskCache("unit_test_subdir")
+    fresh._memory_cache.clear()
+    assert fresh.get_by_key("k1", CacheModel) == CacheModel(name="a", value=1)
+
+
+def test_disk_cache_subdirs_are_isolated() -> None:
+    from autointent.generation._cache import PydanticDiskCache
+
+    first = PydanticDiskCache("subdir_a")
+    first.set_by_key("shared-key", CacheModel(name="a", value=1))
+
+    second = PydanticDiskCache("subdir_b")
+    assert second.get_by_key("shared-key", CacheModel) is None
+    assert not second._memory_cache
+    assert first._entry_path("shared-key").parent.name == "subdir_a"
+    assert second._entry_path("shared-key").parent.name == "subdir_b"
+
+
+def test_structured_output_cache_uses_structured_outputs_subdir() -> None:
+    cache = StructuredOutputCache(use_cache=True)
+    key = cache._get_cache_key(MESSAGES, CacheModel, PARAMS, MODEL_NAME, BASE_URL)
+    assert cache._entry_path(key) == _get_structured_output_cache_path(key)
+
+
+def test_disk_cache_disabled_is_noop() -> None:
+    from autointent.generation._cache import PydanticDiskCache
+
+    cache = PydanticDiskCache("unit_test_subdir", use_cache=False)
+    cache.set_by_key("k1", CacheModel(name="a", value=1))
+    assert cache.get_by_key("k1", CacheModel) is None
+
+
+@pytest.mark.asyncio
+async def test_disk_cache_async_by_key_roundtrip() -> None:
+    from autointent.generation._cache import PydanticDiskCache
+
+    cache = PydanticDiskCache("unit_test_subdir")
+    await cache.set_by_key_async("k2", CacheModel(name="b", value=2))
+    cache._memory_cache.clear()
+    assert await cache.get_by_key_async("k2", CacheModel) == CacheModel(name="b", value=2)

@@ -126,6 +126,7 @@ SearchSpacePreset = Literal[
     "transformers-light",
     "transformers-no-hpo",
     "zero-shot-llm",
+    "zero-shot-typesafe",
     "zero-shot-encoders",
 ]
 """Bundled search-space presets that our library supports.

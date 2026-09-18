@@ -190,6 +190,7 @@ Available Presets
 - ``transformers-light``: Transformer models with limited search
 - ``transformers-no-hpo``: Transformer models without hyperparameter optimization
 - ``zero-shot-llm``: Zero-shot classification using OpenAI models
+- ``zero-shot-typesafe``: Zero-shot classification using TypeSafe's ``jev`` model (requires ``TYPESAFE_API_KEY``)
 - ``zero-shot-encoders``: Zero-shot classification using transformer models
 
 Making Predictions

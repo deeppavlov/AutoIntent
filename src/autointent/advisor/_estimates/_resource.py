@@ -106,13 +106,14 @@ _CACHE_HONORING_MODULES = frozenset(
         "description_bi",
         "description_cross",
         "description_llm",
+        "description_typesafe",
     },
 )
 
 # Cache-honoring modules whose per-entry estimate already bundles the embedder
 # forward into `time_hours` (vs. classic linear/catboost which don't).
 _EMBEDDER_FORWARD_TRANSFORMER_MODULES = frozenset(
-    {"knn", "mlknn", "retrieval", "description_bi", "description_cross", "description_llm"},
+    {"knn", "mlknn", "retrieval", "description_bi", "description_cross", "description_llm", "description_typesafe"},
 )
 
 
@@ -608,6 +609,7 @@ _EMBEDDER_CONSUMING_MODULES = frozenset(
         "description_bi",
         "description_cross",
         "description_llm",
+        "description_typesafe",
     },
 )
 
