@@ -52,6 +52,29 @@ def test_presets(
     pipeline_optimizer.fit(dataset, refit_after=False)
 
 
+def test_zero_shot_typesafe_preset_on_multilabel(
+    dataset: Dataset,
+    patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient],
+    tmp_path: Path,
+) -> None:
+    """The preset's `question_type: [choice, noul]` search space must not crash on a multilabel dataset.
+
+    HPO can sample `choice` for the `description_typesafe` module even though the dataset is
+    multilabel; `from_context` must downgrade it to `noul` (with a warning) instead of raising,
+    so the whole `Pipeline.fit()` doesn't abort on the first such trial.
+    """
+    project_dir = tmp_path
+
+    pipeline_optimizer = Pipeline.from_preset("zero-shot-typesafe")
+    apply_test_models(pipeline_optimizer)
+
+    pipeline_optimizer.set_config(LoggingConfig(project_dir=project_dir, dump_modules=True, clear_ram=True))
+    pipeline_optimizer.set_config(DataConfig(scheme="ho"))
+    pipeline_optimizer.set_config(HPOConfig(timeout=60))  # limit budget time because we want tests to be fast
+
+    pipeline_optimizer.fit(dataset.to_multilabel(), refit_after=False)
+
+
 def test_apply_test_models_retargets_pipeline_slots() -> None:
     from autointent import Pipeline
     from tests.conftest import (

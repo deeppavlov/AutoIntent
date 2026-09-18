@@ -23,22 +23,32 @@ NOUL_YES = 0.9
 NOUL_NO = 0.1
 
 
-def fake_response(questions: dict[str, dict[str, Any]], utterance: str, best_index: int = 0) -> SimpleNamespace:
-    """Deterministic answers: option ``best_index`` gets 0.7 and the rest share 0.3 (choice), or 0.9 vs 0.1 (noul).
+def expected_best_index(utterance: str, n_options: int) -> int:
+    """Mirror `fake_response`'s derivation of the "winning" option when `best_index` is omitted."""
+    return sum(map(ord, utterance)) % n_options
 
-    ``utterance`` is accepted so callers can build the expectation for a specific input; the
-    fake ignores its content.
+
+def fake_response(
+    questions: dict[str, dict[str, Any]], utterance: str, best_index: int | None = None
+) -> SimpleNamespace:
+    """Deterministic answers: one option gets 0.7 and the rest share 0.3 (choice), or 0.9 vs 0.1 (noul).
+
+    ``best_index`` picks the "winning" option; when omitted it is derived from ``utterance`` (see
+    `expected_best_index`), so different utterances land on different options and the result order
+    is observable in tests instead of always being index 0.
     """
-    del utterance
     answers: dict[str, SimpleNamespace] = {}
     if CHOICE_KEY in questions and questions[CHOICE_KEY]["type"] == "choice":
         keys = list(questions[CHOICE_KEY]["criteria"])
+        index = best_index if best_index is not None else expected_best_index(utterance, len(keys))
         rest = (1.0 - BEST_PROBABILITY) / max(len(keys) - 1, 1)
-        probabilities = {key: (BEST_PROBABILITY if i == best_index else rest) for i, key in enumerate(keys)}
-        answers[CHOICE_KEY] = SimpleNamespace(choice=keys[best_index], confidence=0.5, probabilities=probabilities)
+        probabilities = {key: (BEST_PROBABILITY if i == index else rest) for i, key in enumerate(keys)}
+        answers[CHOICE_KEY] = SimpleNamespace(choice=keys[index], confidence=0.5, probabilities=probabilities)
     else:
+        n_options = len(questions)
+        index = best_index if best_index is not None else expected_best_index(utterance, n_options)
         for i, key in enumerate(questions):
-            answers[key] = SimpleNamespace(noul=NOUL_YES if i == best_index else NOUL_NO)
+            answers[key] = SimpleNamespace(noul=NOUL_YES if i == index else NOUL_NO)
     return SimpleNamespace(answers=answers, usage=SimpleNamespace(input_tokens=100, output_tokens=10), model="jev-test")
 
 
