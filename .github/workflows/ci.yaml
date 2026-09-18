@@ -138,7 +138,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dependency-group: [ "base", "transformers", "peft", "catboost" ]
+        dependency-group: [ "base", "transformers", "peft", "catboost", "typesafe" ]
     uses: ./.github/workflows/reusable-test.yaml
     secrets: inherit
     with:
