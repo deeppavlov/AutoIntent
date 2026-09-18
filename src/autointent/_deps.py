@@ -37,6 +37,7 @@ Extra = Literal[
     "peft",
     "sentence-transformers",
     "transformers",
+    "typesafe",
     "vllm",
     "wandb",
 ]

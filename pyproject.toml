@@ -80,6 +80,9 @@ openai = [
     "openai (>=2,<3)",
     "tiktoken (>=0.7,<1)",
 ]
+typesafe = [
+    "typesafe-sdk (>=0.7,<1)",
+]
 vllm = [
     "vllm>=0.20.0",
 ]
