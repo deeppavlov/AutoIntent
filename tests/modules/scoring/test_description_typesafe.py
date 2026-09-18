@@ -123,3 +123,91 @@ def test_from_context_defaults_question_type_by_task(dataset: Dataset) -> None:
 def test_predict_before_fit_raises() -> None:
     with pytest.raises(RuntimeError, match="fit"):
         TypeSafeDescriptionScorer(max_concurrent=None).predict(["hello"])
+
+
+def test_async_path_uses_async_client_and_matches_sync(
+    dataset: Dataset, patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient]
+) -> None:
+    sync_client, async_client = patch_typesafe_scorer_client
+    descriptions = _descriptions(DataHandler(dataset))
+
+    concurrent = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=2, max_per_second=100)
+    concurrent.fit([], [], descriptions)
+    concurrent_probabilities = concurrent.predict(TEST_UTTERANCES)
+    assert async_client.calls == TEST_UTTERANCES
+    assert sync_client.calls == []
+
+    sequential = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=None, use_cache=False)
+    sequential.fit([], [], descriptions)
+    np.testing.assert_allclose(sequential.predict(TEST_UTTERANCES), concurrent_probabilities)
+
+
+@pytest.mark.parametrize("max_concurrent", [None, 2])
+def test_failed_request_yields_uniform_row_and_warns(
+    dataset: Dataset,
+    patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient],
+    max_concurrent: int | None,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    sync_client, async_client = patch_typesafe_scorer_client
+    descriptions = _descriptions(DataHandler(dataset))
+
+    def boom(*_: object, **__: object) -> None:
+        msg = "simulated outage"
+        raise RuntimeError(msg)
+
+    async def boom_async(*_: object, **__: object) -> None:
+        boom()
+
+    sync_client.system_one = boom  # type: ignore[assignment]
+    async_client.system_one = boom_async  # type: ignore[assignment]
+
+    scorer = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=max_concurrent)
+    scorer.fit([], [], descriptions)
+    with caplog.at_level("WARNING"):
+        probabilities = scorer.predict(TEST_UTTERANCES)
+
+    np.testing.assert_allclose(probabilities, 1.0 / len(descriptions))
+    assert "simulated outage" in caplog.text
+
+
+def test_cache_hit_skips_the_client(
+    dataset: Dataset, patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient]
+) -> None:
+    sync_client, _ = patch_typesafe_scorer_client
+    descriptions = _descriptions(DataHandler(dataset))
+
+    scorer = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=None)
+    scorer.fit([], [], descriptions)
+    first = scorer.predict(TEST_UTTERANCES)
+    assert len(sync_client.calls) == len(TEST_UTTERANCES)
+
+    second = scorer.predict(TEST_UTTERANCES)
+    assert len(sync_client.calls) == len(TEST_UTTERANCES)
+    np.testing.assert_allclose(first, second)
+
+    # A fresh instance (new HPO trial) with the same descriptions also hits the disk cache.
+    other = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=None, temperature=2.0)
+    other.fit([], [], descriptions)
+    other.predict(TEST_UTTERANCES)
+    assert len(sync_client.calls) == len(TEST_UTTERANCES)
+
+    # A different question_type is a different key.
+    noul = TypeSafeDescriptionScorer(question_type="noul", max_concurrent=None)
+    noul.fit([], [], descriptions)
+    noul.predict(TEST_UTTERANCES)
+    assert len(sync_client.calls) == 2 * len(TEST_UTTERANCES)
+
+
+def test_predict_logs_usage(
+    dataset: Dataset,
+    patch_typesafe_scorer_client: tuple[FakeTypeSafeClient, FakeAsyncTypeSafeClient],
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    descriptions = _descriptions(DataHandler(dataset))
+    scorer = TypeSafeDescriptionScorer(question_type="choice", max_concurrent=None)
+    scorer.fit([], [], descriptions)
+    with caplog.at_level("INFO", logger="autointent.modules.scoring._description.typesafe"):
+        scorer.predict(TEST_UTTERANCES)
+    assert "2 requests" in caplog.text
+    assert "200 input tokens" in caplog.text

@@ -6,8 +6,10 @@ import asyncio
 import json
 import logging
 import os
+from functools import partial
 from typing import TYPE_CHECKING, Any, Literal
 
+import aiometer
 import numpy as np
 import scipy
 from dotenv import load_dotenv
@@ -229,9 +231,10 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         n_intents = len(self._description_texts)
         probabilities = np.full((len(utterances), n_intents), 1.0 / n_intents, dtype=np.float64)
 
+        cache_keys = [self._cache_key(utterance) for utterance in utterances]
         pending: list[int] = []
-        for i, utterance in enumerate(utterances):
-            cached = self._cache.get_by_key(self._cache_key(utterance), TypeSafeAnswer)
+        for i, cache_key in enumerate(cache_keys):
+            cached = self._cache.get_by_key(cache_key, TypeSafeAnswer)
             if cached is None:
                 pending.append(i)
             else:
@@ -250,7 +253,7 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
                 probabilities[i] = row
                 input_tokens += row_input_tokens
                 output_tokens += row_output_tokens
-                self._cache.set_by_key(self._cache_key(utterances[i]), TypeSafeAnswer(probabilities=row))
+                self._cache.set_by_key(cache_keys[i], TypeSafeAnswer(probabilities=row))
 
         logger.info(
             "TypeSafe predict: %d utterances, %d from cache, %d requests, %d input tokens, %d output tokens",
@@ -263,12 +266,26 @@ class TypeSafeDescriptionScorer(BaseDescriptionScorer):
         return self._to_similarities(probabilities)
 
     def _ask_many(self, utterances: list[str]) -> list[_Result]:
-        """Send one request per utterance, synchronously in this task (async path added in Task 4)."""
-        return [self._ask_one_sync(utterance) for utterance in utterances]
+        """Send one request per utterance: through aiometer when ``max_concurrent`` is set, else sequentially."""
+        if self.max_concurrent is None:
+            return [self._ask_one_sync(utterance) for utterance in utterances]
+        task = aiometer.run_all(
+            [partial(self._ask_one_async, utterance) for utterance in utterances],
+            max_at_once=self.max_concurrent,
+            max_per_second=self.max_per_second,
+        )
+        return self._event_loop.run_until_complete(task)
 
     def _ask_one_sync(self, utterance: str) -> _Result:
         try:
             response = self._client.system_one(state={"utterance": utterance}, questions=self._questions)
+        except Exception as e:  # noqa: BLE001  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
+            return e
+        return self._unpack(response)
+
+    async def _ask_one_async(self, utterance: str) -> _Result:
+        try:
+            response = await self._async_client.system_one(state={"utterance": utterance}, questions=self._questions)
         except Exception as e:  # noqa: BLE001  # reason: any SDK/network failure degrades to a uniform row, like the LLM scorer
             return e
         return self._unpack(response)
