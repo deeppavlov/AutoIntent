@@ -45,6 +45,7 @@ PRESET_COST_ORDER: tuple[SearchSpacePreset, ...] = (
     "transformers-light",
     "nn-heavy",
     "zero-shot-llm",
+    "zero-shot-typesafe",
     "nn-medium",
     "classic-heavy",
     "transformers-no-hpo",

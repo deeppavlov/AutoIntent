@@ -274,7 +274,7 @@ def _data_phase(
                 )
 
     # partial descriptions x description scorer
-    description_modules = {"description_bi", "description_cross", "description_llm"}
+    description_modules = {"description_bi", "description_cross", "description_llm", "description_typesafe"}
     has_description = any(e.get("module_name") in description_modules for _, e in _walk_modules(search_space))
     if has_description and stats.has_descriptions is False:
         report.add(
