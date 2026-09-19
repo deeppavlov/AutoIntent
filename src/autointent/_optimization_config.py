@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field, PositiveInt, field_validator
+from pydantic import BaseModel, Field, NonNegativeInt, field_validator
 
 from .configs import (
     CrossEncoderConfig,
@@ -49,7 +49,7 @@ class OptimizationConfig(BaseModel):
 
     hpo_config: HPOConfig = HPOConfig()
 
-    seed: PositiveInt = 42
+    seed: NonNegativeInt = 42
 
     @classmethod
     def from_preset(cls, preset: SearchSpacePreset) -> OptimizationConfig:
