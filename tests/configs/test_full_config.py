@@ -17,3 +17,14 @@ def test_not_valid_reporting() -> None:
 
     with pytest.raises(ValidationError):
         OptimizationConfig(**config)
+
+
+@pytest.mark.parametrize("seed", [0, 1, 42])
+def test_seed_accepts_non_negative(seed: int) -> None:
+    config = OptimizationConfig(seed=seed, search_space=[])
+    assert config.seed == seed
+
+
+def test_seed_rejects_negative() -> None:
+    with pytest.raises(ValidationError):
+        OptimizationConfig(seed=-1, search_space=[])

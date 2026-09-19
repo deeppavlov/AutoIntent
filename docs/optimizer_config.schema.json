@@ -1242,7 +1242,7 @@
         },
         "seed": {
             "default": 42,
-            "exclusiveMinimum": 0,
+            "minimum": 0,
             "title": "Seed",
             "type": "integer"
         }
