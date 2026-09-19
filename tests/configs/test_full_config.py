@@ -17,3 +17,13 @@ def test_not_valid_reporting() -> None:
 
     with pytest.raises(ValidationError):
         OptimizationConfig(**config)
+
+
+def test_optimization_config_accepts_seed_zero() -> None:
+    config = OptimizationConfig(seed=0, search_space=[])
+    assert config.seed == 0
+
+
+def test_optimization_config_rejects_negative_seed() -> None:
+    with pytest.raises(ValidationError):
+        OptimizationConfig(seed=-1, search_space=[])
