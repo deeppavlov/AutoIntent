@@ -5,10 +5,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import aiometer
 import numpy as np
@@ -23,11 +24,16 @@ from autointent.generation.chat_templates import Message, Role
 from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
+    from collections.abc import Coroutine
+
     from numpy.typing import NDArray
 
     from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
+
+
+_T = TypeVar("_T")
 
 GENERATOR_CONFIG_FILENAME = "generator_config.json"
 
@@ -249,7 +255,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
                 max_at_once=self.max_concurrent,
                 max_per_second=self.max_per_second,
             )
-            categorizations = self._event_loop.run_until_complete(task)  # type: ignore[arg-type]
+            categorizations = self._run_async(task)  # type: ignore[arg-type]
 
         for i, categorization in enumerate(categorizations):
             if isinstance(categorization, IntentCategorization):
@@ -276,19 +282,30 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         # Generator doesn't have a clear_ram method, so we just set it to None
         if hasattr(self, "_generator"):
             delattr(self, "_generator")
-        if hasattr(self, "_event_loop"):
-            delattr(self, "_event_loop")
+        self._close_event_loop()
 
     def _init_event_loop(self) -> None:
+        # A private loop, never the caller's: the generator's async client keeps its
+        # connections bound to the loop it first ran on, so all batches reuse this one.
+        self._close_event_loop()
         if self.max_concurrent is not None:
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-            else:
-                if loop.is_closed():
-                    loop = asyncio.new_event_loop()
-            self._event_loop = loop
+            self._event_loop = asyncio.new_event_loop()
+
+    def _close_event_loop(self) -> None:
+        if hasattr(self, "_event_loop"):
+            self._event_loop.close()
+            delattr(self, "_event_loop")
+
+    def _run_async(self, coro: Coroutine[Any, Any, _T]) -> _T:
+        """Run ``coro`` to completion on the scorer's loop, whether or not the caller is already in one."""
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return self._event_loop.run_until_complete(coro)
+        # Called from async code (notebook, async web handler): this thread's loop is busy,
+        # so drive the scorer's loop from a worker thread and block until it finishes.
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(self._event_loop.run_until_complete, coro).result()
 
     def dump(self, path: str) -> None:
         dump_path = Path(path)
