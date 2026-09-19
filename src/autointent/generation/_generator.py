@@ -246,6 +246,18 @@ class Generator:
 
         return res, msg, raw
 
+    def get_cached_structured_output(self, messages: list[Message], output_model: type[T]) -> T | None:
+        """Return the cached structured output for ``messages`` without calling the API.
+
+        Args:
+            messages: List of messages that would be sent to the model.
+            output_model: Pydantic model class the response is parsed into.
+
+        Returns:
+            Cached result if available, None otherwise (including when caching is disabled).
+        """
+        return self.cache.get(messages, output_model, self.generation_params, self.model_name, self.base_url)
+
     async def get_structured_output_async(
         self,
         messages: list[Message],
