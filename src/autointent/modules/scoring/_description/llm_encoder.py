@@ -223,6 +223,33 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         except RetriesExceededError as e:
             return e
 
+    def _compute_categorizations_async(
+        self, utterances: list[str]
+    ) -> list[IntentCategorization | RetriesExceededError]:
+        """Categorize utterances concurrently, sending only cache misses through the rate limiter.
+
+        Cache lookups are cheap, so resolving them up front keeps ``max_per_second``
+        from throttling utterances that never reach the API.
+        """
+        results: list[IntentCategorization | RetriesExceededError | None] = [
+            self._generator.get_cached_structured_output(
+                self._create_prompt(utt, self._description_texts), IntentCategorization
+            )
+            for utt in utterances
+        ]
+        misses = [i for i, res in enumerate(results) if res is None]
+
+        if misses:
+            task = aiometer.run_all(
+                [partial(self._process_utterance_async, utterances[i]) for i in misses],
+                max_at_once=self.max_concurrent,
+                max_per_second=self.max_per_second,
+            )
+            for i, res in zip(misses, self._event_loop.run_until_complete(task), strict=True):
+                results[i] = res
+
+        return [res for res in results if res is not None]
+
     def _compute_similarities(self, utterances: list[str]) -> NDArray[np.float64]:
         """Compute similarities using LLM categorization approach.
 
@@ -241,15 +268,11 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
 
         similarities = np.zeros((len(utterances), len(self._description_texts)), dtype=np.float64)
 
+        categorizations: list[IntentCategorization | RetriesExceededError]
         if self.max_concurrent is None:
-            categorizations = map(self._process_utterance_sync, utterances)
+            categorizations = list(map(self._process_utterance_sync, utterances))
         else:
-            task = aiometer.run_all(
-                [partial(self._process_utterance_async, utt) for utt in utterances],
-                max_at_once=self.max_concurrent,
-                max_per_second=self.max_per_second,
-            )
-            categorizations = self._event_loop.run_until_complete(task)  # type: ignore[arg-type]
+            categorizations = self._compute_categorizations_async(utterances)
 
         for i, categorization in enumerate(categorizations):
             if isinstance(categorization, IntentCategorization):

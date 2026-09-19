@@ -9,9 +9,12 @@ import pytest
 from autointent import Pipeline
 from autointent.context.data_handler import DataHandler
 from autointent.modules.scoring import LLMDescriptionScorer
+from autointent.modules.scoring._description.llm_encoder import IntentCategorization
 from tests._helpers import is_strict_labels
 
 if TYPE_CHECKING:
+    from unittest.mock import AsyncMock, Mock
+
     import numpy.typing as npt
 
     from autointent import Dataset
@@ -112,3 +115,58 @@ def test_llm_description_in_pipeline(dataset: Dataset, patch_llm_scorer_generato
     pipeline.fit(dataset)
     predictions = pipeline.predict(["test utterance"])
     assert len(predictions) == 1
+
+
+def test_description_scorer_llm_skips_api_for_cache_hits(
+    dataset: Dataset, patch_llm_scorer_generator: Generator
+) -> None:
+    """Cached utterances are resolved up front; only misses go through the rate-limited API path."""
+    data_handler = DataHandler(dataset)
+    scorer = LLMDescriptionScorer(generator_config={"temperature": 0})
+    descriptions = data_handler.intent_descriptions
+    assert all(d is not None for d in descriptions)
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels, cast("list[str]", descriptions))
+
+    cached = IntentCategorization(reasoning="cached", most_probable=[2], promising=[])
+
+    def cache_lookup(messages: list[Any], output_model: type) -> IntentCategorization | None:
+        return cached if "cached utterance" in messages[0]["content"] else None
+
+    generator = cast("Mock", patch_llm_scorer_generator)
+    generator.get_cached_structured_output.side_effect = cache_lookup
+    api_call = cast("AsyncMock", generator.get_structured_output_async)
+    api_call.reset_mock()
+
+    predictions = scorer.predict(["cached utterance one", "fresh utterance", "cached utterance two"])
+
+    assert api_call.await_count == 1
+    assert api_call.await_args is not None
+    assert "fresh utterance" in api_call.await_args.kwargs["messages"][0]["content"]
+    assert predictions.shape == (3, len(descriptions))
+    np.testing.assert_array_equal(predictions[0], predictions[2])
+    assert not np.array_equal(predictions[0], predictions[1])
+
+
+def test_description_scorer_llm_all_cached_makes_no_api_calls(
+    dataset: Dataset, patch_llm_scorer_generator: Generator
+) -> None:
+    data_handler = DataHandler(dataset)
+    scorer = LLMDescriptionScorer(generator_config={"temperature": 0})
+    descriptions = data_handler.intent_descriptions
+    assert all(d is not None for d in descriptions)
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    scorer.fit(data_handler.train_utterances(0), labels, cast("list[str]", descriptions))
+
+    generator = cast("Mock", patch_llm_scorer_generator)
+    generator.get_cached_structured_output.return_value = IntentCategorization(
+        reasoning="cached", most_probable=[1], promising=[]
+    )
+    api_call = cast("AsyncMock", generator.get_structured_output_async)
+    api_call.reset_mock()
+
+    scorer.predict(["a", "b", "c"])
+
+    api_call.assert_not_awaited()
