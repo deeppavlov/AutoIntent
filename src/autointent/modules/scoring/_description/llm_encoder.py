@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from concurrent.futures import ThreadPoolExecutor
+import threading
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
@@ -287,25 +287,33 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
     def _init_event_loop(self) -> None:
         # A private loop, never the caller's: the generator's async client keeps its
         # connections bound to the loop it first ran on, so all batches reuse this one.
+        # The loop runs forever on one dedicated thread, so it is only ever driven from
+        # that thread, whichever thread (sync or async, one or several) submits work.
         self._close_event_loop()
         if self.max_concurrent is not None:
             self._event_loop = asyncio.new_event_loop()
+            self._event_loop_thread = threading.Thread(
+                target=self._event_loop.run_forever, name="LLMDescriptionScorer-loop", daemon=True
+            )
+            self._event_loop_thread.start()
 
     def _close_event_loop(self) -> None:
         if hasattr(self, "_event_loop"):
+            if hasattr(self, "_event_loop_thread"):
+                self._event_loop.call_soon_threadsafe(self._event_loop.stop)
+                self._event_loop_thread.join()
+                delattr(self, "_event_loop_thread")
             self._event_loop.close()
             delattr(self, "_event_loop")
 
     def _run_async(self, coro: Coroutine[Any, Any, _T]) -> _T:
-        """Run ``coro`` to completion on the scorer's loop, whether or not the caller is already in one."""
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            return self._event_loop.run_until_complete(coro)
-        # Called from async code (notebook, async web handler): this thread's loop is busy,
-        # so drive the scorer's loop from a worker thread and block until it finishes.
-        with ThreadPoolExecutor(max_workers=1) as executor:
-            return executor.submit(self._event_loop.run_until_complete, coro).result()
+        """Run ``coro`` on the scorer's loop thread and block until it finishes.
+
+        Works the same whether or not the caller is already inside a running event loop
+        (a notebook, an async web handler), and concurrent callers are safe: the loop
+        schedules their batches itself instead of being re-entered from several threads.
+        """
+        return asyncio.run_coroutine_threadsafe(coro, self._event_loop).result()
 
     def dump(self, path: str) -> None:
         dump_path = Path(path)
@@ -315,7 +323,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         # it via GeneratorDumper — load() recreates it from generator_config.
         generator = self.__dict__.pop("_generator", None)
         try:
-            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, dict])
+            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, threading.Thread, dict])
         finally:
             if generator is not None:
                 self._generator = generator

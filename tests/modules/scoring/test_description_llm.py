@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -146,11 +147,30 @@ def test_description_scorer_llm_closes_its_event_loop(dataset: Dataset, patch_ll
     scorer = _fit_llm_scorer(dataset)
     first_loop = scorer._event_loop
 
+    first_thread = scorer._event_loop_thread
+
     scorer.fit([], [], scorer._description_texts)
     assert first_loop.is_closed()
+    assert not first_thread.is_alive()
     assert scorer._event_loop is not first_loop
 
-    second_loop = scorer._event_loop
+    second_loop, second_thread = scorer._event_loop, scorer._event_loop_thread
     scorer.clear_cache()
     assert second_loop.is_closed()
+    assert not second_thread.is_alive()
     assert not hasattr(scorer, "_event_loop")
+
+
+def test_description_scorer_llm_predict_from_several_threads(
+    dataset: Dataset, patch_llm_scorer_generator: Generator
+) -> None:
+    """Concurrent predict() calls share the scorer's loop without re-entering it from several threads."""
+    scorer = _fit_llm_scorer(dataset)
+    utterances = ["What is the balance on my account?", "How do I reset my online banking password?"]
+    expected = scorer.predict(utterances)
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        results = list(executor.map(lambda _: scorer.predict(utterances), range(8)))
+
+    for result in results:
+        np.testing.assert_array_equal(result, expected)
