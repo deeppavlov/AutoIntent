@@ -5,10 +5,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import threading
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import aiometer
 import numpy as np
@@ -23,11 +24,16 @@ from autointent.generation.chat_templates import Message, Role
 from .base import BaseDescriptionScorer
 
 if TYPE_CHECKING:
+    from collections.abc import Coroutine
+
     from numpy.typing import NDArray
 
     from autointent.configs import CrossEncoderConfig, EmbedderConfig
 
 logger = logging.getLogger(__name__)
+
+
+_T = TypeVar("_T")
 
 GENERATOR_CONFIG_FILENAME = "generator_config.json"
 
@@ -249,7 +255,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
                 max_at_once=self.max_concurrent,
                 max_per_second=self.max_per_second,
             )
-            categorizations = self._event_loop.run_until_complete(task)  # type: ignore[arg-type]
+            categorizations = self._run_async(task)  # type: ignore[arg-type]
 
         for i, categorization in enumerate(categorizations):
             if isinstance(categorization, IntentCategorization):
@@ -276,19 +282,38 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         # Generator doesn't have a clear_ram method, so we just set it to None
         if hasattr(self, "_generator"):
             delattr(self, "_generator")
-        if hasattr(self, "_event_loop"):
-            delattr(self, "_event_loop")
+        self._close_event_loop()
 
     def _init_event_loop(self) -> None:
+        # A private loop, never the caller's: the generator's async client keeps its
+        # connections bound to the loop it first ran on, so all batches reuse this one.
+        # The loop runs forever on one dedicated thread, so it is only ever driven from
+        # that thread, whichever thread (sync or async, one or several) submits work.
+        self._close_event_loop()
         if self.max_concurrent is not None:
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-            else:
-                if loop.is_closed():
-                    loop = asyncio.new_event_loop()
-            self._event_loop = loop
+            self._event_loop = asyncio.new_event_loop()
+            self._event_loop_thread = threading.Thread(
+                target=self._event_loop.run_forever, name="LLMDescriptionScorer-loop", daemon=True
+            )
+            self._event_loop_thread.start()
+
+    def _close_event_loop(self) -> None:
+        if hasattr(self, "_event_loop"):
+            if hasattr(self, "_event_loop_thread"):
+                self._event_loop.call_soon_threadsafe(self._event_loop.stop)
+                self._event_loop_thread.join()
+                delattr(self, "_event_loop_thread")
+            self._event_loop.close()
+            delattr(self, "_event_loop")
+
+    def _run_async(self, coro: Coroutine[Any, Any, _T]) -> _T:
+        """Run ``coro`` on the scorer's loop thread and block until it finishes.
+
+        Works the same whether or not the caller is already inside a running event loop
+        (a notebook, an async web handler), and concurrent callers are safe: the loop
+        schedules their batches itself instead of being re-entered from several threads.
+        """
+        return asyncio.run_coroutine_threadsafe(coro, self._event_loop).result()
 
     def dump(self, path: str) -> None:
         dump_path = Path(path)
@@ -298,7 +323,7 @@ class LLMDescriptionScorer(BaseDescriptionScorer):
         # it via GeneratorDumper — load() recreates it from generator_config.
         generator = self.__dict__.pop("_generator", None)
         try:
-            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, dict])
+            Dumper.dump(self, dump_path, exclude=[asyncio.BaseEventLoop, threading.Thread, dict])
         finally:
             if generator is not None:
                 self._generator = generator

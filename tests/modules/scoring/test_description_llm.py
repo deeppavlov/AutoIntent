@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -112,3 +114,63 @@ def test_llm_description_in_pipeline(dataset: Dataset, patch_llm_scorer_generato
     pipeline.fit(dataset)
     predictions = pipeline.predict(["test utterance"])
     assert len(predictions) == 1
+
+
+def _fit_llm_scorer(dataset: Dataset) -> LLMDescriptionScorer:
+    data_handler = DataHandler(dataset)
+    scorer = LLMDescriptionScorer(generator_config={"temperature": 0})
+    labels = data_handler.train_labels(0)
+    assert is_strict_labels(labels)
+    descriptions = data_handler.intent_descriptions
+    assert all(d is not None for d in descriptions)
+    scorer.fit(data_handler.train_utterances(0), labels, cast("list[str]", descriptions))
+    return scorer
+
+
+def test_description_scorer_llm_predict_inside_running_loop(
+    dataset: Dataset, patch_llm_scorer_generator: Generator
+) -> None:
+    """predict() is sync, but must also work when called from async code (notebooks, async servers)."""
+    scorer = _fit_llm_scorer(dataset)
+    utterances = ["What is the balance on my account?", "How do I reset my online banking password?"]
+    expected = scorer.predict(utterances)
+
+    async def predict_from_coroutine() -> npt.NDArray[Any]:
+        return scorer.predict(utterances)
+
+    np.testing.assert_array_equal(asyncio.run(predict_from_coroutine()), expected)
+    # the scorer's loop is still usable from sync code afterwards
+    np.testing.assert_array_equal(scorer.predict(utterances), expected)
+
+
+def test_description_scorer_llm_closes_its_event_loop(dataset: Dataset, patch_llm_scorer_generator: Generator) -> None:
+    scorer = _fit_llm_scorer(dataset)
+    first_loop = scorer._event_loop
+
+    first_thread = scorer._event_loop_thread
+
+    scorer.fit([], [], scorer._description_texts)
+    assert first_loop.is_closed()
+    assert not first_thread.is_alive()
+    assert scorer._event_loop is not first_loop
+
+    second_loop, second_thread = scorer._event_loop, scorer._event_loop_thread
+    scorer.clear_cache()
+    assert second_loop.is_closed()
+    assert not second_thread.is_alive()
+    assert not hasattr(scorer, "_event_loop")
+
+
+def test_description_scorer_llm_predict_from_several_threads(
+    dataset: Dataset, patch_llm_scorer_generator: Generator
+) -> None:
+    """Concurrent predict() calls share the scorer's loop without re-entering it from several threads."""
+    scorer = _fit_llm_scorer(dataset)
+    utterances = ["What is the balance on my account?", "How do I reset my online banking password?"]
+    expected = scorer.predict(utterances)
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        results = list(executor.map(lambda _: scorer.predict(utterances), range(8)))
+
+    for result in results:
+        np.testing.assert_array_equal(result, expected)
